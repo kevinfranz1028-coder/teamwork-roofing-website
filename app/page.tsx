@@ -8,7 +8,7 @@ export default function Home() {
     {
       icon: FiHome,
       title: 'Roofing',
-      description: 'Expert replacement and repair',
+      description: 'Roof Replacement & Repair',
       href: '/services/roof-replacement/'
     },
     {
@@ -110,7 +110,7 @@ export default function Home() {
     },
     {
       question: 'Do you help with insurance claims?',
-      answer: 'Yes, we provide detailed photo documentation and scope information to support your storm damage claim.'
+      answer: 'We provide photo documentation and scope details you can share with your insurer or adjuster. We do not negotiate claims or guarantee outcomes.'
     },
     {
       question: 'What financing options are available?',

@@ -88,7 +88,7 @@ export default function OverlandParkPage() {
     },
     {
       q: 'Can you inspect my roof after hail or wind storms in Overland Park?',
-      a: 'Yes. We offer same-week storm inspections with professional photo documentation and a clear scope of recommended repairs. Book a storm inspection and we will walk you through what we see.',
+      a: 'Yes. We offer same-week storm inspections with professional photo documentation and a clear scope of recommended repairs. Book a storm inspection and we'll walk you through what we see.',
       link: { text: 'storm inspections', href: '/storm/' }
     },
     {

@@ -98,7 +98,14 @@ export default function RoofingCompaniesPage() {
               {checklist.map((item, index) => (
                 <div key={index} className="flex items-start space-x-3">
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-gray-300">{item}</span>
+                  <div>
+                    <span className="text-gray-300">{item}</span>
+                    {item === 'Emergency/urgent service availability' && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        If you need urgent help, see <Link href="/overland-park-ks/emergency-roof-repair/" className="text-teamwork-blue hover:underline">Emergency Roof Repair in Overland Park →</Link>
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

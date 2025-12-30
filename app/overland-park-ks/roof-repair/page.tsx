@@ -21,16 +21,18 @@ export default function OverlandParkRoofRepairPage() {
   ]
 
   const neighborhoods = [
-    'Blue Valley',
-    'Downtown OP',
-    'South Overland Park',
-    'Nottingham',
-    'Stanley',
-    'Indian Creek',
-    'Deer Creek',
-    'Corporate Woods',
+    'Downtown Overland Park',
+    'Old Overland Park',
+    'Nottingham by the Green',
     'Nall Hills',
-    'Tomahawk Creek'
+    'Stanley',
+    'Cherokee Hills',
+    'Maple Crest',
+    'Wilshire by the Lake',
+    'Deer Creek',
+    'LionsGate',
+    'Red Fox',
+    'Indian Creek'
   ]
 
   const timeline = [

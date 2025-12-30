@@ -82,6 +82,9 @@ export default function EmergencyRoofRepairPage() {
                 <span className="text-gray-300">Call or text us immediately: 913-396-3717</span>
               </li>
             </ol>
+            <p className="text-gray-400 text-sm text-center mt-6">
+              Need non-emergency help? <Link href="/overland-park-ks/roof-repair/" className="text-teamwork-blue hover:underline">See Roof Repair in Overland Park →</Link>
+            </p>
           </div>
         </div>
       </section>
