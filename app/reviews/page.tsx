@@ -34,7 +34,7 @@ export default function ReviewsPage() {
       city: 'Shawnee',
       rating: 5,
       date: '2 months ago',
-      text: 'They replaced our roof and it was a flawless experience. Clean site guarantee is real — you'd never know they were here except for the beautiful new roof.'
+      text: 'They replaced our roof and it was a flawless experience. Clean site guarantee is real — you would never know they were here except for the beautiful new roof.'
     },
     {
       name: 'Lisa P.',
