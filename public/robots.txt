@@ -1,0 +1,6 @@
+# Robots.txt for Teamwork Roofing Services
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://teamworkroofing.com/sitemap.xml
