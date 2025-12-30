@@ -48,7 +48,7 @@ export default function ReviewsPage() {
       city: 'Prairie Village',
       rating: 5,
       date: '3 months ago',
-      text: 'Repaired our roof leak fast. Honest assessment, fair price, and they actually showed us photos of the problem and the fix. That's real partnership.'
+      text: 'Repaired our roof leak fast. Honest assessment, fair price, and they actually showed us photos of the problem and the fix. That is real partnership.'
     },
     {
       name: 'Amanda S.',
