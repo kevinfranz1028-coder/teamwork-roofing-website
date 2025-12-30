@@ -62,7 +62,7 @@ export default function ReviewsPage() {
       city: 'Gardner',
       rating: 5,
       date: '1 month ago',
-      text: 'Best roofing company we've worked with. Photo proof inspection gave us confidence, and the warranty backing shows they stand behind their work.'
+      text: 'Best roofing company we have worked with. Photo proof inspection gave us confidence, and the warranty backing shows they stand behind their work.'
     },
     {
       name: 'Michelle W.',
