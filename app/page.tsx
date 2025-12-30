@@ -133,8 +133,14 @@ export default function Home() {
                 Roofing & Exteriors — Done{' '}
                 <span className="text-teamwork-blue">The Teamwork Way</span>
               </h1>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-xl text-gray-300 mb-4">
                 A partnership from day one. Same-week inspections, photo documentation, and clean site practices across Kansas City Metro.
+              </p>
+
+              <p className="text-sm text-gray-400 mb-8">
+                <Link href="/overland-park-ks/" className="hover:text-teamwork-blue hover:underline transition-colors">
+                  Explore Overland Park service area →
+                </Link>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">

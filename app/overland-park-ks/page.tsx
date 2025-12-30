@@ -240,6 +240,17 @@ export default function OverlandParkPage() {
 
       <NeighborhoodsSection city="Overland Park" neighborhoods={neighborhoods} />
 
+      {/* Metro Coverage Link */}
+      <section className="py-6 bg-dark-bg">
+        <div className="container-custom">
+          <p className="text-sm text-gray-400 text-center">
+            <Link href="/" className="hover:text-teamwork-blue hover:underline transition-colors">
+              Serving more than Overland Park? View Kansas City Metro coverage →
+            </Link>
+          </p>
+        </div>
+      </section>
+
       {/* Reviews */}
       <section className="section-padding bg-dark-surface">
         <div className="container-custom">

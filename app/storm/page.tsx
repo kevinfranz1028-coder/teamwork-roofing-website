@@ -17,8 +17,13 @@ export default function StormPage() {
             <h1 className="heading-1 mb-6">
               Storm Damage? <span className="text-teamwork-blue">Start With Teamwork</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-gray-400 mb-4">
               Full exterior storm assessment with professional photo documentation you can share with your insurer and adjuster.
+            </p>
+            <p className="text-sm text-gray-400 mb-8">
+              <Link href="/overland-park-ks/" className="hover:text-teamwork-blue hover:underline transition-colors">
+                Storm inspection in Overland Park? Start here →
+              </Link>
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/book/" className="btn-primary">Book Storm Inspection</Link>

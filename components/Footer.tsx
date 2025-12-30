@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="bg-dark-surface border-t border-dark-border">
       <div className="container-custom section-padding">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Company Info */}
           <div>
             <h3 className="text-xl font-bold mb-4">
@@ -129,10 +129,41 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
+          </div>
+
+          {/* Service Areas */}
+          <div>
+            <h4 className="font-semibold mb-4">Service Areas</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/overland-park-ks/" className="text-gray-400 hover:text-teamwork-blue transition-colors">
+                  Overland Park, KS
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/overland-park-ks/roof-repair/" className="text-gray-400 text-sm hover:text-teamwork-blue transition-colors">
+                  Roof Repair
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/overland-park-ks/emergency-roof-repair/" className="text-gray-400 text-sm hover:text-teamwork-blue transition-colors">
+                  Emergency Repair
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/overland-park-ks/roofing-contractor/" className="text-gray-400 text-sm hover:text-teamwork-blue transition-colors">
+                  Roofing Contractor
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/overland-park-ks/roofing-companies/" className="text-gray-400 text-sm hover:text-teamwork-blue transition-colors">
+                  Choosing a Company
+                </Link>
+              </li>
+            </ul>
             <div className="mt-6">
-              <p className="text-sm text-gray-400 mb-2">Service Area:</p>
-              <p className="text-sm text-gray-500">
-                Kansas City Metro — KCK, KCMO, Johnson County, Wyandotte, Jackson, and nearby areas
+              <p className="text-xs text-gray-500">
+                Also serving Kansas City Metro — KCK, KCMO, Johnson County, and nearby areas
               </p>
             </div>
           </div>

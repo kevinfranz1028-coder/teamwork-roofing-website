@@ -35,8 +35,13 @@ export default function RoofRepairPage() {
             <h1 className="heading-1 mb-6">
               Roof Repair — <span className="text-teamwork-blue">Fast, Clean, Photo-Documented</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-gray-400 mb-4">
               Same-week service for Kansas City Metro. Honest guidance on repair vs replace.
+            </p>
+            <p className="text-sm text-gray-400 mb-8">
+              <Link href="/overland-park-ks/roof-repair/" className="hover:text-teamwork-blue hover:underline transition-colors">
+                Need roof repair in Overland Park? See local options →
+              </Link>
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="tel:9133963717" className="btn-primary">
