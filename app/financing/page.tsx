@@ -10,12 +10,12 @@ export const metadata = {
 export default function FinancingPage() {
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-16 max-w-3xl mx-auto">
             <FiDollarSign className="w-16 h-16 text-teamwork-blue mx-auto mb-6" />
             <h1 className="heading-1 mb-6">Teamwork Financing Options</h1>
-            <p className="text-xl text-gray-400">
+            <p className="text-xl text-text-secondary">
               Flexible payment plans to make your roofing and exterior projects affordable
             </p>
           </div>
@@ -28,25 +28,25 @@ export default function FinancingPage() {
                   <div className="w-8 h-8 rounded-full bg-teamwork-blue/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-teamwork-blue font-bold text-sm">1</span>
                   </div>
-                  <p className="text-gray-400 text-sm">Book your same-week inspection</p>
+                  <p className="text-text-secondary text-sm">Book your same-week inspection</p>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-8 h-8 rounded-full bg-teamwork-blue/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-teamwork-blue font-bold text-sm">2</span>
                   </div>
-                  <p className="text-gray-400 text-sm">Receive your project estimate</p>
+                  <p className="text-text-secondary text-sm">Receive your project estimate</p>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-8 h-8 rounded-full bg-teamwork-blue/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-teamwork-blue font-bold text-sm">3</span>
                   </div>
-                  <p className="text-gray-400 text-sm">Review financing options with us</p>
+                  <p className="text-text-secondary text-sm">Review financing options with us</p>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-8 h-8 rounded-full bg-teamwork-blue/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-teamwork-blue font-bold text-sm">4</span>
                   </div>
-                  <p className="text-gray-400 text-sm">Choose the plan that fits your budget</p>
+                  <p className="text-text-secondary text-sm">Choose the plan that fits your budget</p>
                 </div>
               </div>
             </div>
@@ -86,15 +86,15 @@ export default function FinancingPage() {
               <div className="space-y-4 text-left">
                 <div>
                   <p className="font-semibold text-sm mb-1">Do I need good credit?</p>
-                  <p className="text-gray-400 text-sm">Multiple options available for various credit profiles</p>
+                  <p className="text-text-secondary text-sm">Multiple options available for various credit profiles</p>
                 </div>
                 <div>
                   <p className="font-semibold text-sm mb-1">How fast is approval?</p>
-                  <p className="text-gray-400 text-sm">Often same-day or next-day decisions</p>
+                  <p className="text-text-secondary text-sm">Often same-day or next-day decisions</p>
                 </div>
                 <div>
                   <p className="font-semibold text-sm mb-1">Are there fees?</p>
-                  <p className="text-gray-400 text-sm">We'll explain all terms upfront — no surprises</p>
+                  <p className="text-text-secondary text-sm">We'll explain all terms upfront — no surprises</p>
                 </div>
               </div>
             </div>

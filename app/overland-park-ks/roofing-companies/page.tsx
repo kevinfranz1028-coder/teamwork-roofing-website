@@ -60,25 +60,25 @@ export default function RoofingCompaniesPage() {
 
   return (
     <>
-      <div className="bg-dark-surface border-b border-dark-border">
+      <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <div className="flex items-center space-x-2 text-sm text-text-muted">
             <Link href="/" className="hover:text-teamwork-blue">Home</Link>
             <span>/</span>
             <Link href="/overland-park-ks/" className="hover:text-teamwork-blue">Overland Park</Link>
             <span>/</span>
-            <span className="text-gray-300">Roofing Companies Guide</span>
+            <span className="text-text-secondary">Roofing Companies Guide</span>
           </div>
         </div>
       </div>
 
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto">
             <h1 className="heading-1 mb-6">
               How to Choose a Roofing Company in <span className="text-teamwork-blue">Overland Park</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               Your roof is a major investment. Use this checklist to make an informed decision and avoid common pitfalls when hiring a roofing company in Overland Park.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -89,19 +89,19 @@ export default function RoofingCompaniesPage() {
         </div>
       </section>
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Overland Park Roofing Company Checklist</h2>
           <div className="max-w-3xl mx-auto">
-            <p className="text-gray-400 mb-8 text-center">Look for these when choosing a roofing contractor:</p>
+            <p className="text-text-secondary mb-8 text-center">Look for these when choosing a roofing contractor:</p>
             <div className="grid md:grid-cols-2 gap-4">
               {checklist.map((item, index) => (
                 <div key={index} className="flex items-start space-x-3">
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
                   <div>
-                    <span className="text-gray-300">{item}</span>
+                    <span className="text-text-secondary">{item}</span>
                     {item === 'Emergency/urgent service availability' && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-text-muted mt-1">
                         If you need urgent help, see <Link href="/overland-park-ks/emergency-roof-repair/" className="text-teamwork-blue hover:underline">Emergency Roof Repair in Overland Park →</Link>
                       </p>
                     )}
@@ -113,20 +113,20 @@ export default function RoofingCompaniesPage() {
         </div>
       </section>
 
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Questions to Ask Before Signing</h2>
           <div className="max-w-3xl mx-auto space-y-3">
             {questions.map((question, index) => (
               <div key={index} className="card">
-                <p className="font-semibold text-gray-200">{index + 1}. {question}</p>
+                <p className="font-semibold text-text-primary">{index + 1}. {question}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Red Flags to Avoid</h2>
           <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
@@ -136,14 +136,14 @@ export default function RoofingCompaniesPage() {
                   <FiX className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
                   <h4 className="font-semibold text-red-400">{item.flag}</h4>
                 </div>
-                <p className="text-sm text-gray-400 ml-8">{item.why}</p>
+                <p className="text-sm text-text-secondary ml-8">{item.why}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">How Teamwork Matches the Checklist</h2>
           <div className="max-w-3xl mx-auto space-y-4">
@@ -153,7 +153,7 @@ export default function RoofingCompaniesPage() {
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold mb-1">{item.promise}</h4>
-                    <p className="text-sm text-gray-400">{item.match}</p>
+                    <p className="text-sm text-text-secondary">{item.match}</p>
                   </div>
                 </div>
               </div>
@@ -164,23 +164,23 @@ export default function RoofingCompaniesPage() {
 
       <LocalProjectsSection city="Overland Park" />
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto bg-yellow-500/5 border-yellow-500">
             <div className="flex items-start space-x-3 mb-4">
               <FiAlertTriangle className="w-6 h-6 text-yellow-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="heading-4 mb-2">Final Tip: Trust Your Gut</h3>
-                <p className="text-gray-400 mb-3">
+                <p className="text-text-secondary mb-3">
                   Beyond checklists and questions, pay attention to how a roofing company makes you feel.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-400">
+                <ul className="space-y-2 text-sm text-text-secondary">
                   <li>Do they listen to your concerns?</li>
                   <li>Do they answer questions clearly?</li>
                   <li>Do they respect your timeline?</li>
                   <li>Do they seem trustworthy?</li>
                 </ul>
-                <p className="text-gray-400 mt-3">
+                <p className="text-text-secondary mt-3">
                   At Teamwork, we believe the relationship matters as much as the roof itself.
                 </p>
               </div>

@@ -12,16 +12,16 @@ export const metadata = {
 export default function StormPage() {
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
               Storm Damage? <span className="text-teamwork-blue">Start With Teamwork</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-4">
+            <p className="text-xl text-text-secondary mb-4">
               Full exterior storm assessment with professional photo documentation you can share with your insurer and adjuster.
             </p>
-            <p className="text-sm text-gray-400 mb-8">
+            <p className="text-sm text-text-secondary mb-8">
               <Link href="/overland-park-ks/" className="hover:text-teamwork-blue hover:underline transition-colors">
                 Storm inspection in Overland Park? Start here →
               </Link>
@@ -36,34 +36,34 @@ export default function StormPage() {
 
       <PromiseStrip />
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Full Exterior Storm Check</h2>
-          <p className="text-xl text-gray-400 text-center mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-text-secondary text-center mb-8 max-w-3xl mx-auto">
             We inspect every exterior surface storms commonly impact — so nothing gets missed.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
             <div className="card text-center">
               <h4 className="font-semibold mb-2">Roof</h4>
-              <p className="text-sm text-gray-400">Shingle damage, missing granules, impact marks</p>
+              <p className="text-sm text-text-secondary">Shingle damage, missing granules, impact marks</p>
             </div>
             <div className="card text-center">
               <h4 className="font-semibold mb-2">Gutters</h4>
-              <p className="text-sm text-gray-400">Dents, detachment, downspout damage</p>
+              <p className="text-sm text-text-secondary">Dents, detachment, downspout damage</p>
             </div>
             <div className="card text-center">
               <h4 className="font-semibold mb-2">Siding</h4>
-              <p className="text-sm text-gray-400">Cracks, holes, hail impact, wind damage</p>
+              <p className="text-sm text-text-secondary">Cracks, holes, hail impact, wind damage</p>
             </div>
             <div className="card text-center">
               <h4 className="font-semibold mb-2">Windows</h4>
-              <p className="text-sm text-gray-400">Broken glass, frame damage, seal failure</p>
+              <p className="text-sm text-text-secondary">Broken glass, frame damage, seal failure</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Photo Documentation</h2>
           <div className="card max-w-3xl mx-auto">
@@ -72,24 +72,24 @@ export default function StormPage() {
             <ul className="space-y-3 mb-6">
               <li className="flex items-start space-x-3">
                 <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                <span className="text-gray-300">Detailed photos of visible exterior damage and affected areas</span>
+                <span className="text-text-secondary">Detailed photos of visible exterior damage and affected areas</span>
               </li>
               <li className="flex items-start space-x-3">
                 <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                <span className="text-gray-300">A written scope of observed damage and recommended repairs</span>
+                <span className="text-text-secondary">A written scope of observed damage and recommended repairs</span>
               </li>
               <li className="flex items-start space-x-3">
                 <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                <span className="text-gray-300">A repair estimate for your records and to share with your insurer/adjuster</span>
+                <span className="text-text-secondary">A repair estimate for your records and to share with your insurer/adjuster</span>
               </li>
               <li className="flex items-start space-x-3">
                 <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                <span className="text-gray-300">On-site availability during the adjuster visit (at your request) to answer construction questions about materials, code-related items, and repair methods</span>
+                <span className="text-text-secondary">On-site availability during the adjuster visit (at your request) to answer construction questions about materials, code-related items, and repair methods</span>
               </li>
             </ul>
-            <div className="bg-dark-bg border border-dark-border rounded-lg p-4">
-              <p className="text-sm text-gray-400 font-semibold mb-2">Important (Kansas + Missouri):</p>
-              <p className="text-sm text-gray-500">
+            <div className="bg-light-bg border border-light-border rounded-lg p-4">
+              <p className="text-sm text-text-secondary font-semibold mb-2">Important (Kansas + Missouri):</p>
+              <p className="text-sm text-text-muted">
                 We provide inspection documentation and repair estimates. We are not public adjusters, do not negotiate or settle claims, and do not interpret policy coverage or guarantee claim outcomes.
               </p>
             </div>
@@ -97,7 +97,7 @@ export default function StormPage() {
         </div>
       </section>
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">What To Do Now</h2>
           <div className="max-w-3xl mx-auto space-y-4">
@@ -114,7 +114,7 @@ export default function StormPage() {
                   <span className="text-teamwork-blue font-bold">{index + 1}</span>
                 </div>
                 <div className="flex items-center h-10">
-                  <p className="text-gray-300">{step}</p>
+                  <p className="text-text-secondary">{step}</p>
                 </div>
               </div>
             ))}

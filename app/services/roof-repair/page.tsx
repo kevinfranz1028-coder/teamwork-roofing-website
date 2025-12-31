@@ -30,16 +30,16 @@ export default function RoofRepairPage() {
 
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
               Roof Repair — <span className="text-teamwork-blue">Fast, Clean, Photo-Documented</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-4">
+            <p className="text-xl text-text-secondary mb-4">
               Same-week service for Kansas City Metro. Honest guidance on repair vs replace.
             </p>
-            <p className="text-sm text-gray-400 mb-8">
+            <p className="text-sm text-text-secondary mb-8">
               <Link href="/overland-park-ks/roof-repair/" className="hover:text-teamwork-blue hover:underline transition-colors">
                 Need roof repair in Overland Park? See local options →
               </Link>
@@ -63,35 +63,35 @@ export default function RoofRepairPage() {
 
       <PromiseStrip />
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Common Issues We Fix</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {commonIssues.map((issue, index) => (
               <div key={index} className="flex items-start space-x-3">
                 <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                <span className="text-gray-300">{issue}</span>
+                <span className="text-text-secondary">{issue}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto">
             <h2 className="heading-3 mb-4">Repair vs Replace: We'll Be Honest</h2>
-            <p className="text-gray-400 mb-4">
+            <p className="text-text-secondary mb-4">
               Sometimes repair makes sense. Sometimes replacement is smarter. We'll show you the photos, explain your options, and let you decide.
             </p>
-            <p className="text-gray-400">
+            <p className="text-text-secondary">
               If your roof has years of life left, we'll repair it right. If it's near the end, we'll explain why replacement saves you money long-term.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Our Repair Process</h2>
           <div className="max-w-3xl mx-auto space-y-4">
@@ -101,7 +101,7 @@ export default function RoofRepairPage() {
                   <span className="text-teamwork-blue font-bold">{index + 1}</span>
                 </div>
                 <div className="flex items-center h-10">
-                  <p className="text-gray-300">{step}</p>
+                  <p className="text-text-secondary">{step}</p>
                 </div>
               </div>
             ))}

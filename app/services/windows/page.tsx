@@ -11,13 +11,13 @@ export const metadata = {
 export default function WindowsPage() {
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
               Windows — <span className="text-teamwork-blue">Comfort & Efficiency</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               Energy-efficient window replacement for comfort, lower energy bills, and improved curb appeal.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -30,13 +30,13 @@ export default function WindowsPage() {
 
       <PromiseStrip />
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Why Replace Windows</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="card text-center"><h3 className="heading-4 mb-2">Lower Energy Bills</h3><p className="text-gray-400">Modern windows reduce heating and cooling costs</p></div>
-            <div className="card text-center"><h3 className="heading-4 mb-2">Increased Comfort</h3><p className="text-gray-400">Better insulation, less drafts, quieter home</p></div>
-            <div className="card text-center"><h3 className="heading-4 mb-2">Enhanced Value</h3><p className="text-gray-400">Improve curb appeal and home value</p></div>
+            <div className="card text-center"><h3 className="heading-4 mb-2">Lower Energy Bills</h3><p className="text-text-secondary">Modern windows reduce heating and cooling costs</p></div>
+            <div className="card text-center"><h3 className="heading-4 mb-2">Increased Comfort</h3><p className="text-text-secondary">Better insulation, less drafts, quieter home</p></div>
+            <div className="card text-center"><h3 className="heading-4 mb-2">Enhanced Value</h3><p className="text-text-secondary">Improve curb appeal and home value</p></div>
           </div>
         </div>
       </section>

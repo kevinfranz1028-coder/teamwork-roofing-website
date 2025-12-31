@@ -26,13 +26,13 @@ export default function ContactPage() {
 
   if (submitted) {
     return (
-      <section className="section-padding bg-dark-bg min-h-screen flex items-center justify-center">
+      <section className="section-padding bg-light-bg min-h-screen flex items-center justify-center">
         <div className="card max-w-2xl text-center">
           <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
             <FiCheckCircle className="w-10 h-10 text-green-500" />
           </div>
           <h1 className="heading-2 mb-4">Message Sent!</h1>
-          <p className="text-xl text-gray-400">
+          <p className="text-xl text-text-secondary">
             Thank you for contacting Teamwork Roofing. We'll respond within 24 hours.
           </p>
         </div>
@@ -42,11 +42,11 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h1 className="heading-1 mb-6">Contact Us</h1>
-            <p className="text-xl text-gray-400">
+            <p className="text-xl text-text-secondary">
               Call, text, or send us a message — we're here to help
             </p>
           </div>
@@ -90,17 +90,17 @@ export default function ContactPage() {
                 <div className="flex items-start space-x-3 mb-4">
                   <FiMapPin className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
                   <div>
-                    <p className="text-gray-300 mb-2">Kansas City Metro</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-text-secondary mb-2">Kansas City Metro</p>
+                    <p className="text-sm text-text-muted">
                       KCK, KCMO, Johnson County, Wyandotte County, Jackson County, and nearby areas in Kansas and Missouri
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="card bg-dark-surface">
+              <div className="card bg-white">
                 <h3 className="heading-4 mb-4">What to Expect</h3>
-                <ul className="space-y-3 text-sm text-gray-400">
+                <ul className="space-y-3 text-sm text-text-secondary">
                   <li className="flex items-start space-x-2">
                     <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
                     <span>Response within 24 hours</span>
@@ -129,7 +129,7 @@ export default function ContactPage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     required
                   />
                 </div>
@@ -142,7 +142,7 @@ export default function ContactPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     required
                   />
                 </div>
@@ -153,7 +153,7 @@ export default function ContactPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                   />
                 </div>
 
@@ -162,7 +162,7 @@ export default function ContactPage() {
                   <select
                     value={formData.service}
                     onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                   >
                     <option value="">Select a service</option>
                     <option value="roof-replacement">Roof Replacement</option>
@@ -183,7 +183,7 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     rows={5}
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     required
                   />
                 </div>
@@ -192,7 +192,7 @@ export default function ContactPage() {
                   Send Message
                 </button>
 
-                <p className="text-xs text-gray-500 text-center">
+                <p className="text-xs text-text-muted text-center">
                   By submitting, you agree to receive calls/texts from Teamwork Roofing Services.
                 </p>
               </form>

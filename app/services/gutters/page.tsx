@@ -12,13 +12,13 @@ export const metadata = {
 export default function GuttersPage() {
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
               Gutters — <span className="text-teamwork-blue">Seamless, Guards, Repair</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               Protect your home with professional gutter services. Seamless installation, guard options, and expert repairs.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -31,14 +31,14 @@ export default function GuttersPage() {
 
       <PromiseStrip />
 
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Our Gutter Services</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="card">
               <h3 className="heading-4 mb-3">Seamless Installation</h3>
-              <p className="text-gray-400 mb-4">Custom-fit gutters with no leaky seams. Multiple colors available.</p>
-              <ul className="space-y-2 text-sm text-gray-500">
+              <p className="text-text-secondary mb-4">Custom-fit gutters with no leaky seams. Multiple colors available.</p>
+              <ul className="space-y-2 text-sm text-text-muted">
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />5" & 6" sizes</li>
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />Color matching</li>
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />Proper pitch</li>
@@ -47,8 +47,8 @@ export default function GuttersPage() {
 
             <div className="card">
               <h3 className="heading-4 mb-3">Gutter Guards</h3>
-              <p className="text-gray-400 mb-4">Keep debris out, reduce maintenance, protect your investment.</p>
-              <ul className="space-y-2 text-sm text-gray-500">
+              <p className="text-text-secondary mb-4">Keep debris out, reduce maintenance, protect your investment.</p>
+              <ul className="space-y-2 text-sm text-text-muted">
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />Mesh guards</li>
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />Screen options</li>
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />Easy maintenance</li>
@@ -57,8 +57,8 @@ export default function GuttersPage() {
 
             <div className="card">
               <h3 className="heading-4 mb-3">Repair</h3>
-              <p className="text-gray-400 mb-4">Fix sagging, leaks, and damage fast with our same-week service.</p>
-              <ul className="space-y-2 text-sm text-gray-500">
+              <p className="text-text-secondary mb-4">Fix sagging, leaks, and damage fast with our same-week service.</p>
+              <ul className="space-y-2 text-sm text-text-muted">
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />Leak sealing</li>
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />Re-hanging</li>
                 <li className="flex items-center"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mr-2" />Downspout fixes</li>
@@ -68,14 +68,14 @@ export default function GuttersPage() {
         </div>
       </section>
 
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Signs of Failing Gutters</h2>
           <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {['Water pooling near foundation', 'Sagging or pulling away', 'Overflow during rain', 'Rust or holes', 'Peeling paint on gutters', 'Basement water issues'].map((sign, index) => (
               <div key={index} className="flex items-start space-x-3">
                 <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                <span className="text-gray-300">{sign}</span>
+                <span className="text-text-secondary">{sign}</span>
               </div>
             ))}
           </div>

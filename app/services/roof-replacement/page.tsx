@@ -80,13 +80,13 @@ export default function RoofReplacementPage() {
   return (
     <>
       {/* Hero */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
               Roof Replacement — <span className="text-teamwork-blue">The Teamwork Way</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               Premium materials, expert installation, photo documentation, and financing options for Kansas City Metro homeowners
             </p>
             <div className="flex flex-wrap gap-4">
@@ -104,14 +104,14 @@ export default function RoofReplacementPage() {
       <PromiseStrip />
 
       {/* Signs You Need Replacement */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Signs You Need Roof Replacement</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {signs.map((sign, index) => (
               <div key={index} className="flex items-start space-x-3">
                 <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                <span className="text-gray-300">{sign}</span>
+                <span className="text-text-secondary">{sign}</span>
               </div>
             ))}
           </div>
@@ -119,21 +119,21 @@ export default function RoofReplacementPage() {
       </section>
 
       {/* Material Tiers */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-4 text-center">Good, Better, Best</h2>
-          <p className="text-xl text-gray-400 text-center mb-12">Choose the option that fits your needs</p>
+          <p className="text-xl text-text-secondary text-center mb-12">Choose the option that fits your needs</p>
 
           <div className="grid md:grid-cols-3 gap-8">
             {tiers.map((tier, index) => (
               <div key={index} className="card">
                 <h3 className="heading-3 mb-2">{tier.name}</h3>
-                <p className="text-gray-400 mb-6">{tier.description}</p>
+                <p className="text-text-secondary mb-6">{tier.description}</p>
                 <ul className="space-y-3">
                   {tier.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start space-x-2">
                       <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-300">{feature}</span>
+                      <span className="text-sm text-text-secondary">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -144,7 +144,7 @@ export default function RoofReplacementPage() {
       </section>
 
       {/* Process */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">The Teamwork Process</h2>
           <div className="max-w-3xl mx-auto space-y-6">
@@ -155,7 +155,7 @@ export default function RoofReplacementPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">{step.title}</h4>
-                  <p className="text-gray-400 text-sm">{step.description}</p>
+                  <p className="text-text-secondary text-sm">{step.description}</p>
                 </div>
               </div>
             ))}
@@ -164,17 +164,17 @@ export default function RoofReplacementPage() {
       </section>
 
       {/* Pricing Factors */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-4 text-center">What Affects Pricing</h2>
-          <p className="text-xl text-gray-400 text-center mb-12">
+          <p className="text-xl text-text-secondary text-center mb-12">
             Every roof is different — here's what we consider
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {pricingFactors.map((factor, index) => (
               <div key={index} className="card text-center">
-                <p className="text-gray-300">{factor}</p>
+                <p className="text-text-secondary">{factor}</p>
               </div>
             ))}
           </div>
@@ -182,12 +182,12 @@ export default function RoofReplacementPage() {
       </section>
 
       {/* Financing Teaser */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto text-center">
             <FiDollarSign className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
             <h2 className="heading-3 mb-4">Teamwork Financing Available</h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-text-secondary mb-6">
               Flexible payment options to make your roof replacement affordable
             </p>
             <Link href="/financing/" className="btn-primary">
@@ -201,14 +201,14 @@ export default function RoofReplacementPage() {
       <BrandsWeInstall variant="compact" />
 
       {/* FAQ */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Roof Replacement FAQ</h2>
           <div className="max-w-3xl mx-auto space-y-4">
             {faqs.map((faq, index) => (
               <div key={index} className="card">
                 <h4 className="font-semibold mb-2">{faq.q}</h4>
-                <p className="text-gray-400 text-sm">{faq.a}</p>
+                <p className="text-text-secondary text-sm">{faq.a}</p>
               </div>
             ))}
           </div>

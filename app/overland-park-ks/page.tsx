@@ -145,13 +145,13 @@ export default function OverlandParkPage() {
       />
 
       {/* Hero */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
               Roofing & Exteriors in <span className="text-teamwork-blue">Overland Park, KS</span> — Done The Teamwork Way
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               A partnership from day one. Teamwork is a local roofing company in Overland Park, KS providing roof repair, roof replacement, and storm inspections—backed by photo-proof documentation, clean site practices, flexible financing, and a Teamwork Warranty.
             </p>
 
@@ -164,19 +164,19 @@ export default function OverlandParkPage() {
               </Link>
             </div>
 
-            <p className="text-sm text-gray-400 mb-6 text-center">
+            <p className="text-sm text-text-secondary mb-6 text-center">
               Looking for a roofer in Overland Park? Start with a same-week inspection.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-              <span className="px-3 py-1 bg-dark-surface border border-dark-border rounded-full text-xs text-gray-400">Licensed & Insured</span>
-              <span className="px-3 py-1 bg-dark-surface border border-dark-border rounded-full text-xs text-gray-400">Photo-Proof Inspection</span>
-              <span className="px-3 py-1 bg-dark-surface border border-dark-border rounded-full text-xs text-gray-400">Clean Site Guarantee</span>
-              <span className="px-3 py-1 bg-dark-surface border border-dark-border rounded-full text-xs text-gray-400">Same-Week Inspections</span>
-              <span className="px-3 py-1 bg-dark-surface border border-dark-border rounded-full text-xs text-gray-400">Financing Options</span>
+              <span className="px-3 py-1 bg-white border border-light-border rounded-full text-xs text-text-secondary">Licensed & Insured</span>
+              <span className="px-3 py-1 bg-white border border-light-border rounded-full text-xs text-text-secondary">Photo-Proof Inspection</span>
+              <span className="px-3 py-1 bg-white border border-light-border rounded-full text-xs text-text-secondary">Clean Site Guarantee</span>
+              <span className="px-3 py-1 bg-white border border-light-border rounded-full text-xs text-text-secondary">Same-Week Inspections</span>
+              <span className="px-3 py-1 bg-white border border-light-border rounded-full text-xs text-text-secondary">Financing Options</span>
             </div>
 
-            <div className="flex items-center justify-center gap-6 text-gray-400">
+            <div className="flex items-center justify-center gap-6 text-text-secondary">
               <a href="tel:9133963717" className="hover:text-teamwork-blue transition-colors">
                 <FiCheckCircle className="inline w-5 h-5 mr-2" />
                 Call: 913-396-3717
@@ -190,10 +190,10 @@ export default function OverlandParkPage() {
       </section>
 
       {/* Service Tiles */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-4 text-center">Our Services in Overland Park</h2>
-          <p className="text-gray-400 text-center mb-12 max-w-3xl mx-auto">
+          <p className="text-text-secondary text-center mb-12 max-w-3xl mx-auto">
             Roof repair, roof replacement, and exterior upgrades—done with clear communication, clean job sites, and photo documentation.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -219,10 +219,10 @@ export default function OverlandParkPage() {
       <LocalProjectsSection city="Overland Park" />
 
       {/* The Teamwork Process */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-4 text-center">The Teamwork Process</h2>
-          <p className="text-xl text-gray-400 text-center mb-12">Five steps, five promises</p>
+          <p className="text-xl text-text-secondary text-center mb-12">Five steps, five promises</p>
 
           <div className="grid md:grid-cols-5 gap-6">
             {processSteps.map((step, index) => (
@@ -231,7 +231,7 @@ export default function OverlandParkPage() {
                   <span className="text-2xl font-bold text-teamwork-blue">{step.number}</span>
                 </div>
                 <h4 className="font-semibold mb-2">{step.title}</h4>
-                <p className="text-sm text-gray-400">{step.description}</p>
+                <p className="text-sm text-text-secondary">{step.description}</p>
               </div>
             ))}
           </div>
@@ -241,9 +241,9 @@ export default function OverlandParkPage() {
       <NeighborhoodsSection city="Overland Park" neighborhoods={neighborhoods} />
 
       {/* Metro Coverage Link */}
-      <section className="py-6 bg-dark-bg">
+      <section className="py-6 bg-light-bg">
         <div className="container-custom">
-          <p className="text-sm text-gray-400 text-center">
+          <p className="text-sm text-text-secondary text-center">
             <Link href="/" className="hover:text-teamwork-blue hover:underline transition-colors">
               Serving more than Overland Park? View Kansas City Metro coverage →
             </Link>
@@ -252,7 +252,7 @@ export default function OverlandParkPage() {
       </section>
 
       {/* Reviews */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">What Overland Park Customers Say</h2>
 
@@ -264,10 +264,10 @@ export default function OverlandParkPage() {
                     <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-4">{review.text}</p>
-                <div className="border-t border-dark-border pt-4">
+                <p className="text-text-secondary mb-4">{review.text}</p>
+                <div className="border-t border-light-border pt-4">
                   <p className="font-semibold">{review.name}</p>
-                  <p className="text-sm text-gray-400">{review.city}, KS</p>
+                  <p className="text-sm text-text-secondary">{review.city}, KS</p>
                 </div>
               </div>
             ))}
@@ -282,7 +282,7 @@ export default function OverlandParkPage() {
       </section>
 
       {/* FAQ */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Overland Park Roofing FAQ</h2>
 
@@ -290,7 +290,7 @@ export default function OverlandParkPage() {
             {faqs.map((faq, index) => (
               <div key={index} className="card">
                 <h4 className="font-semibold mb-2">{faq.q}</h4>
-                <p className="text-gray-400 text-sm">
+                <p className="text-text-secondary text-sm">
                   {faq.link ? (
                     <>
                       {faq.a.split(faq.link.text)[0]}

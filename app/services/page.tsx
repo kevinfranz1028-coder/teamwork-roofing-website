@@ -49,11 +49,11 @@ export default function ServicesPage() {
 
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-16">
             <h1 className="heading-1 mb-6">Exterior Services Built on Teamwork</h1>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               From roofing to windows, every service backed by our five promises: warranty, same-week inspection, clean sites, photo documentation, and flexible financing
             </p>
           </div>
@@ -69,10 +69,10 @@ export default function ServicesPage() {
                 >
                   <Icon className="w-12 h-12 text-teamwork-blue mb-4 group-hover:scale-110 transition-transform" />
                   <h3 className="heading-4 mb-3">{service.title}</h3>
-                  <p className="text-gray-400 mb-4">{service.description}</p>
+                  <p className="text-text-secondary mb-4">{service.description}</p>
                   <ul className="space-y-2">
                     {service.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-500">
+                      <li key={idx} className="flex items-center text-sm text-text-muted">
                         <span className="w-1.5 h-1.5 bg-teamwork-blue rounded-full mr-2"></span>
                         {feature}
                       </li>
@@ -88,17 +88,17 @@ export default function ServicesPage() {
       <PromiseStrip />
 
       {/* Which Service Fits You */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="heading-2 mb-4">Which Service Fits You?</h2>
-            <p className="text-xl text-gray-400">Let us help you figure out what you need</p>
+            <p className="text-xl text-text-secondary">Let us help you figure out what you need</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="card">
               <h3 className="heading-4 mb-3">Repair</h3>
-              <p className="text-gray-400 mb-4">
+              <p className="text-text-secondary mb-4">
                 Minor damage, isolated issues, or quick fixes
               </p>
               <Link href="/services/roof-repair/" className="text-teamwork-blue hover:underline">
@@ -108,7 +108,7 @@ export default function ServicesPage() {
 
             <div className="card">
               <h3 className="heading-4 mb-3">Replace</h3>
-              <p className="text-gray-400 mb-4">
+              <p className="text-text-secondary mb-4">
                 Age, widespread damage, or full upgrade
               </p>
               <Link href="/services/roof-replacement/" className="text-teamwork-blue hover:underline">
@@ -118,7 +118,7 @@ export default function ServicesPage() {
 
             <div className="card">
               <h3 className="heading-4 mb-3">Storm Damage</h3>
-              <p className="text-gray-400 mb-4">
+              <p className="text-text-secondary mb-4">
                 Recent storm? We inspect roof, gutters, siding, and windows
               </p>
               <Link href="/storm/" className="text-teamwork-blue hover:underline">

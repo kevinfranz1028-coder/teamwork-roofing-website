@@ -84,11 +84,11 @@ export default function ReviewsPage() {
 
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h1 className="heading-1 mb-6">Customer Reviews</h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               Real experiences from real partnerships across Kansas City Metro
             </p>
             <div className="flex items-center justify-center gap-2 mb-4">
@@ -99,7 +99,7 @@ export default function ReviewsPage() {
               </div>
               <span className="text-3xl font-bold">5.0</span>
             </div>
-            <p className="text-gray-500">Based on {reviews.length}+ verified reviews</p>
+            <p className="text-text-muted">Based on {reviews.length}+ verified reviews</p>
           </div>
 
           {/* Top Mentions */}
@@ -109,7 +109,7 @@ export default function ReviewsPage() {
               {topMentions.map((mention, index) => (
                 <div key={index} className="flex items-center space-x-2 card">
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue flex-shrink-0" />
-                  <span className="text-gray-300">{mention}</span>
+                  <span className="text-text-secondary">{mention}</span>
                 </div>
               ))}
             </div>
@@ -124,11 +124,11 @@ export default function ReviewsPage() {
                     <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-4">{review.text}</p>
-                <div className="border-t border-dark-border pt-4">
+                <p className="text-text-secondary mb-4">{review.text}</p>
+                <div className="border-t border-light-border pt-4">
                   <p className="font-semibold">{review.name}</p>
-                  <p className="text-sm text-gray-400">{review.city}, KS</p>
-                  <p className="text-xs text-gray-500 mt-1">{review.date}</p>
+                  <p className="text-sm text-text-secondary">{review.city}, KS</p>
+                  <p className="text-xs text-text-muted mt-1">{review.date}</p>
                 </div>
               </div>
             ))}

@@ -5,15 +5,15 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <section className="section-padding bg-dark-bg">
+    <section className="section-padding bg-light-bg">
       <div className="container-custom max-w-4xl">
         <h1 className="heading-1 mb-8">Privacy Policy</h1>
 
-        <div className="space-y-6 text-gray-400">
-          <p className="text-sm text-gray-500">Last updated: {new Date().toLocaleDateString()}</p>
+        <div className="space-y-6 text-text-secondary">
+          <p className="text-sm text-text-muted">Last updated: {new Date().toLocaleDateString()}</p>
 
           <div>
-            <h2 className="heading-4 text-white mb-3">Information We Collect</h2>
+            <h2 className="heading-4 text-text-primary mb-3">Information We Collect</h2>
             <p>
               When you contact Teamwork Roofing Services LLC, request an estimate, or book an inspection, we may collect:
             </p>
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           </div>
 
           <div>
-            <h2 className="heading-4 text-white mb-3">How We Use Your Information</h2>
+            <h2 className="heading-4 text-text-primary mb-3">How We Use Your Information</h2>
             <p>We use your information to:</p>
             <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
               <li>Schedule inspections and provide estimates</li>
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
           </div>
 
           <div>
-            <h2 className="heading-4 text-white mb-3">Communication Consent</h2>
+            <h2 className="heading-4 text-text-primary mb-3">Communication Consent</h2>
             <p>
               By providing your phone number, you consent to receive calls and text messages from Teamwork Roofing Services LLC
               regarding your service request, appointment reminders, and related communications. Message and data rates may apply.
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
           </div>
 
           <div>
-            <h2 className="heading-4 text-white mb-3">Information Sharing</h2>
+            <h2 className="heading-4 text-text-primary mb-3">Information Sharing</h2>
             <p>
               We do not sell or rent your personal information. We may share information with service providers who help us
               operate our business (e.g., scheduling software, payment processors) under strict confidentiality agreements.
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
           </div>
 
           <div>
-            <h2 className="heading-4 text-white mb-3">Data Security</h2>
+            <h2 className="heading-4 text-text-primary mb-3">Data Security</h2>
             <p>
               We implement reasonable security measures to protect your information. However, no method of transmission over
               the internet is 100% secure.
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
           </div>
 
           <div>
-            <h2 className="heading-4 text-white mb-3">Your Rights</h2>
+            <h2 className="heading-4 text-text-primary mb-3">Your Rights</h2>
             <p>You have the right to:</p>
             <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
               <li>Request access to your personal information</li>
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
           </div>
 
           <div>
-            <h2 className="heading-4 text-white mb-3">Contact Us</h2>
+            <h2 className="heading-4 text-text-primary mb-3">Contact Us</h2>
             <p>
               For questions about this privacy policy or to exercise your rights, contact us at:
             </p>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
           </div>
 
           <div>
-            <h2 className="heading-4 text-white mb-3">Changes to This Policy</h2>
+            <h2 className="heading-4 text-text-primary mb-3">Changes to This Policy</h2>
             <p>
               We may update this privacy policy from time to time. Changes will be posted on this page with an updated date.
             </p>

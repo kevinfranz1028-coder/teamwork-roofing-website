@@ -75,26 +75,26 @@ export default function OverlandParkRoofRepairPage() {
   return (
     <>
       {/* Breadcrumbs */}
-      <div className="bg-dark-surface border-b border-dark-border">
+      <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <div className="flex items-center space-x-2 text-sm text-text-muted">
             <Link href="/" className="hover:text-teamwork-blue">Home</Link>
             <span>/</span>
             <Link href="/overland-park-ks/" className="hover:text-teamwork-blue">Overland Park</Link>
             <span>/</span>
-            <span className="text-gray-300">Roof Repair</span>
+            <span className="text-text-secondary">Roof Repair</span>
           </div>
         </div>
       </div>
 
       {/* Hero */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
               Roof Repair in <span className="text-teamwork-blue">Overland Park, KS</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               Fast, professional roof repair with photo-proof documentation, honest guidance, and clean site practices. Serving all Overland Park neighborhoods with same-week inspections.
             </p>
 
@@ -112,7 +112,7 @@ export default function OverlandParkRoofRepairPage() {
               </Link>
             </div>
 
-            <div className="flex items-start space-x-2 text-sm text-gray-500">
+            <div className="flex items-start space-x-2 text-sm text-text-muted">
               <FiShield className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
               <span>All repairs backed by Teamwork Warranty</span>
             </div>
@@ -123,7 +123,7 @@ export default function OverlandParkRoofRepairPage() {
       <PromiseStrip />
 
       {/* Common Problems */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Common Roof Repair Problems We Fix</h2>
 
@@ -134,7 +134,7 @@ export default function OverlandParkRoofRepairPage() {
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />
                   {problem.title}
                 </h4>
-                <p className="text-sm text-gray-400 ml-7">{problem.description}</p>
+                <p className="text-sm text-text-secondary ml-7">{problem.description}</p>
               </div>
             ))}
           </div>
@@ -142,51 +142,51 @@ export default function OverlandParkRoofRepairPage() {
       </section>
 
       {/* Repair vs Replace */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto">
             <h2 className="heading-3 mb-4">Repair vs Replace: We Will Be Honest</h2>
-            <p className="text-gray-400 mb-4">
+            <p className="text-text-secondary mb-4">
               Sometimes repair makes sense. Sometimes replacement is smarter. We will show you the photos, explain your options, and let you decide.
             </p>
-            <p className="text-gray-400 mb-4">
-              <strong className="text-white">If your roof has years of life left</strong> and the damage is isolated, we will repair it right and save you money.
+            <p className="text-text-secondary mb-4">
+              <strong className="text-text-primary">If your roof has years of life left</strong> and the damage is isolated, we will repair it right and save you money.
             </p>
-            <p className="text-gray-400">
-              <strong className="text-white">If it is near the end of its lifespan</strong> or damage is widespread, we will explain why replacement saves you money long-term and prevents repeat repairs.
+            <p className="text-text-secondary">
+              <strong className="text-text-primary">If it is near the end of its lifespan</strong> or damage is widespread, we will explain why replacement saves you money long-term and prevents repeat repairs.
             </p>
           </div>
         </div>
       </section>
 
       {/* What Inspection Includes */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">What Your Teamwork Inspection Includes</h2>
 
           <div className="max-w-3xl mx-auto space-y-4">
             <div className="card">
               <h4 className="font-semibold mb-2">Photo Documentation</h4>
-              <p className="text-gray-400 text-sm">Detailed photos of all damage so you can see exactly what we see</p>
+              <p className="text-text-secondary text-sm">Detailed photos of all damage so you can see exactly what we see</p>
             </div>
             <div className="card">
               <h4 className="font-semibold mb-2">Written Scope</h4>
-              <p className="text-gray-400 text-sm">Clear description of damage and recommended repairs</p>
+              <p className="text-text-secondary text-sm">Clear description of damage and recommended repairs</p>
             </div>
             <div className="card">
               <h4 className="font-semibold mb-2">Clear Pricing</h4>
-              <p className="text-gray-400 text-sm">Upfront, honest pricing with no hidden fees</p>
+              <p className="text-text-secondary text-sm">Upfront, honest pricing with no hidden fees</p>
             </div>
             <div className="card">
               <h4 className="font-semibold mb-2">Timeline Estimate</h4>
-              <p className="text-gray-400 text-sm">When we can start and how long it will take</p>
+              <p className="text-text-secondary text-sm">When we can start and how long it will take</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Repair Timeline */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Repair Timeline</h2>
 
@@ -197,7 +197,7 @@ export default function OverlandParkRoofRepairPage() {
                   <span className="text-teamwork-blue font-bold">{index + 1}</span>
                 </div>
                 <div className="flex items-center h-10">
-                  <p className="text-gray-300">{step}</p>
+                  <p className="text-text-secondary">{step}</p>
                 </div>
               </div>
             ))}
@@ -210,12 +210,12 @@ export default function OverlandParkRoofRepairPage() {
       <NeighborhoodsSection city="Overland Park" neighborhoods={neighborhoods} />
 
       {/* Warranty */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto text-center">
             <FiShield className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
             <h3 className="heading-3 mb-4">Repairs Backed by Teamwork Warranty</h3>
-            <p className="text-gray-400 mb-6">
+            <p className="text-text-secondary mb-6">
               Our repair work is covered under our Teamwork Warranty. Quality workmanship, clean site practices, and your peace of mind.
             </p>
             <Link href="/warranty/" className="text-teamwork-blue hover:underline">
@@ -226,7 +226,7 @@ export default function OverlandParkRoofRepairPage() {
       </section>
 
       {/* FAQ */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Roof Repair FAQ</h2>
 
@@ -234,7 +234,7 @@ export default function OverlandParkRoofRepairPage() {
             {faqs.map((faq, index) => (
               <div key={index} className="card">
                 <h4 className="font-semibold mb-2">{faq.q}</h4>
-                <p className="text-gray-400 text-sm">{faq.a}</p>
+                <p className="text-text-secondary text-sm">{faq.a}</p>
               </div>
             ))}
           </div>

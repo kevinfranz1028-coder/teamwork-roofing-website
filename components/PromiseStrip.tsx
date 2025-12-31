@@ -30,7 +30,7 @@ export default function PromiseStrip() {
   ]
 
   return (
-    <div className="bg-dark-surface border-y border-dark-border">
+    <div className="bg-white border-y border-light-border">
       <div className="container-custom py-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {promises.map((promise, index) => {
@@ -41,7 +41,7 @@ export default function PromiseStrip() {
                   <Icon className="w-6 h-6 text-teamwork-blue" />
                 </div>
                 <h4 className="font-semibold text-sm mb-1">{promise.title}</h4>
-                <p className="text-xs text-gray-400">{promise.description}</p>
+                <p className="text-xs text-text-secondary">{promise.description}</p>
               </div>
             )
           })}

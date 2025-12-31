@@ -41,7 +41,7 @@ function BrandChips({ brands }: { brands: Brand[] }) {
           href={brand.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 bg-dark-bg border border-dark-border rounded-full text-sm font-semibold hover:border-teamwork-blue hover:text-teamwork-blue transition-all duration-200"
+          className="px-4 py-2 bg-light-bg border border-light-border rounded-full text-sm font-semibold hover:border-teamwork-blue hover:text-teamwork-blue transition-all duration-200"
         >
           {brand.name}
         </a>
@@ -54,13 +54,13 @@ export default function MaterialsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
               Roofing Materials & Systems <span className="text-teamwork-blue">We Install</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               We help you choose the right roofing system for your home, budget, and Kansas City weather conditions. Every installation follows manufacturer specifications and includes photo documentation, clean site practices, and our Teamwork Warranty.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -76,11 +76,11 @@ export default function MaterialsPage() {
       </section>
 
       {/* Architectural Asphalt Shingles */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <h2 className="heading-2 mb-4 text-center">Architectural Asphalt Shingles</h2>
-            <p className="text-gray-400 text-center mb-8">
+            <p className="text-text-secondary text-center mb-8">
               The most popular roofing choice for Kansas City homes. Architectural shingles offer excellent wind and hail resistance, dimensional appearance, and manufacturer warranties ranging from 25 years to lifetime.
             </p>
             <BrandChips brands={architecturalShingleBrands} />
@@ -89,11 +89,11 @@ export default function MaterialsPage() {
       </section>
 
       {/* Synthetic Slate/Shake */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <h2 className="heading-2 mb-4 text-center">Synthetic Slate & Shake</h2>
-            <p className="text-gray-400 text-center mb-8">
+            <p className="text-text-secondary text-center mb-8">
               Premium appearance with advanced polymer engineering. Lighter than natural slate, impact-resistant, and designed for long-term performance with exceptional curb appeal.
             </p>
             <BrandChips brands={syntheticBrands} />
@@ -102,11 +102,11 @@ export default function MaterialsPage() {
       </section>
 
       {/* Concrete Tile */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <h2 className="heading-2 mb-4 text-center">Concrete Tile</h2>
-            <p className="text-gray-400 text-center mb-8">
+            <p className="text-text-secondary text-center mb-8">
               Durable, fire-resistant, and available in a variety of profiles and colors. Concrete tile roofing provides superior longevity and distinctive architectural style.
             </p>
             <BrandChips brands={concreteTileBrands} />
@@ -115,11 +115,11 @@ export default function MaterialsPage() {
       </section>
 
       {/* Low-Slope Membranes */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <h2 className="heading-2 mb-4 text-center">Low-Slope Membranes</h2>
-            <p className="text-gray-400 text-center mb-8">
+            <p className="text-text-secondary text-center mb-8">
               Single-ply TPO and EPDM membranes for flat or low-slope residential and commercial applications. Energy-efficient, weather-resistant, and designed for proper drainage and long-term performance.
             </p>
             <BrandChips brands={lowSlopeBrands} />
@@ -128,32 +128,32 @@ export default function MaterialsPage() {
       </section>
 
       {/* How We Help You Choose */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <h2 className="heading-2 mb-12 text-center">How We Help You Choose</h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="card">
                 <h3 className="text-xl font-semibold mb-3">Photo Documentation</h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-text-secondary text-sm">
                   We show you the current condition of your roof with clear photos so you understand what needs attention and why.
                 </p>
               </div>
               <div className="card">
                 <h3 className="text-xl font-semibold mb-3">Clear Options</h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-text-secondary text-sm">
                   We explain the differences between systems, warranties, and price points — no pressure, just honest guidance.
                 </p>
               </div>
               <div className="card">
                 <h3 className="text-xl font-semibold mb-3">Code & Ventilation</h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-text-secondary text-sm">
                   We review local code requirements and proper ventilation to ensure your roof performs as designed.
                 </p>
               </div>
               <div className="card">
                 <h3 className="text-xl font-semibold mb-3">Manufacturer Specs</h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-text-secondary text-sm">
                   Every installation follows manufacturer specifications to protect your warranty and your investment.
                 </p>
               </div>
@@ -163,9 +163,9 @@ export default function MaterialsPage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="py-8 bg-dark-bg">
+      <section className="py-8 bg-light-bg">
         <div className="container-custom">
-          <p className="text-xs text-gray-500 text-center max-w-4xl mx-auto">
+          <p className="text-xs text-text-muted text-center max-w-4xl mx-auto">
             Brand names and trademarks are the property of their respective owners. Teamwork Roofing Services LLC is an independent contractor and is not affiliated with or endorsed by these manufacturers.
           </p>
         </div>

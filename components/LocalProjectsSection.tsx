@@ -33,18 +33,18 @@ export default function LocalProjectsSection({ city, projects }: LocalProjectsSe
   const displayProjects = projects || defaultProjects
 
   return (
-    <section className="section-padding bg-dark-surface">
+    <section className="section-padding bg-white">
       <div className="container-custom">
         <h2 className="heading-2 mb-4 text-center">Projects Near You</h2>
-        <p className="text-xl text-gray-400 text-center mb-12">
+        <p className="text-xl text-text-secondary text-center mb-12">
           Recent Teamwork projects completed in and around {city}, KS.
         </p>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           {displayProjects.slice(0, 3).map((project, index) => (
             <div key={index} className="card group">
-              <div className="relative h-48 bg-dark-bg rounded-lg mb-4 overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center text-gray-600">
+              <div className="relative h-48 bg-light-bg rounded-lg mb-4 overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center text-text-muted">
                   Project Photo
                 </div>
               </div>
@@ -54,7 +54,7 @@ export default function LocalProjectsSection({ city, projects }: LocalProjectsSe
                 </span>
               </div>
               <h4 className="font-semibold mb-2">{project.title}</h4>
-              <p className="text-sm text-gray-400 mb-4">{project.scope}</p>
+              <p className="text-sm text-text-secondary mb-4">{project.scope}</p>
               <Link href="/projects/" className="text-teamwork-blue hover:underline text-sm font-semibold">
                 View Project →
               </Link>

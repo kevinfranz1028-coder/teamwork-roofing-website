@@ -85,12 +85,12 @@ export default function EstimatePage() {
 
   return (
     <>
-      <section className="section-padding bg-dark-bg min-h-screen">
+      <section className="section-padding bg-light-bg min-h-screen">
         <div className="container-custom max-w-4xl">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="heading-1 mb-4">Start Your Teamwork Estimate</h1>
-            <p className="text-xl text-gray-400">
+            <p className="text-xl text-text-secondary">
               Get a quick starting-at number, then book a same-week inspection for exact scope
             </p>
           </div>
@@ -128,7 +128,7 @@ export default function EstimatePage() {
                   <select
                     value={formData.size}
                     onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     required
                   >
                     <option value="">Select size</option>
@@ -144,7 +144,7 @@ export default function EstimatePage() {
                     <select
                       value={formData.stories}
                       onChange={(e) => setFormData({ ...formData, stories: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                       required
                     >
                       <option value="">Select stories</option>
@@ -160,7 +160,7 @@ export default function EstimatePage() {
                   <select
                     value={formData.urgency}
                     onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     required
                   >
                     <option value="">Select urgency</option>
@@ -207,7 +207,7 @@ export default function EstimatePage() {
               {/* Lead Form */}
               <div className="card max-w-2xl mx-auto">
                 <h3 className="heading-4 mb-4">Book Your Same-Week Inspection</h3>
-                <p className="text-gray-400 mb-6">
+                <p className="text-text-secondary mb-6">
                   Provide your contact info and we'll reach out to schedule your inspection
                 </p>
 
@@ -220,7 +220,7 @@ export default function EstimatePage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                       required
                     />
                   </div>
@@ -233,7 +233,7 @@ export default function EstimatePage() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                       required
                     />
                   </div>
@@ -244,7 +244,7 @@ export default function EstimatePage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     />
                   </div>
 
@@ -254,7 +254,7 @@ export default function EstimatePage() {
                       type="text"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     />
                   </div>
 
@@ -264,7 +264,7 @@ export default function EstimatePage() {
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={4}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     />
                   </div>
 
@@ -272,7 +272,7 @@ export default function EstimatePage() {
                     Submit & Book Inspection
                   </button>
 
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-text-muted text-center">
                     By submitting, you agree to receive calls/texts from Teamwork Roofing Services at the number provided.
                   </p>
                 </form>
@@ -281,7 +281,7 @@ export default function EstimatePage() {
               {/* What Happens Next */}
               <div className="card max-w-2xl mx-auto">
                 <h4 className="font-semibold mb-4">What Happens Next</h4>
-                <ol className="space-y-3 text-gray-400">
+                <ol className="space-y-3 text-text-secondary">
                   <li className="flex">
                     <span className="font-bold text-teamwork-blue mr-3">1.</span>
                     <span>We'll call or text within 24 hours</span>

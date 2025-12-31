@@ -6,16 +6,16 @@
 
 @layer base {
   * {
-    @apply border-dark-border;
+    @apply border-light-border;
   }
   body {
-    @apply bg-dark-bg text-gray-100 antialiased;
+    @apply bg-light-bg text-text-primary antialiased;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-teamwork-blue text-white font-semibold rounded-lg hover:bg-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl;
+    @apply px-6 py-3 bg-teamwork-blue text-white font-semibold rounded-lg hover:bg-[#0094CC] transition-all duration-200 shadow-md hover:shadow-lg;
   }
 
   .btn-secondary {
@@ -23,7 +23,7 @@
   }
 
   .card {
-    @apply bg-dark-surface border border-dark-border rounded-xl p-6 shadow-lg;
+    @apply bg-white border border-light-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow;
   }
 
   .container-custom {

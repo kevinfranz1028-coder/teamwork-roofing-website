@@ -30,13 +30,13 @@ export default function BrandsWeInstall({
   brandList = DEFAULT_BRANDS
 }: BrandsWeInstallProps) {
   return (
-    <section className={`${variant === 'full' ? 'section-padding' : 'py-12'} bg-dark-surface`}>
+    <section className={`${variant === 'full' ? 'section-padding' : 'py-12'} bg-white`}>
       <div className="container-custom">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className={variant === 'full' ? 'heading-2 mb-4' : 'heading-3 mb-4'}>
             {title}
           </h2>
-          <p className="text-gray-400 mb-8">
+          <p className="text-text-secondary mb-8">
             We install manufacturer-grade systems based on your home, budget, and storm conditions.
           </p>
 
@@ -57,7 +57,7 @@ export default function BrandsWeInstall({
           </div>
 
           {showDisclaimer && (
-            <p className="text-xs text-gray-500 mt-8">
+            <p className="text-xs text-text-muted mt-8">
               Brand names and trademarks are the property of their respective owners. Teamwork Roofing Services LLC is an independent contractor and is not affiliated with or endorsed by these manufacturers.
             </p>
           )}

@@ -25,11 +25,11 @@ export default function ProjectsPage() {
 
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h1 className="heading-1 mb-6">Our Projects</h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-text-secondary mb-8">
               Real work, real results across Kansas City Metro
             </p>
 
@@ -39,8 +39,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('all')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all ${
                   filter === 'all'
-                    ? 'bg-teamwork-blue text-white'
-                    : 'bg-dark-surface text-gray-400 hover:text-white border border-dark-border'
+                    ? 'bg-teamwork-blue text-text-primary'
+                    : 'bg-white text-text-secondary hover:text-text-primary border border-light-border'
                 }`}
               >
                 All Projects
@@ -49,8 +49,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('roofing')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all ${
                   filter === 'roofing'
-                    ? 'bg-teamwork-blue text-white'
-                    : 'bg-dark-surface text-gray-400 hover:text-white border border-dark-border'
+                    ? 'bg-teamwork-blue text-text-primary'
+                    : 'bg-white text-text-secondary hover:text-text-primary border border-light-border'
                 }`}
               >
                 Roofing
@@ -59,8 +59,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('storm')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all ${
                   filter === 'storm'
-                    ? 'bg-teamwork-blue text-white'
-                    : 'bg-dark-surface text-gray-400 hover:text-white border border-dark-border'
+                    ? 'bg-teamwork-blue text-text-primary'
+                    : 'bg-white text-text-secondary hover:text-text-primary border border-light-border'
                 }`}
               >
                 Storm
@@ -69,8 +69,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('gutters')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all ${
                   filter === 'gutters'
-                    ? 'bg-teamwork-blue text-white'
-                    : 'bg-dark-surface text-gray-400 hover:text-white border border-dark-border'
+                    ? 'bg-teamwork-blue text-text-primary'
+                    : 'bg-white text-text-secondary hover:text-text-primary border border-light-border'
                 }`}
               >
                 Gutters
@@ -79,8 +79,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('siding')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all ${
                   filter === 'siding'
-                    ? 'bg-teamwork-blue text-white'
-                    : 'bg-dark-surface text-gray-400 hover:text-white border border-dark-border'
+                    ? 'bg-teamwork-blue text-text-primary'
+                    : 'bg-white text-text-secondary hover:text-text-primary border border-light-border'
                 }`}
               >
                 Siding
@@ -89,8 +89,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('windows')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all ${
                   filter === 'windows'
-                    ? 'bg-teamwork-blue text-white'
-                    : 'bg-dark-surface text-gray-400 hover:text-white border border-dark-border'
+                    ? 'bg-teamwork-blue text-text-primary'
+                    : 'bg-white text-text-secondary hover:text-text-primary border border-light-border'
                 }`}
               >
                 Windows
@@ -102,15 +102,15 @@ export default function ProjectsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project) => (
               <div key={project.id} className="card group cursor-pointer hover:border-teamwork-blue transition-all">
-                <div className="relative h-48 bg-dark-bg rounded-lg mb-4 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-600">
+                <div className="relative h-48 bg-light-bg rounded-lg mb-4 overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-text-muted">
                     Project Photo
                   </div>
                 </div>
                 <div className="flex justify-between items-start">
                   <div>
                     <h4 className="font-semibold mb-1">{project.service}</h4>
-                    <p className="text-sm text-gray-400">{project.city}, KS</p>
+                    <p className="text-sm text-text-secondary">{project.city}, KS</p>
                   </div>
                   <span className="text-xs px-3 py-1 bg-teamwork-blue/10 text-teamwork-blue rounded-full">
                     {project.city}
@@ -122,7 +122,7 @@ export default function ProjectsPage() {
 
           {filteredProjects.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500">No projects found for this filter.</p>
+              <p className="text-text-muted">No projects found for this filter.</p>
             </div>
           )}
         </div>

@@ -9,13 +9,13 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h1 className="heading-1 mb-6">
               Built on <span className="text-teamwork-blue">Teamwork</span>
             </h1>
-            <p className="text-xl text-gray-400">
+            <p className="text-xl text-text-secondary">
               More than a name — it's our commitment. From day one, you're a partner, not a transaction.
             </p>
           </div>
@@ -24,7 +24,7 @@ export default function AboutPage() {
             {/* What Teamwork Means */}
             <div className="card">
               <h2 className="heading-3 mb-6">What "Teamwork" Means to Us</h2>
-              <div className="space-y-4 text-gray-400">
+              <div className="space-y-4 text-text-secondary">
                 <p>
                   Every roofing company talks about quality. We do quality differently — with you as part of the team.
                 </p>
@@ -47,44 +47,44 @@ export default function AboutPage() {
                 <div className="card text-center">
                   <FiShield className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
                   <h4 className="font-semibold mb-2">Teamwork Warranty</h4>
-                  <p className="text-sm text-gray-400">Backed by our partnership commitment</p>
+                  <p className="text-sm text-text-secondary">Backed by our partnership commitment</p>
                 </div>
 
                 <div className="card text-center">
                   <FiClock className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
                   <h4 className="font-semibold mb-2">Same-Week Inspection</h4>
-                  <p className="text-sm text-gray-400">Fast response guaranteed</p>
+                  <p className="text-sm text-text-secondary">Fast response guaranteed</p>
                 </div>
 
                 <div className="card text-center">
                   <FiCheckCircle className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
                   <h4 className="font-semibold mb-2">Clean Site Guarantee</h4>
-                  <p className="text-sm text-gray-400">Your property protected</p>
+                  <p className="text-sm text-text-secondary">Your property protected</p>
                 </div>
 
                 <div className="card text-center">
                   <FiCamera className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
                   <h4 className="font-semibold mb-2">Photo-Proof Inspection</h4>
-                  <p className="text-sm text-gray-400">Complete documentation</p>
+                  <p className="text-sm text-text-secondary">Complete documentation</p>
                 </div>
 
                 <div className="card text-center">
                   <FiDollarSign className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
                   <h4 className="font-semibold mb-2">Teamwork Financing</h4>
-                  <p className="text-sm text-gray-400">Flexible payment options</p>
+                  <p className="text-sm text-text-secondary">Flexible payment options</p>
                 </div>
               </div>
             </div>
 
             {/* Service Area */}
-            <div className="card bg-dark-surface">
+            <div className="card bg-white">
               <h2 className="heading-3 mb-4">Serving Kansas City Metro</h2>
-              <p className="text-gray-400 mb-4">
+              <p className="text-text-secondary mb-4">
                 We proudly serve homeowners across the Kansas City Metro area with the same commitment to partnership and quality.
               </p>
-              <div className="grid md:grid-cols-2 gap-4 text-gray-500">
+              <div className="grid md:grid-cols-2 gap-4 text-text-muted">
                 <div>
-                  <h4 className="font-semibold text-white mb-2">Kansas</h4>
+                  <h4 className="font-semibold text-text-primary mb-2">Kansas</h4>
                   <ul className="space-y-1 text-sm">
                     <li>Overland Park</li>
                     <li>Olathe</li>
@@ -101,7 +101,7 @@ export default function AboutPage() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-white mb-2">Missouri</h4>
+                  <h4 className="font-semibold text-text-primary mb-2">Missouri</h4>
                   <ul className="space-y-1 text-sm">
                     <li>Kansas City</li>
                     <li>Lee's Summit</li>

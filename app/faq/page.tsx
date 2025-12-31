@@ -103,11 +103,11 @@ export default function FAQPage() {
 
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h1 className="heading-1 mb-6">Frequently Asked Questions</h1>
-            <p className="text-xl text-gray-400">
+            <p className="text-xl text-text-secondary">
               Find answers to common questions about our services
             </p>
           </div>
@@ -124,8 +124,8 @@ export default function FAQPage() {
                   }}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     openCategory === category.id
-                      ? 'bg-teamwork-blue text-white'
-                      : 'bg-dark-surface text-gray-400 hover:text-white border border-dark-border'
+                      ? 'bg-teamwork-blue text-text-primary'
+                      : 'bg-white text-text-secondary hover:text-text-primary border border-light-border'
                   }`}
                 >
                   {category.title}
@@ -153,7 +153,7 @@ export default function FAQPage() {
                             }`}
                           />
                         </button>
-                        {isOpen && <p className="text-gray-400 text-sm mt-3 pt-3 border-t border-dark-border">{faq.a}</p>}
+                        {isOpen && <p className="text-text-secondary text-sm mt-3 pt-3 border-t border-light-border">{faq.a}</p>}
                       </div>
                     )
                   })
@@ -162,7 +162,7 @@ export default function FAQPage() {
 
             {!openCategory && (
               <div className="text-center py-12">
-                <p className="text-gray-500">Select a category above to view questions</p>
+                <p className="text-text-muted">Select a category above to view questions</p>
               </div>
             )}
           </div>

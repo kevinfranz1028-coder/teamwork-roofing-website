@@ -126,7 +126,7 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative bg-dark-bg pt-20 pb-24">
+      <section className="relative bg-light-bg pt-20 pb-24">
         <div className="container-custom">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -134,11 +134,11 @@ export default function Home() {
                 Roofing & Exteriors — Done{' '}
                 <span className="text-teamwork-blue">The Teamwork Way</span>
               </h1>
-              <p className="text-xl text-gray-300 mb-4">
+              <p className="text-xl text-text-secondary mb-4">
                 A partnership from day one. Same-week inspections, photo documentation, and clean site practices across Kansas City Metro.
               </p>
 
-              <p className="text-sm text-gray-400 mb-8">
+              <p className="text-sm text-text-secondary mb-8">
                 <Link href="/overland-park-ks/" className="hover:text-teamwork-blue hover:underline transition-colors">
                   Explore Overland Park service area →
                 </Link>
@@ -154,29 +154,29 @@ export default function Home() {
               </div>
 
               {/* Trust Snippets */}
-              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-dark-border">
+              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-light-border">
                 <div className="flex items-start space-x-2">
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-sm text-gray-400">Licensed & Insured</span>
+                  <span className="text-sm text-text-secondary">Licensed & Insured</span>
                 </div>
                 <div className="flex items-start space-x-2">
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-sm text-gray-400">Photo Documentation Included</span>
+                  <span className="text-sm text-text-secondary">Photo Documentation Included</span>
                 </div>
                 <div className="flex items-start space-x-2">
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-sm text-gray-400">Clean Site Guarantee</span>
+                  <span className="text-sm text-text-secondary">Clean Site Guarantee</span>
                 </div>
                 <div className="flex items-start space-x-2">
                   <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-sm text-gray-400">Teamwork Warranty Backed</span>
+                  <span className="text-sm text-text-secondary">Teamwork Warranty Backed</span>
                 </div>
               </div>
             </div>
 
-            <div className="relative h-[400px] lg:h-[500px] rounded-2xl overflow-hidden bg-dark-surface border border-dark-border">
+            <div className="relative h-[400px] lg:h-[500px] rounded-2xl overflow-hidden bg-white border border-light-border">
               {/* Placeholder for hero image */}
-              <div className="absolute inset-0 flex items-center justify-center text-gray-600">
+              <div className="absolute inset-0 flex items-center justify-center text-text-muted">
                 Hero Image: Modern home with new roof
               </div>
             </div>
@@ -185,11 +185,11 @@ export default function Home() {
       </section>
 
       {/* Service Tiles */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="heading-2 mb-4">Our Services</h2>
-            <p className="text-xl text-gray-400">Complete exterior solutions for your home</p>
+            <p className="text-xl text-text-secondary">Complete exterior solutions for your home</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -203,7 +203,7 @@ export default function Home() {
                 >
                   <Icon className="w-12 h-12 text-teamwork-blue mb-4 group-hover:scale-110 transition-transform" />
                   <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                  <p className="text-gray-400 text-sm">{service.description}</p>
+                  <p className="text-text-secondary text-sm">{service.description}</p>
                 </Link>
               )
             })}
@@ -215,25 +215,25 @@ export default function Home() {
       <PromiseStrip />
 
       {/* Projects Near You */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="heading-2 mb-4">Projects Near You</h2>
-            <p className="text-xl text-gray-400">See our work across Kansas City Metro</p>
+            <p className="text-xl text-text-secondary">See our work across Kansas City Metro</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {projects.map((project, index) => (
               <div key={index} className="card group cursor-pointer">
-                <div className="relative h-48 bg-dark-bg rounded-lg mb-4 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-600">
+                <div className="relative h-48 bg-light-bg rounded-lg mb-4 overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-text-muted">
                     Project Photo
                   </div>
                 </div>
                 <div className="flex justify-between items-start">
                   <div>
                     <h4 className="font-semibold mb-1">{project.service}</h4>
-                    <p className="text-sm text-gray-400">{project.city}, KS</p>
+                    <p className="text-sm text-text-secondary">{project.city}, KS</p>
                   </div>
                   <span className="text-xs px-3 py-1 bg-teamwork-blue/10 text-teamwork-blue rounded-full">
                     {project.city}
@@ -252,11 +252,11 @@ export default function Home() {
       </section>
 
       {/* The Teamwork Process */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="heading-2 mb-4">The Teamwork Process</h2>
-            <p className="text-xl text-gray-400">Five steps, five promises</p>
+            <p className="text-xl text-text-secondary">Five steps, five promises</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -266,7 +266,7 @@ export default function Home() {
                   <span className="text-2xl font-bold text-teamwork-blue">{step.number}</span>
                 </div>
                 <h4 className="font-semibold mb-2">{step.title}</h4>
-                <p className="text-sm text-gray-400">{step.description}</p>
+                <p className="text-sm text-text-secondary">{step.description}</p>
               </div>
             ))}
           </div>
@@ -274,11 +274,11 @@ export default function Home() {
       </section>
 
       {/* Financing Teaser */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto text-center">
             <h2 className="heading-3 mb-4">Teamwork Financing Options</h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-text-secondary mb-6">
               Flexible payment plans to make your roofing and exterior projects affordable
             </p>
             <Link href="/financing/" className="btn-primary">
@@ -292,11 +292,11 @@ export default function Home() {
       <BrandsWeInstall variant="full" />
 
       {/* Reviews Highlights */}
-      <section className="section-padding bg-dark-surface">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="heading-2 mb-4">What Customers Say</h2>
-            <p className="text-xl text-gray-400">Real experiences from real partnerships</p>
+            <p className="text-xl text-text-secondary">Real experiences from real partnerships</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -307,10 +307,10 @@ export default function Home() {
                     <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-4">{review.text}</p>
-                <div className="border-t border-dark-border pt-4">
+                <p className="text-text-secondary mb-4">{review.text}</p>
+                <div className="border-t border-light-border pt-4">
                   <p className="font-semibold">{review.name}</p>
-                  <p className="text-sm text-gray-400">{review.city}, KS</p>
+                  <p className="text-sm text-text-secondary">{review.city}, KS</p>
                 </div>
               </div>
             ))}
@@ -325,18 +325,18 @@ export default function Home() {
       </section>
 
       {/* FAQ Quick Hits */}
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="heading-2 mb-4">Quick Answers</h2>
-            <p className="text-xl text-gray-400">Common questions about working with us</p>
+            <p className="text-xl text-text-secondary">Common questions about working with us</p>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-4 mb-8">
             {faqs.map((faq, index) => (
               <div key={index} className="card">
                 <h4 className="font-semibold mb-2">{faq.question}</h4>
-                <p className="text-gray-400 text-sm">{faq.answer}</p>
+                <p className="text-text-secondary text-sm">{faq.answer}</p>
               </div>
             ))}
           </div>

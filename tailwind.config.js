@@ -8,10 +8,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'teamwork-blue': '#0066CC',
-        'dark-bg': '#0A0A0A',
-        'dark-surface': '#151515',
-        'dark-border': '#2A2A2A',
+        'teamwork-blue': '#00A5E3',
+        'light-bg': '#FFFFFF',
+        'light-surface': '#F8F9FA',
+        'light-border': '#E5E7EB',
+        'text-primary': '#1F2937',
+        'text-secondary': '#6B7280',
+        'text-muted': '#9CA3AF',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

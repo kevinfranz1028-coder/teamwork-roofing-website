@@ -47,16 +47,16 @@ export default function BookPage() {
 
   if (submitted) {
     return (
-      <section className="section-padding bg-dark-bg min-h-screen flex items-center justify-center">
+      <section className="section-padding bg-light-bg min-h-screen flex items-center justify-center">
         <div className="card max-w-2xl text-center">
           <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
             <FiCheckCircle className="w-10 h-10 text-green-500" />
           </div>
           <h1 className="heading-2 mb-4">Inspection Requested!</h1>
-          <p className="text-xl text-gray-400 mb-6">
+          <p className="text-xl text-text-secondary mb-6">
             Thank you for choosing Teamwork Roofing. We'll contact you within 24 hours to confirm your same-week inspection.
           </p>
-          <p className="text-gray-500">
+          <p className="text-text-muted">
             Questions? Call us at <a href="tel:9133963717" className="text-teamwork-blue hover:underline">913-396-3717</a>
           </p>
         </div>
@@ -66,12 +66,12 @@ export default function BookPage() {
 
   return (
     <>
-      <section className="section-padding bg-dark-bg">
+      <section className="section-padding bg-light-bg">
         <div className="container-custom max-w-4xl">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="heading-1 mb-4">Book Your Same-Week Inspection</h1>
-            <p className="text-xl text-gray-400 mb-6">
+            <p className="text-xl text-text-secondary mb-6">
               Fast, professional, photo-documented — we'll schedule within the same week
             </p>
             <div className="inline-flex items-center space-x-2 bg-teamwork-blue/10 border border-teamwork-blue px-4 py-2 rounded-lg">
@@ -97,7 +97,7 @@ export default function BookPage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                       required
                     />
                   </div>
@@ -111,7 +111,7 @@ export default function BookPage() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                       required
                     />
                   </div>
@@ -126,7 +126,7 @@ export default function BookPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                   />
                 </div>
 
@@ -141,7 +141,7 @@ export default function BookPage() {
                       type="text"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                       required
                     />
                   </div>
@@ -152,7 +152,7 @@ export default function BookPage() {
                       type="text"
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     />
                   </div>
                 </div>
@@ -166,7 +166,7 @@ export default function BookPage() {
                     <select
                       value={formData.service}
                       onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                       required
                     >
                       <option value="">Select service</option>
@@ -188,7 +188,7 @@ export default function BookPage() {
                     <select
                       value={formData.urgency}
                       onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                       required
                     >
                       <option value="">Select urgency</option>
@@ -212,7 +212,7 @@ export default function BookPage() {
                       type="date"
                       value={formData.preferredDate}
                       onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     />
                   </div>
 
@@ -224,7 +224,7 @@ export default function BookPage() {
                     <select
                       value={formData.preferredTime}
                       onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
-                      className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                     >
                       <option value="">Any time</option>
                       <option value="morning">Morning (8am - 12pm)</option>
@@ -244,17 +244,17 @@ export default function BookPage() {
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     rows={4}
                     placeholder="Tell us more about what you need..."
-                    className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
                   />
                 </div>
 
                 {/* Photo Upload Info */}
-                <div className="bg-dark-bg border border-dark-border rounded-lg p-4">
+                <div className="bg-light-bg border border-light-border rounded-lg p-4">
                   <h4 className="font-semibold mb-2 flex items-center">
                     <FiCheckCircle className="w-5 h-5 text-teamwork-blue mr-2" />
                     Have photos?
                   </h4>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-text-secondary">
                     Text photos to <a href="sms:9133963717" className="text-teamwork-blue hover:underline">913-396-3717</a> or email them after booking
                   </p>
                 </div>
@@ -263,7 +263,7 @@ export default function BookPage() {
                   Request Same-Week Inspection
                 </button>
 
-                <p className="text-xs text-gray-500 text-center">
+                <p className="text-xs text-text-muted text-center">
                   By submitting, you agree to receive calls/texts from Teamwork Roofing Services. We respect your privacy.
                 </p>
               </form>
@@ -281,7 +281,7 @@ export default function BookPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-sm">Fast Confirmation</h4>
-                      <p className="text-xs text-gray-400">We'll call or text within 24 hours</p>
+                      <p className="text-xs text-text-secondary">We'll call or text within 24 hours</p>
                     </div>
                   </div>
 
@@ -291,7 +291,7 @@ export default function BookPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-sm">Same-Week Inspection</h4>
-                      <p className="text-xs text-gray-400">Scheduled at your convenience</p>
+                      <p className="text-xs text-text-secondary">Scheduled at your convenience</p>
                     </div>
                   </div>
 
@@ -301,7 +301,7 @@ export default function BookPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-sm">Photo Documentation</h4>
-                      <p className="text-xs text-gray-400">Complete visual proof included</p>
+                      <p className="text-xs text-text-secondary">Complete visual proof included</p>
                     </div>
                   </div>
 
@@ -311,7 +311,7 @@ export default function BookPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-sm">Clear Options</h4>
-                      <p className="text-xs text-gray-400">Honest pricing and recommendations</p>
+                      <p className="text-xs text-text-secondary">Honest pricing and recommendations</p>
                     </div>
                   </div>
                 </div>
