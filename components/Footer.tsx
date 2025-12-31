@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { FiFacebook, FiInstagram, FiLinkedin } from 'react-icons/fi'
 
 export default function Footer() {
@@ -8,9 +9,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-bold mb-4">
-              <span className="text-teamwork-blue">TEAMWORK</span> <span className="text-text-primary">ROOFING</span>
-            </h3>
+            <Link href="/" className="inline-block mb-4">
+              <Image
+                src="/teamwork-logo.png"
+                alt="Teamwork Roofing Services"
+                width={250}
+                height={194}
+                className="h-14 w-auto"
+              />
+            </Link>
             <p className="text-text-secondary mb-4">
               Roofing & Exteriors — Done The Teamwork Way
             </p>

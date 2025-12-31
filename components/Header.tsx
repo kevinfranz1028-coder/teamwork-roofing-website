@@ -14,13 +14,13 @@ export default function Header() {
       <div className="container-custom">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
+          <Link href="/" className="flex items-center">
             <Image
               src="/teamwork-logo.png"
               alt="Teamwork Roofing Services"
               width={250}
               height={194}
-              className="h-14 w-auto"
+              className="h-16 md:h-20 w-auto"
               priority
             />
           </Link>
