@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FiHome, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiStar } from 'react-icons/fi'
+import { FiHome, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiStar, FiPhone, FiAward } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
 import BrandsWeInstall from '@/components/BrandsWeInstall'
@@ -36,15 +36,6 @@ export default function Home() {
       description: 'Comfort and efficiency',
       href: '/services/windows/'
     }
-  ]
-
-  const projects = [
-    { city: 'Overland Park', service: 'Roof Replacement', image: '/projects/placeholder.jpg' },
-    { city: 'Lenexa', service: 'Storm Repair', image: '/projects/placeholder.jpg' },
-    { city: 'Olathe', service: 'Gutters & Siding', image: '/projects/placeholder.jpg' },
-    { city: 'Kansas City', service: 'Roof Repair', image: '/projects/placeholder.jpg' },
-    { city: 'Shawnee', service: 'Full Exterior', image: '/projects/placeholder.jpg' },
-    { city: 'Leawood', service: 'Roof Replacement', image: '/projects/placeholder.jpg' }
   ]
 
   const processSteps = [
@@ -96,90 +87,85 @@ export default function Home() {
     }
   ]
 
-  const faqs = [
-    {
-      question: 'Do you really inspect same-week?',
-      answer: 'Yes — it\'s our promise. We schedule inspections within the same week you contact us.'
-    },
-    {
-      question: 'What does photo-proof inspection mean?',
-      answer: 'We document everything with photos so you can see exactly what we see — full transparency.'
-    },
-    {
-      question: 'What areas do you serve?',
-      answer: 'Kansas City Metro including KCK, KCMO, Johnson County, Wyandotte, Jackson, and nearby areas.'
-    },
-    {
-      question: 'Do you help with insurance claims?',
-      answer: 'We provide photo documentation and scope details you can share with your insurer or adjuster. We do not negotiate claims or guarantee outcomes.'
-    },
-    {
-      question: 'What financing options are available?',
-      answer: 'We offer flexible Teamwork Financing options to fit your budget. Learn more on our Financing page.'
-    },
-    {
-      question: 'What does the clean site guarantee include?',
-      answer: 'We protect your property during work and ensure complete cleanup — your home, your peace of mind.'
-    }
+  const stats = [
+    { number: '1000+', label: 'Projects Completed' },
+    { number: '15+', label: 'Years Experience' },
+    { number: '100%', label: 'Satisfaction Rate' },
+    { number: '24/7', label: 'Emergency Service' }
   ]
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="relative bg-light-bg pt-20 pb-24">
+      {/* Hero Section - Full Width with Background Image Overlay */}
+      <section className="relative min-h-[600px] md:min-h-[700px] flex items-center">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-800/95 z-0">
+          {/* Pattern overlay for texture */}
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}></div>
+        </div>
+
+        {/* Content */}
+        <div className="container-custom relative z-10 py-20">
+          <div className="max-w-4xl">
+            {/* Main Headline */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              Roofing & Exteriors <span className="block text-teamwork-blue mt-2">The Teamwork Way</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl">
+              A partnership from day one. Same-week inspections, photo documentation, and clean site practices across Kansas City Metro.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <Link href="/book/" className="inline-flex items-center justify-center px-8 py-4 bg-teamwork-blue text-white font-bold text-lg rounded-lg hover:bg-[#0094CC] transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5">
+                Book Same-Week Inspection
+              </Link>
+              <a href="tel:9133963717" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teamwork-blue font-bold text-lg rounded-lg hover:bg-gray-100 transition-all shadow-xl">
+                <FiPhone className="mr-2" />
+                913-396-3717
+              </a>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="flex flex-wrap gap-6 pt-6">
+              <div className="flex items-center space-x-2 text-white">
+                <FiCheckCircle className="w-6 h-6 text-teamwork-blue" />
+                <span className="font-medium">Licensed & Insured</span>
+              </div>
+              <div className="flex items-center space-x-2 text-white">
+                <FiCheckCircle className="w-6 h-6 text-teamwork-blue" />
+                <span className="font-medium">Same-Week Inspections</span>
+              </div>
+              <div className="flex items-center space-x-2 text-white">
+                <FiCheckCircle className="w-6 h-6 text-teamwork-blue" />
+                <span className="font-medium">Photo Documentation</span>
+              </div>
+              <div className="flex items-center space-x-2 text-white">
+                <FiCheckCircle className="w-6 h-6 text-teamwork-blue" />
+                <span className="font-medium">Clean Site Guarantee</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Decorative Element */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="py-12 bg-white border-b border-light-border">
         <div className="container-custom">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="heading-1 mb-6">
-                Roofing & Exteriors — Done{' '}
-                <span className="text-teamwork-blue">The Teamwork Way</span>
-              </h1>
-              <p className="text-xl text-text-secondary mb-4">
-                A partnership from day one. Same-week inspections, photo documentation, and clean site practices across Kansas City Metro.
-              </p>
-
-              <p className="text-sm text-text-secondary mb-8">
-                <Link href="/service-areas/" className="hover:text-teamwork-blue hover:underline transition-colors">
-                  Explore service areas →
-                </Link>
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Link href="/book/" className="btn-primary">
-                  Book Same-Week Inspection
-                </Link>
-                <Link href="/estimate/" className="btn-secondary">
-                  Start Teamwork Estimate
-                </Link>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-teamwork-blue mb-2">{stat.number}</div>
+                <div className="text-sm md:text-base text-text-secondary font-medium">{stat.label}</div>
               </div>
-
-              {/* Trust Snippets */}
-              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-light-border">
-                <div className="flex items-start space-x-2">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-sm text-text-secondary">Licensed & Insured</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-sm text-text-secondary">Photo Documentation Included</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-sm text-text-secondary">Clean Site Guarantee</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
-                  <span className="text-sm text-text-secondary">Teamwork Warranty Backed</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative h-[400px] lg:h-[500px] rounded-2xl overflow-hidden bg-white border border-light-border">
-              {/* Placeholder for hero image */}
-              <div className="absolute inset-0 flex items-center justify-center text-text-muted">
-                Hero Image: Modern home with new roof
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -189,7 +175,9 @@ export default function Home() {
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="heading-2 mb-4">Our Services</h2>
-            <p className="text-xl text-text-secondary">Complete exterior solutions for your home</p>
+            <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+              Complete exterior solutions for your Kansas City home
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -199,67 +187,105 @@ export default function Home() {
                 <Link
                   key={index}
                   href={service.href}
-                  className="card hover:border-teamwork-blue transition-all duration-200 group"
+                  className="card hover:border-teamwork-blue transition-all duration-200 group text-center"
                 >
-                  <Icon className="w-12 h-12 text-teamwork-blue mb-4 group-hover:scale-110 transition-transform" />
+                  <Icon className="w-14 h-14 text-teamwork-blue mx-auto mb-4 group-hover:scale-110 transition-transform" />
                   <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                  <p className="text-text-secondary text-sm">{service.description}</p>
+                  <p className="text-sm text-text-secondary">{service.description}</p>
                 </Link>
               )
             })}
           </div>
-        </div>
-      </section>
 
-      {/* Partnership Promise Strip */}
-      <PromiseStrip />
-
-      {/* Projects Near You */}
-      <section className="section-padding bg-light-bg">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="heading-2 mb-4">Projects Near You</h2>
-            <p className="text-xl text-text-secondary">See our work across Kansas City Metro</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {projects.map((project, index) => (
-              <div key={index} className="card group cursor-pointer">
-                <div className="relative h-48 bg-light-bg rounded-lg mb-4 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center text-text-muted">
-                    Project Photo
-                  </div>
-                </div>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-semibold mb-1">{project.service}</h4>
-                    <p className="text-sm text-text-secondary">{project.city}, KS</p>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-teamwork-blue/10 text-teamwork-blue rounded-full">
-                    {project.city}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link href="/projects/" className="btn-secondary">
-              View All Projects
+          <div className="text-center mt-10">
+            <Link href="/service-areas/" className="text-teamwork-blue hover:underline font-medium">
+              Explore service areas →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* The Teamwork Process */}
+      <PromiseStrip />
+
+      {/* Why Choose Teamwork - Visual Section */}
       <section className="section-padding bg-white">
+        <div className="container-custom">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Content */}
+            <div>
+              <h2 className="heading-2 mb-6">Why Kansas City Homeowners Choose Teamwork</h2>
+              <p className="text-xl text-text-secondary mb-8">
+                We're not just another roofing contractor. We're your partners in protecting your home.
+              </p>
+
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 rounded-full bg-teamwork-blue/10 flex items-center justify-center flex-shrink-0">
+                    <FiCheckCircle className="w-6 h-6 text-teamwork-blue" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Photo-Proof Transparency</h4>
+                    <p className="text-text-secondary">Every inspection includes detailed photos so you see exactly what we see. No surprises, no guesswork.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 rounded-full bg-teamwork-blue/10 flex items-center justify-center flex-shrink-0">
+                    <FiCheckCircle className="w-6 h-6 text-teamwork-blue" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Same-Week Response</h4>
+                    <p className="text-text-secondary">Your time matters. We schedule inspections within the same week you contact us—guaranteed.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 rounded-full bg-teamwork-blue/10 flex items-center justify-center flex-shrink-0">
+                    <FiCheckCircle className="w-6 h-6 text-teamwork-blue" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Clean Site Guarantee</h4>
+                    <p className="text-text-secondary">Tarps, magnetic sweeps, daily cleanup. We leave your property spotless—like we were never there.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 rounded-full bg-teamwork-blue/10 flex items-center justify-center flex-shrink-0">
+                    <FiAward className="w-6 h-6 text-teamwork-blue" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Teamwork Warranty</h4>
+                    <p className="text-text-secondary">Our workmanship is backed by our partnership commitment, plus manufacturer warranties on materials.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <Link href="/about/" className="btn-secondary">
+                  Learn More About Us
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: Image Placeholder */}
+            <div className="relative h-[500px] rounded-2xl overflow-hidden bg-white border border-light-border shadow-lg">
+              <div className="absolute inset-0 flex items-center justify-center text-text-muted">
+                Image: Team working on roof / Happy homeowner
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The Teamwork Process */}
+      <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="heading-2 mb-4">The Teamwork Process</h2>
-            <p className="text-xl text-text-secondary">Five steps, five promises</p>
+            <p className="text-xl text-text-secondary max-w-2xl mx-auto">Five steps, five promises</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="grid md:grid-cols-5 gap-6">
             {processSteps.map((step, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 rounded-full bg-teamwork-blue/10 border-2 border-teamwork-blue flex items-center justify-center mx-auto mb-4">
@@ -273,30 +299,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Financing Teaser */}
-      <section className="section-padding bg-light-bg">
-        <div className="container-custom">
-          <div className="card max-w-3xl mx-auto text-center">
-            <h2 className="heading-3 mb-4">Teamwork Financing Options</h2>
-            <p className="text-text-secondary mb-6">
-              Flexible payment plans to make your roofing and exterior projects affordable
-            </p>
-            <Link href="/financing/" className="btn-primary">
-              Learn About Financing
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Brands We Install */}
-      <BrandsWeInstall variant="full" />
-
-      {/* Reviews Highlights */}
+      {/* Reviews */}
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="heading-2 mb-4">What Customers Say</h2>
-            <p className="text-xl text-text-secondary">Real experiences from real partnerships</p>
+            <h2 className="heading-2 mb-4">What Kansas City Homeowners Say</h2>
+            <p className="text-xl text-text-secondary">Real feedback from real partnerships</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -324,33 +332,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ Quick Hits */}
-      <section className="section-padding bg-light-bg">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="heading-2 mb-4">Quick Answers</h2>
-            <p className="text-xl text-text-secondary">Common questions about working with us</p>
-          </div>
+      <BrandsWeInstall variant="full" />
 
-          <div className="max-w-3xl mx-auto space-y-4 mb-8">
-            {faqs.map((faq, index) => (
-              <div key={index} className="card">
-                <h4 className="font-semibold mb-2">{faq.question}</h4>
-                <p className="text-text-secondary text-sm">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link href="/faq/" className="btn-secondary">
-              View All FAQs
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA Band */}
-      <CTABand />
+      <CTABand title="Ready to Get Started?" subtitle="Book your same-week inspection or get a quick estimate today" />
     </>
   )
 }
