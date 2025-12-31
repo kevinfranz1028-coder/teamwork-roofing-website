@@ -46,7 +46,7 @@ export default function Header() {
               onMouseEnter={() => setServicesDropdownOpen(true)}
               onMouseLeave={() => setServicesDropdownOpen(false)}
             >
-              <button className="flex items-center space-x-1 px-4 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+              <button className="flex items-center space-x-1 px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
                 <span>Services</span>
                 <FiChevronDown className={`w-4 h-4 transition-transform ${servicesDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -82,22 +82,31 @@ export default function Header() {
                     <div className="w-2 h-2 rounded-full bg-teamwork-blue/40 mr-4"></div>
                     <span>Windows</span>
                   </Link>
+                  <Link href="/storm/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-blue-50 transition-all">
+                    <div className="w-2 h-2 rounded-full bg-teamwork-blue/40 mr-4"></div>
+                    <span>Storm Damage</span>
+                  </Link>
                 </div>
               )}
             </div>
 
-            <Link href="/storm/" className="px-4 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
-              Storm Damage
+            <Link href="/financing/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+              Financing
             </Link>
-            <Link href="/projects/" className="px-4 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+            <Link href="/warranty/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+              Warranty
+            </Link>
+            <Link href="/projects/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
               Projects
             </Link>
-            <Link href="/reviews/" className="px-4 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+            <Link href="/reviews/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
               Reviews
             </Link>
-            <Link href="/service-areas/" className="px-4 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50 flex items-center gap-1">
-              <FiMapPin className="w-4 h-4" />
-              Areas
+            <Link href="/faq/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+              FAQ
+            </Link>
+            <Link href="/contact/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+              Contact
             </Link>
           </nav>
 
@@ -151,8 +160,14 @@ export default function Header() {
               <Link href="/services/windows/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors pl-8">
                 Windows
               </Link>
-              <Link href="/storm/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/storm/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors pl-8">
                 Storm Damage
+              </Link>
+              <Link href="/financing/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+                Financing
+              </Link>
+              <Link href="/warranty/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+                Warranty
               </Link>
               <Link href="/projects/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Projects
@@ -160,9 +175,11 @@ export default function Header() {
               <Link href="/reviews/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Reviews
               </Link>
-              <Link href="/service-areas/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium flex items-center gap-2">
-                <FiMapPin className="w-4 h-4" />
-                Service Areas
+              <Link href="/faq/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+                FAQ
+              </Link>
+              <Link href="/about/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+                About
               </Link>
               <Link href="/contact/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Contact
