@@ -4,6 +4,7 @@ interface Brand {
   name: string
   href: string
   logo?: string
+  color?: string // Brand color for styling
 }
 
 interface BrandsWeInstallProps {
@@ -14,52 +15,51 @@ interface BrandsWeInstallProps {
 }
 
 // Default brand list - use across the site for consistency
-// Logo files should be placed in public/brands/ directory
 export const DEFAULT_BRANDS: Brand[] = [
   {
     name: 'GAF',
     href: 'https://www.gaf.com/en-us/roofing-materials/residential-roofing-materials/shingles/timberline-hdz',
-    logo: '/brands/gaf.png' // You'll need to add the actual logo file
+    color: '#E31837'
   },
   {
     name: 'CertainTeed',
     href: 'https://www.certainteed.com/products/residential-roofing-products/landmark',
-    logo: '/brands/certainteed.png'
+    color: '#003DA5'
   },
   {
     name: 'Malarkey',
     href: 'https://www.malarkeyroofing.com/products/shingles-overview/highlander-shingles/',
-    logo: '/brands/malarkey.png'
+    color: '#C41E3A'
   },
   {
     name: 'Owens Corning',
     href: 'https://www.owenscorning.com/en-us/roofing/duration-series-shingles',
-    logo: '/brands/owens-corning.png'
+    color: '#E4007C'
   },
   {
     name: 'TAMKO',
     href: 'https://www.tamko.com/heritage',
-    logo: '/brands/tamko.png'
+    color: '#003B5C'
   },
   {
     name: 'Stoneworth',
     href: 'https://stoneworthrooftile.com/',
-    logo: '/brands/stoneworth.png'
+    color: '#8B4513'
   },
   {
     name: 'DaVinci',
     href: 'https://www.davinciroofscapes.com/davinci-products/',
-    logo: '/brands/davinci.png'
+    color: '#2C5234'
   },
   {
     name: 'Versico',
     href: 'https://www.versico.com/en/Roofing-Products/Membranes/TPO',
-    logo: '/brands/versico.png'
+    color: '#0066B3'
   },
   {
     name: 'MuleHide',
     href: 'https://www.mulehide.com/Products/p/TPOMembranes',
-    logo: '/brands/mulehide.png'
+    color: '#D4002A'
   }
 ]
 
@@ -89,23 +89,34 @@ export default function BrandsWeInstall({
                 href={brand.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-white rounded-lg p-6 flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-300 border border-gray-200 hover:border-teamwork-blue group min-h-[120px]"
+                className="group bg-white rounded-lg p-6 flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-300 border border-gray-200 hover:border-teamwork-blue min-h-[120px] relative overflow-hidden"
                 title={`Learn more about ${brand.name}`}
               >
-                {brand.logo ? (
-                  <div className="relative w-full h-16 grayscale group-hover:grayscale-0 transition-all duration-300">
-                    <Image
-                      src={brand.logo}
-                      alt={`${brand.name} logo`}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                ) : (
-                  <span className="text-lg font-bold text-gray-400 group-hover:text-teamwork-blue transition-colors">
+                {/* Subtle background accent on hover */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300"
+                  style={{ backgroundColor: brand.color || '#00AEEF' }}
+                ></div>
+
+                {/* Brand name styled as logo */}
+                <div className="relative z-10 text-center">
+                  <span
+                    className="text-xl font-black tracking-tight text-gray-400 group-hover:text-gray-800 transition-colors duration-300"
+                    style={{
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      textTransform: 'uppercase',
+                      letterSpacing: brand.name.length > 8 ? '-0.02em' : '0.05em'
+                    }}
+                  >
                     {brand.name}
                   </span>
-                )}
+
+                  {/* Underline accent */}
+                  <div
+                    className="h-0.5 w-0 group-hover:w-full transition-all duration-300 mx-auto mt-1.5"
+                    style={{ backgroundColor: brand.color || '#00AEEF' }}
+                  ></div>
+                </div>
               </a>
             ))}
           </div>
