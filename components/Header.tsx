@@ -18,9 +18,9 @@ export default function Header() {
             <Image
               src="/teamwork-logo.png"
               alt="Teamwork Roofing Services"
-              width={180}
-              height={60}
-              className="h-12 w-auto"
+              width={250}
+              height={194}
+              className="h-14 w-auto"
               priority
             />
           </Link>
