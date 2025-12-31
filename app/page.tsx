@@ -268,43 +268,43 @@ export default function Home() {
       </section>
 
       {/* Process Timeline with Flip Cards */}
-      <section className="section-padding bg-gray-50">
+      <section className="py-16 bg-gray-50">
         <div className="container-custom">
-          <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="heading-2 mb-4">How It Works</h2>
-            <p className="text-lg text-text-secondary">
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <h2 className="heading-2 mb-3">How It Works</h2>
+            <p className="text-text-secondary">
               Five simple steps from first contact to warranty activation. Hover over each step to see details.
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto relative">
+          <div className="max-w-4xl mx-auto relative">
             {/* Timeline Line */}
-            <div className="hidden lg:block absolute left-1/2 top-0 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-teamwork-blue via-teamwork-blue to-transparent"></div>
+            <div className="hidden lg:block absolute left-1/2 top-0 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-teamwork-blue via-teamwork-blue to-transparent"></div>
 
-            <div className="space-y-8">
+            <div className="space-y-4">
               {processSteps.map((step, index) => {
                 const Icon = step.icon
                 const isEven = index % 2 === 0
 
                 return (
-                  <div key={index} className={`flex items-center ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8`}>
+                  <div key={index} className={`flex items-center ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-4`}>
                     {/* Content - Flip Card */}
                     <div className="flex-1 group [perspective:1000px]">
-                      <div className="relative w-full h-[220px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                      <div className="relative w-full h-[160px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                         {/* Front */}
                         <div className="absolute inset-0 [backface-visibility:hidden]">
-                          <div className="h-full bg-white rounded-xl p-6 shadow-lg border-2 border-gray-100 hover:border-teamwork-blue transition-colors">
-                            <div className="flex items-start gap-4 h-full">
-                              <div className="w-12 h-12 rounded-lg bg-teamwork-blue flex items-center justify-center flex-shrink-0">
-                                <Icon className="w-6 h-6 text-white" />
+                          <div className="h-full bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:border-teamwork-blue transition-colors">
+                            <div className="flex items-start gap-3 h-full">
+                              <div className="w-10 h-10 rounded-lg bg-teamwork-blue flex items-center justify-center flex-shrink-0">
+                                <Icon className="w-5 h-5 text-white" />
                               </div>
                               <div className="flex-1">
-                                <div className="flex items-baseline gap-3 mb-2">
+                                <div className="flex items-baseline gap-2 mb-1">
                                   <span className="text-xs font-bold text-teamwork-blue tracking-wider">{step.number}</span>
-                                  <h3 className="text-xl font-bold">{step.title}</h3>
+                                  <h3 className="text-lg font-bold">{step.title}</h3>
                                 </div>
-                                <p className="text-text-secondary mb-3">{step.frontDesc}</p>
-                                <p className="text-sm text-teamwork-blue font-medium">Hover for details →</p>
+                                <p className="text-text-secondary text-sm mb-2">{step.frontDesc}</p>
+                                <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
                               </div>
                             </div>
                           </div>
@@ -312,19 +312,19 @@ export default function Home() {
 
                         {/* Back */}
                         <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                          <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-xl p-6 shadow-2xl flex flex-col justify-between">
+                          <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 shadow-xl flex flex-col justify-between">
                             <div>
-                              <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                                  <Icon className="w-5 h-5 text-white" />
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                                  <Icon className="w-4 h-4 text-white" />
                                 </div>
-                                <span className="text-sm font-bold tracking-wider opacity-80">{step.number}</span>
+                                <span className="text-xs font-bold tracking-wider opacity-80">{step.number}</span>
                               </div>
-                              <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                              <p className="text-white/95 leading-relaxed">{step.backDesc}</p>
+                              <h3 className="text-lg font-bold mb-2">{step.title}</h3>
+                              <p className="text-white/95 text-sm leading-relaxed">{step.backDesc}</p>
                             </div>
-                            <div className="mt-4 pt-4 border-t border-white/20">
-                              <p className="text-xs text-white/80">{step.shortDesc}</p>
+                            <div className="mt-2 pt-2 border-t border-white/20">
+                              <p className="text-xs text-white/70">{step.shortDesc}</p>
                             </div>
                           </div>
                         </div>
@@ -332,7 +332,7 @@ export default function Home() {
                     </div>
 
                     {/* Center Number Badge */}
-                    <div className="hidden lg:flex flex-shrink-0 w-16 h-16 rounded-full bg-teamwork-blue text-white items-center justify-center font-bold text-xl shadow-lg border-4 border-gray-50 z-10">
+                    <div className="hidden lg:flex flex-shrink-0 w-12 h-12 rounded-full bg-teamwork-blue text-white items-center justify-center font-bold text-lg shadow-lg border-4 border-gray-50 z-10">
                       {index + 1}
                     </div>
 

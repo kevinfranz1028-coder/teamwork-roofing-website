@@ -15,6 +15,7 @@ interface BrandsWeInstallProps {
 }
 
 // Default brand list - use across the site for consistency
+// Residential roofing brands only
 export const DEFAULT_BRANDS: Brand[] = [
   {
     name: 'GAF',
@@ -42,24 +43,9 @@ export const DEFAULT_BRANDS: Brand[] = [
     color: '#003B5C'
   },
   {
-    name: 'Stoneworth',
-    href: 'https://stoneworthrooftile.com/',
-    color: '#8B4513'
-  },
-  {
-    name: 'DaVinci',
-    href: 'https://www.davinciroofscapes.com/davinci-products/',
-    color: '#2C5234'
-  },
-  {
-    name: 'Versico',
-    href: 'https://www.versico.com/en/Roofing-Products/Membranes/TPO',
-    color: '#0066B3'
-  },
-  {
-    name: 'MuleHide',
-    href: 'https://www.mulehide.com/Products/p/TPOMembranes',
-    color: '#D4002A'
+    name: 'IKO',
+    href: 'https://www.iko.com/na/products/residential-roofing/',
+    color: '#005EB8'
   }
 ]
 
