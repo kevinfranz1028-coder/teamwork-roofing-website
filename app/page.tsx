@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiHome, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiStar, FiPhone, FiAward, FiShield, FiClock, FiCamera, FiArrowRight, FiTool, FiUsers } from 'react-icons/fi'
+import { FiHome, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiStar, FiPhone, FiAward, FiShield, FiClock, FiCamera, FiArrowRight, FiTool, FiUsers, FiFileText } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
 import BrandsWeInstall from '@/components/BrandsWeInstall'
@@ -10,69 +10,94 @@ export default function Home() {
     {
       icon: FiHome,
       title: 'Roof Replacement',
-      description: 'Complete roof systems with premium materials and expert installation',
+      shortDesc: 'Complete systems',
+      frontDesc: 'Premium roof systems with expert installation',
+      backDesc: 'Full tear-off and replacement with manufacturer-grade materials. GAF, CertainTeed, Owens Corning, and more. Lifetime warranties available.',
       href: '/services/roof-replacement/'
     },
     {
       icon: FiTool,
       title: 'Roof Repair',
-      description: 'Fast, reliable repairs that extend your roof\'s life',
+      shortDesc: 'Fast repairs',
+      frontDesc: 'Reliable repairs that extend your roof\'s life',
+      backDesc: 'Storm damage, leaks, missing shingles, and aging roofs. Same-week service with photo documentation of all repairs.',
       href: '/services/roof-repair/'
     },
     {
       icon: FiCloudRain,
       title: 'Storm Damage',
-      description: 'Thorough inspection and insurance claim assistance',
+      shortDesc: 'Full inspection',
+      frontDesc: 'Thorough inspection and insurance assistance',
+      backDesc: 'Complete storm damage assessment with detailed photo reports. We handle insurance claims and work directly with adjusters.',
       href: '/storm/'
     },
     {
       icon: FiDroplet,
       title: 'Gutters',
-      description: 'Seamless gutters, gutter guards, and repair',
+      shortDesc: 'Seamless systems',
+      frontDesc: 'Seamless gutters, guards, and repair',
+      backDesc: 'Custom-fitted seamless gutters, leaf guards, and downspout systems. Protect your foundation and landscaping.',
       href: '/services/gutters/'
     },
     {
       icon: FiLayers,
       title: 'Siding',
-      description: 'Beautiful, durable siding that protects your home',
+      shortDesc: 'Beautiful protection',
+      frontDesc: 'Durable siding that beautifies your home',
+      backDesc: 'Vinyl, fiber cement, and composite siding. Energy-efficient options with superior weather protection.',
       href: '/services/siding/'
     },
     {
       icon: FiSquare,
       title: 'Windows',
-      description: 'Energy-efficient window replacements',
+      shortDesc: 'Energy efficient',
+      frontDesc: 'Energy-efficient window replacements',
+      backDesc: 'Double and triple-pane windows that reduce energy bills. Professional installation with weatherproof sealing.',
       href: '/services/windows/'
     }
   ]
 
-  const whyChoose = [
+  const processSteps = [
     {
+      number: '01',
+      icon: FiPhone,
+      title: 'Contact Us',
+      shortDesc: 'Same-day response',
+      frontDesc: 'Call, text, or book online',
+      backDesc: 'Reach us by phone, text, or our online booking form. We respond the same day and schedule your inspection within the week.'
+    },
+    {
+      number: '02',
+      icon: FiClock,
+      title: 'Same-Week Inspection',
+      shortDesc: 'We arrive fast',
+      frontDesc: 'Professional assessment',
+      backDesc: 'Our certified team arrives within the week with all necessary equipment. We conduct a thorough inspection of your roof and exterior.'
+    },
+    {
+      number: '03',
       icon: FiCamera,
       title: 'Photo Documentation',
-      description: 'Every inspection includes detailed photos so you see exactly what we see'
+      shortDesc: 'See what we see',
+      frontDesc: 'Complete transparency',
+      backDesc: 'Every inspection includes detailed photos and measurements. You receive a full report showing exactly what we found.'
     },
     {
-      icon: FiClock,
-      title: 'Same-Week Service',
-      description: 'We schedule and arrive within the same week you contact us'
+      number: '04',
+      icon: FiFileText,
+      title: 'Clear Options',
+      shortDesc: 'Honest pricing',
+      frontDesc: 'No pressure guidance',
+      backDesc: 'We present multiple options with transparent pricing. No hidden fees, no pressure tactics—just honest advice.'
     },
     {
-      icon: FiCheckCircle,
-      title: 'Clean Site Guarantee',
-      description: 'Tarps, magnetic sweeps, daily cleanup—your property stays pristine'
-    },
-    {
+      number: '05',
       icon: FiShield,
-      title: 'Warranty Protection',
-      description: 'Workmanship warranty plus manufacturer coverage on all materials'
+      title: 'Expert Installation',
+      shortDesc: 'Warranty backed',
+      frontDesc: 'Professional execution',
+      backDesc: 'Skilled installation with daily cleanup and magnetic sweeps. Site left spotless with full warranty protection.'
     }
-  ]
-
-  const stats = [
-    { number: '1000+', label: 'Projects Completed' },
-    { number: '15+', label: 'Years Experience' },
-    { number: '4.9', label: 'Star Rating' },
-    { number: '100%', label: 'Satisfaction Rate' }
   ]
 
   const reviews = [
@@ -98,7 +123,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Section - Modern Professional Design */}
+      {/* Hero Section - Clean Modern Design */}
       <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
@@ -109,14 +134,14 @@ export default function Home() {
 
         <div className="container-custom relative">
           <div className="py-20 md:py-28 lg:py-32">
-            {/* Trust Badge */}
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/20">
-              <FiShield className="w-4 h-4 text-teamwork-blue" />
-              <span className="text-sm font-semibold">Kansas City's Trusted Roofing Partner Since 2009</span>
-            </div>
-
-            {/* Main Headline */}
             <div className="max-w-4xl">
+              {/* Trust Badge */}
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/20">
+                <FiShield className="w-4 h-4 text-teamwork-blue" />
+                <span className="text-sm font-semibold">Kansas City's Trusted Roofing Partner Since 2009</span>
+              </div>
+
+              {/* Main Headline */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 Roofing & Exteriors —<br />
                 <span className="text-teamwork-blue">The Teamwork Way</span>
@@ -144,21 +169,39 @@ export default function Home() {
                 </a>
               </div>
 
-              {/* Stats Bar */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-white/20">
-                {stats.map((stat, index) => (
-                  <div key={index}>
-                    <div className="text-3xl font-bold text-teamwork-blue mb-1">{stat.number}</div>
-                    <div className="text-sm text-gray-400">{stat.label}</div>
+              {/* Trust Icons */}
+              <div className="flex flex-wrap gap-6 pt-8 border-t border-white/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-teamwork-blue/20 flex items-center justify-center">
+                    <FiCheckCircle className="w-5 h-5 text-teamwork-blue" />
                   </div>
-                ))}
+                  <span className="text-sm font-medium">Licensed & Insured</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-teamwork-blue/20 flex items-center justify-center">
+                    <FiClock className="w-5 h-5 text-teamwork-blue" />
+                  </div>
+                  <span className="text-sm font-medium">Same-Week Service</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-teamwork-blue/20 flex items-center justify-center">
+                    <FiCamera className="w-5 h-5 text-teamwork-blue" />
+                  </div>
+                  <span className="text-sm font-medium">Photo Documented</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-teamwork-blue/20 flex items-center justify-center">
+                    <FiShield className="w-5 h-5 text-teamwork-blue" />
+                  </div>
+                  <span className="text-sm font-medium">Warranty Backed</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Services Grid */}
+      {/* Services Grid with Flip Cards */}
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-16">
@@ -172,20 +215,46 @@ export default function Home() {
             {services.map((service, index) => {
               const Icon = service.icon
               return (
-                <Link
-                  key={index}
-                  href={service.href}
-                  className="group bg-white border border-gray-200 rounded-lg p-6 hover:border-teamwork-blue hover:shadow-lg transition-all"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-gray-100 group-hover:bg-teamwork-blue flex items-center justify-center mb-4 transition-colors">
-                    <Icon className="w-6 h-6 text-gray-600 group-hover:text-white transition-colors" />
+                <div key={index} className="group [perspective:1000px] h-[280px]">
+                  <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    {/* Front of Card */}
+                    <div className="absolute inset-0 [backface-visibility:hidden]">
+                      <div className="h-full bg-white border border-gray-200 rounded-xl p-6 flex flex-col justify-between shadow-md hover:shadow-xl transition-shadow">
+                        <div>
+                          <div className="w-14 h-14 rounded-xl bg-teamwork-blue/10 flex items-center justify-center mb-4">
+                            <Icon className="w-7 h-7 text-teamwork-blue" />
+                          </div>
+                          <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                          <p className="text-text-secondary leading-relaxed">{service.frontDesc}</p>
+                        </div>
+                        <div className="text-teamwork-blue text-sm font-medium flex items-center mt-4">
+                          <span>Hover to learn more</span>
+                          <FiArrowRight className="ml-2 w-4 h-4" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Back of Card */}
+                    <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                      <div className="h-full bg-teamwork-blue text-white rounded-xl p-6 flex flex-col justify-between shadow-xl">
+                        <div>
+                          <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mb-4">
+                            <Icon className="w-7 h-7 text-white" />
+                          </div>
+                          <h3 className="text-xl font-bold mb-3">{service.title}</h3>
+                          <p className="text-white/90 text-sm leading-relaxed">{service.backDesc}</p>
+                        </div>
+                        <Link
+                          href={service.href}
+                          className="inline-flex items-center justify-center px-6 py-3 bg-white text-teamwork-blue font-semibold rounded-lg hover:bg-gray-100 transition-colors mt-4"
+                        >
+                          Learn More
+                          <FiArrowRight className="ml-2 w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
-                  <p className="text-text-secondary text-sm mb-4 leading-relaxed">{service.description}</p>
-                  <div className="flex items-center text-teamwork-blue text-sm font-medium">
-                    Learn more <FiArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Link>
+                </div>
               )
             })}
           </div>
@@ -198,73 +267,77 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why Choose Us */}
+      {/* Process Timeline with Flip Cards */}
       <section className="section-padding bg-gray-50">
-        <div className="container-custom">
-          <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="heading-2 mb-4">The Teamwork Difference</h2>
-            <p className="text-lg text-text-secondary">
-              We're not just roofing contractors — we're your partners in protecting what matters most.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            {whyChoose.map((item, index) => {
-              const Icon = item.icon
-              return (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-teamwork-blue mx-auto mb-4 flex items-center justify-center">
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                  <p className="text-text-secondary text-sm leading-relaxed">{item.description}</p>
-                </div>
-              )
-            })}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link href="/about/" className="inline-flex items-center btn-secondary">
-              Learn More About Us <FiArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Process Section */}
-      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h2 className="heading-2 mb-4">How It Works</h2>
             <p className="text-lg text-text-secondary">
-              From first contact to warranty activation, we make the process simple and transparent.
+              Five simple steps from first contact to warranty activation. Hover over each step to see details.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-6">
-              {[
-                { step: '01', icon: FiPhone, title: 'Contact Us', desc: 'Call, text, or book online — same-day response guaranteed' },
-                { step: '02', icon: FiClock, title: 'Same-Week Inspection', desc: 'We arrive within the week with all necessary equipment' },
-                { step: '03', icon: FiCamera, title: 'Photo Documentation', desc: 'Detailed photos and clear explanation of findings' },
-                { step: '04', icon: FiCheckCircle, title: 'Transparent Pricing', desc: 'Honest options with no pressure or hidden fees' },
-                { step: '05', icon: FiShield, title: 'Expert Installation', desc: 'Professional work with clean site guarantee and warranty' }
-              ].map((process, index) => {
-                const Icon = process.icon
+          <div className="max-w-5xl mx-auto relative">
+            {/* Timeline Line */}
+            <div className="hidden lg:block absolute left-1/2 top-0 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-teamwork-blue via-teamwork-blue to-transparent"></div>
+
+            <div className="space-y-8">
+              {processSteps.map((step, index) => {
+                const Icon = step.icon
+                const isEven = index % 2 === 0
+
                 return (
-                  <div key={index} className="flex gap-6 items-start">
-                    <div className="flex-shrink-0">
-                      <div className="w-14 h-14 rounded-lg bg-teamwork-blue text-white flex items-center justify-center">
-                        <Icon className="w-7 h-7" />
+                  <div key={index} className={`flex items-center ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8`}>
+                    {/* Content - Flip Card */}
+                    <div className="flex-1 group [perspective:1000px]">
+                      <div className="relative w-full h-[220px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                        {/* Front */}
+                        <div className="absolute inset-0 [backface-visibility:hidden]">
+                          <div className="h-full bg-white rounded-xl p-6 shadow-lg border-2 border-gray-100 hover:border-teamwork-blue transition-colors">
+                            <div className="flex items-start gap-4 h-full">
+                              <div className="w-12 h-12 rounded-lg bg-teamwork-blue flex items-center justify-center flex-shrink-0">
+                                <Icon className="w-6 h-6 text-white" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-baseline gap-3 mb-2">
+                                  <span className="text-xs font-bold text-teamwork-blue tracking-wider">{step.number}</span>
+                                  <h3 className="text-xl font-bold">{step.title}</h3>
+                                </div>
+                                <p className="text-text-secondary mb-3">{step.frontDesc}</p>
+                                <p className="text-sm text-teamwork-blue font-medium">Hover for details →</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Back */}
+                        <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                          <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-xl p-6 shadow-2xl flex flex-col justify-between">
+                            <div>
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                                  <Icon className="w-5 h-5 text-white" />
+                                </div>
+                                <span className="text-sm font-bold tracking-wider opacity-80">{step.number}</span>
+                              </div>
+                              <h3 className="text-xl font-bold mb-3">{step.title}</h3>
+                              <p className="text-white/95 leading-relaxed">{step.backDesc}</p>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-white/20">
+                              <p className="text-xs text-white/80">{step.shortDesc}</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex-1 pt-2">
-                      <div className="flex items-baseline gap-3 mb-2">
-                        <span className="text-xs font-bold text-teamwork-blue tracking-wider">{process.step}</span>
-                        <h3 className="font-semibold text-lg">{process.title}</h3>
-                      </div>
-                      <p className="text-text-secondary leading-relaxed">{process.desc}</p>
+
+                    {/* Center Number Badge */}
+                    <div className="hidden lg:flex flex-shrink-0 w-16 h-16 rounded-full bg-teamwork-blue text-white items-center justify-center font-bold text-xl shadow-lg border-4 border-gray-50 z-10">
+                      {index + 1}
                     </div>
+
+                    {/* Spacer for alternating layout */}
+                    <div className="hidden lg:block flex-1"></div>
                   </div>
                 )
               })}
@@ -274,7 +347,7 @@ export default function Home() {
       </section>
 
       {/* Reviews */}
-      <section className="section-padding bg-gray-50">
+      <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h2 className="heading-2 mb-4">What Kansas City Homeowners Say</h2>
@@ -283,20 +356,20 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {reviews.map((review, index) => (
-              <div key={index} className="bg-white rounded-lg p-6 shadow-md">
+              <div key={index} className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl hover:border-teamwork-blue transition-all">
                 <div className="flex gap-1 mb-4">
                   {[...Array(review.rating)].map((_, i) => (
                     <FiStar key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-text-secondary mb-6 leading-relaxed">"{review.text}"</p>
+                <p className="text-text-secondary mb-6 leading-relaxed italic">"{review.text}"</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
-                  <div className="w-10 h-10 rounded-full bg-teamwork-blue/10 flex items-center justify-center font-semibold text-teamwork-blue">
+                  <div className="w-12 h-12 rounded-full bg-teamwork-blue/10 flex items-center justify-center font-bold text-teamwork-blue">
                     {review.name.charAt(0)}
                   </div>
                   <div>
-                    <div className="font-semibold text-sm">{review.name}</div>
-                    <div className="text-xs text-text-secondary">{review.city}, KS</div>
+                    <div className="font-semibold">{review.name}</div>
+                    <div className="text-sm text-text-secondary">{review.city}, KS</div>
                   </div>
                 </div>
               </div>
