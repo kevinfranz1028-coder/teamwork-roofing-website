@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { FiCheckCircle } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
+import BrandsWeInstall from '@/components/BrandsWeInstall'
 
 export const metadata = {
   title: 'Gutter Installation & Repair Kansas City | Teamwork Roofing',
@@ -80,6 +81,9 @@ export default function GuttersPage() {
           </div>
         </div>
       </section>
+
+      {/* Brands We Install */}
+      <BrandsWeInstall variant="compact" />
 
       <CTABand title="Ready for Better Gutters?" />
     </>

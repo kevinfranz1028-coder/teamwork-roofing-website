@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { FiCheckCircle, FiDollarSign, FiShield, FiClock } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
+import BrandsWeInstall from '@/components/BrandsWeInstall'
 
 export const metadata = {
   title: 'Roof Replacement Kansas City | Teamwork Roofing Services',
@@ -195,6 +196,9 @@ export default function RoofReplacementPage() {
           </div>
         </div>
       </section>
+
+      {/* Brands We Install */}
+      <BrandsWeInstall variant="compact" />
 
       {/* FAQ */}
       <section className="section-padding bg-dark-bg">

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { FiCheckCircle, FiCamera, FiClipboard } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
+import BrandsWeInstall from '@/components/BrandsWeInstall'
 
 export const metadata = {
   title: 'Storm Damage Inspection Kansas City | Teamwork Roofing',
@@ -120,6 +121,9 @@ export default function StormPage() {
           </div>
         </div>
       </section>
+
+      {/* Brands We Install */}
+      <BrandsWeInstall variant="compact" />
 
       <CTABand title="Storm Damage? Act Fast" subtitle="Book your full exterior inspection today" />
     </>

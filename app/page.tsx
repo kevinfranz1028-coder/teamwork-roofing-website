@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { FiHome, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiStar } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
+import BrandsWeInstall from '@/components/BrandsWeInstall'
 
 export default function Home() {
   const services = [
@@ -286,6 +287,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Brands We Install */}
+      <BrandsWeInstall variant="full" />
 
       {/* Reviews Highlights */}
       <section className="section-padding bg-dark-surface">

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
+import BrandsWeInstall from '@/components/BrandsWeInstall'
 
 export const metadata = {
   title: 'Siding Installation & Repair Kansas City | Teamwork Roofing',
@@ -39,6 +40,9 @@ export default function SidingPage() {
           </div>
         </div>
       </section>
+
+      {/* Brands We Install */}
+      <BrandsWeInstall variant="compact" />
 
       <CTABand />
     </>

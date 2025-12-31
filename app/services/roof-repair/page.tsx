@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { FiCheckCircle, FiPhone, FiMessageSquare } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
+import BrandsWeInstall from '@/components/BrandsWeInstall'
 
 export const metadata = {
   title: 'Roof Repair Kansas City | Fast Professional Service',
@@ -107,6 +108,9 @@ export default function RoofRepairPage() {
           </div>
         </div>
       </section>
+
+      {/* Brands We Install */}
+      <BrandsWeInstall variant="compact" />
 
       <CTABand title="Need Roof Repair Fast?" subtitle="Call, text, or book your same-week inspection now" />
     </>
