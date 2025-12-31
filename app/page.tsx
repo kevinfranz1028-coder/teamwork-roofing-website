@@ -139,8 +139,8 @@ export default function Home() {
               </p>
 
               <p className="text-sm text-text-secondary mb-8">
-                <Link href="/overland-park-ks/" className="hover:text-teamwork-blue hover:underline transition-colors">
-                  Explore Overland Park service area →
+                <Link href="/service-areas/" className="hover:text-teamwork-blue hover:underline transition-colors">
+                  Explore service areas →
                 </Link>
               </p>
 

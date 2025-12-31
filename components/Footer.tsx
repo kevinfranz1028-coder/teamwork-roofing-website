@@ -147,6 +147,7 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Service Areas</h4>
             <ul className="space-y-2">
+              {/* Overland Park */}
               <li>
                 <Link href="/overland-park-ks/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
                   Overland Park, KS
@@ -169,6 +170,60 @@ export default function Footer() {
               </li>
               <li className="ml-4">
                 <Link href="/overland-park-ks/roofing-companies/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
+                  Choosing a Company
+                </Link>
+              </li>
+
+              {/* Leawood */}
+              <li className="mt-3">
+                <Link href="/leawood-ks/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                  Leawood, KS
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/leawood-ks/roof-repair/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
+                  Roof Repair
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/leawood-ks/emergency-roof-repair/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
+                  Emergency Repair
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/leawood-ks/roofing-contractor/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
+                  Roofing Contractor
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/leawood-ks/roofing-companies/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
+                  Choosing a Company
+                </Link>
+              </li>
+
+              {/* Lenexa */}
+              <li className="mt-3">
+                <Link href="/lenexa-ks/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                  Lenexa, KS
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/lenexa-ks/roof-repair/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
+                  Roof Repair
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/lenexa-ks/emergency-roof-repair/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
+                  Emergency Repair
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/lenexa-ks/roofing-contractor/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
+                  Roofing Contractor
+                </Link>
+              </li>
+              <li className="ml-4">
+                <Link href="/lenexa-ks/roofing-companies/" className="text-text-secondary text-sm hover:text-teamwork-blue transition-colors">
                   Choosing a Company
                 </Link>
               </li>

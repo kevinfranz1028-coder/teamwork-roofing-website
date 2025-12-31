@@ -22,8 +22,8 @@ export default function StormPage() {
               Full exterior storm assessment with professional photo documentation you can share with your insurer and adjuster.
             </p>
             <p className="text-sm text-text-secondary mb-8">
-              <Link href="/overland-park-ks/" className="hover:text-teamwork-blue hover:underline transition-colors">
-                Storm inspection in Overland Park? Start here →
+              <Link href="/service-areas/" className="hover:text-teamwork-blue hover:underline transition-colors">
+                Storm inspection by city →
               </Link>
             </p>
             <div className="flex flex-wrap gap-4">
