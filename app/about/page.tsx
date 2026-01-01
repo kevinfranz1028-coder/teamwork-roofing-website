@@ -44,34 +44,99 @@ export default function AboutPage() {
             <div>
               <h2 className="heading-3 mb-8 text-center">The 5 Promises That Define Us</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
-                <div className="card text-center">
-                  <FiShield className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
-                  <h4 className="font-semibold mb-2">Teamwork Warranty</h4>
-                  <p className="text-sm text-text-secondary">Backed by our partnership commitment</p>
+                <div className="group [perspective:1000px]">
+                  <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    <div className="absolute inset-0 [backface-visibility:hidden]">
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
+                        <FiShield className="w-12 h-12 text-teamwork-blue mb-4" />
+                        <h4 className="font-semibold mb-2">Teamwork Warranty</h4>
+                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                        <FiShield className="w-10 h-10 mb-3 opacity-90" />
+                        <h4 className="font-bold mb-2 text-sm">Teamwork Warranty</h4>
+                        <p className="text-xs text-white/90">Backed by our partnership commitment and workmanship guarantee</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="card text-center">
-                  <FiClock className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
-                  <h4 className="font-semibold mb-2">Same-Week Inspection</h4>
-                  <p className="text-sm text-text-secondary">Fast response guaranteed</p>
+                <div className="group [perspective:1000px]">
+                  <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    <div className="absolute inset-0 [backface-visibility:hidden]">
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
+                        <FiClock className="w-12 h-12 text-teamwork-blue mb-4" />
+                        <h4 className="font-semibold mb-2">Same-Week Inspection</h4>
+                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                        <FiClock className="w-10 h-10 mb-3 opacity-90" />
+                        <h4 className="font-bold mb-2 text-sm">Same-Week Inspection</h4>
+                        <p className="text-xs text-white/90">Fast response guaranteed — inspections scheduled within the same week</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="card text-center">
-                  <FiCheckCircle className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
-                  <h4 className="font-semibold mb-2">Clean Site Guarantee</h4>
-                  <p className="text-sm text-text-secondary">Your property protected</p>
+                <div className="group [perspective:1000px]">
+                  <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    <div className="absolute inset-0 [backface-visibility:hidden]">
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
+                        <FiCheckCircle className="w-12 h-12 text-teamwork-blue mb-4" />
+                        <h4 className="font-semibold mb-2">Clean Site Guarantee</h4>
+                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                        <FiCheckCircle className="w-10 h-10 mb-3 opacity-90" />
+                        <h4 className="font-bold mb-2 text-sm">Clean Site Guarantee</h4>
+                        <p className="text-xs text-white/90">Your property protected with tarps, careful handling, and thorough cleanup</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="card text-center">
-                  <FiCamera className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
-                  <h4 className="font-semibold mb-2">Photo-Proof Inspection</h4>
-                  <p className="text-sm text-text-secondary">Complete documentation</p>
+                <div className="group [perspective:1000px]">
+                  <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    <div className="absolute inset-0 [backface-visibility:hidden]">
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
+                        <FiCamera className="w-12 h-12 text-teamwork-blue mb-4" />
+                        <h4 className="font-semibold mb-2">Photo-Proof Inspection</h4>
+                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                        <FiCamera className="w-10 h-10 mb-3 opacity-90" />
+                        <h4 className="font-bold mb-2 text-sm">Photo-Proof Inspection</h4>
+                        <p className="text-xs text-white/90">Complete documentation so you can see exactly what we see</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="card text-center">
-                  <FiDollarSign className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
-                  <h4 className="font-semibold mb-2">Teamwork Financing</h4>
-                  <p className="text-sm text-text-secondary">Flexible payment options</p>
+                <div className="group [perspective:1000px]">
+                  <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    <div className="absolute inset-0 [backface-visibility:hidden]">
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
+                        <FiDollarSign className="w-12 h-12 text-teamwork-blue mb-4" />
+                        <h4 className="font-semibold mb-2">Teamwork Financing</h4>
+                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                        <FiDollarSign className="w-10 h-10 mb-3 opacity-90" />
+                        <h4 className="font-bold mb-2 text-sm">Teamwork Financing</h4>
+                        <p className="text-xs text-white/90">Flexible payment options to make quality work affordable</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

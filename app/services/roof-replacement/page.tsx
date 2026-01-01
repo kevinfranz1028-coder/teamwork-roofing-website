@@ -126,17 +126,48 @@ export default function RoofReplacementPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {tiers.map((tier, index) => (
-              <div key={index} className="card">
-                <h3 className="heading-3 mb-2">{tier.name}</h3>
-                <p className="text-text-secondary mb-6">{tier.description}</p>
-                <ul className="space-y-3">
-                  {tier.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start space-x-2">
-                      <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-text-secondary">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+              <div key={index} className="group [perspective:1000px]">
+                <div className="relative w-full h-[320px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                  {/* Front */}
+                  <div className="absolute inset-0 [backface-visibility:hidden]">
+                    <div className="h-full card hover:border-teamwork-blue transition-colors flex flex-col">
+                      <h3 className="heading-3 mb-2">{tier.name}</h3>
+                      <p className="text-text-secondary mb-6">{tier.description}</p>
+                      <ul className="space-y-3 flex-grow">
+                        {tier.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start space-x-2">
+                            <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-text-secondary">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="text-xs text-teamwork-blue font-medium mt-4">Hover for details →</p>
+                    </div>
+                  </div>
+                  {/* Back */}
+                  <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                    <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-6 shadow-xl flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-2xl font-bold mb-3">{tier.name}</h3>
+                        <p className="text-white/90 mb-6">{tier.description}</p>
+                        <ul className="space-y-3">
+                          {tier.features.map((feature, idx) => (
+                            <li key={idx} className="flex items-start space-x-2">
+                              <FiCheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                              <span className="text-sm text-white/90">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <Link
+                        href="/book/"
+                        className="block w-full text-center bg-white text-teamwork-blue py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors mt-4"
+                      >
+                        Book Inspection →
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -206,8 +237,8 @@ export default function RoofReplacementPage() {
           <h2 className="heading-2 mb-12 text-center">Roof Replacement FAQ</h2>
           <div className="max-w-3xl mx-auto space-y-4">
             {faqs.map((faq, index) => (
-              <div key={index} className="card">
-                <h4 className="font-semibold mb-2">{faq.q}</h4>
+              <div key={index} className="group card hover:border-teamwork-blue transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                <h4 className="font-semibold mb-2 group-hover:text-teamwork-blue transition-colors">{faq.q}</h4>
                 <p className="text-text-secondary text-sm">{faq.a}</p>
               </div>
             ))}

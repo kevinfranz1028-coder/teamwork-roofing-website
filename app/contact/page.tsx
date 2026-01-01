@@ -85,8 +85,8 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="card">
-                <h3 className="heading-4 mb-4">Service Area</h3>
+              <div className="group card hover:border-teamwork-blue transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                <h3 className="heading-4 mb-4 group-hover:text-teamwork-blue transition-colors">Service Area</h3>
                 <div className="flex items-start space-x-3 mb-4">
                   <FiMapPin className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
                   <div>
@@ -98,18 +98,18 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="card bg-white">
-                <h3 className="heading-4 mb-4">What to Expect</h3>
+              <div className="group card bg-white hover:border-teamwork-blue transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                <h3 className="heading-4 mb-4 group-hover:text-teamwork-blue transition-colors">What to Expect</h3>
                 <ul className="space-y-3 text-sm text-text-secondary">
-                  <li className="flex items-start space-x-2">
+                  <li className="flex items-start space-x-2 group/item hover:translate-x-1 transition-transform duration-200">
                     <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
                     <span>Response within 24 hours</span>
                   </li>
-                  <li className="flex items-start space-x-2">
+                  <li className="flex items-start space-x-2 group/item hover:translate-x-1 transition-transform duration-200">
                     <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
                     <span>Same-week inspection available</span>
                   </li>
-                  <li className="flex items-start space-x-2">
+                  <li className="flex items-start space-x-2 group/item hover:translate-x-1 transition-transform duration-200">
                     <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
                     <span>No pressure, clear communication</span>
                   </li>
@@ -129,7 +129,7 @@ export default function ContactPage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200"
                     required
                   />
                 </div>
@@ -142,7 +142,7 @@ export default function ContactPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200"
                     required
                   />
                 </div>
@@ -153,7 +153,7 @@ export default function ContactPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200"
                   />
                 </div>
 
@@ -162,7 +162,7 @@ export default function ContactPage() {
                   <select
                     value={formData.service}
                     onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200"
                   >
                     <option value="">Select a service</option>
                     <option value="roof-replacement">Roof Replacement</option>
@@ -183,12 +183,12 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     rows={5}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200 resize-none"
                     required
                   />
                 </div>
 
-                <button type="submit" className="btn-primary w-full">
+                <button type="submit" className="btn-primary w-full hover:scale-105 active:scale-95 transition-transform duration-200">
                   Send Message
                 </button>
 

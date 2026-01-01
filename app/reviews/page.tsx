@@ -107,9 +107,9 @@ export default function ReviewsPage() {
             <h2 className="heading-3 mb-6 text-center">What Customers Mention Most</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {topMentions.map((mention, index) => (
-                <div key={index} className="flex items-center space-x-2 card">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue flex-shrink-0" />
-                  <span className="text-text-secondary">{mention}</span>
+                <div key={index} className="group flex items-center space-x-2 card hover:border-teamwork-blue transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                  <span className="text-text-secondary group-hover:text-teamwork-blue transition-colors duration-300">{mention}</span>
                 </div>
               ))}
             </div>
@@ -118,15 +118,15 @@ export default function ReviewsPage() {
           {/* Reviews Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {reviews.map((review, index) => (
-              <div key={index} className="card">
-                <div className="flex mb-3">
+              <div key={index} className="group card hover:border-teamwork-blue transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <div className="flex mb-3 space-x-1">
                   {[...Array(review.rating)].map((_, i) => (
-                    <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current" />
+                    <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current group-hover:scale-110 transition-transform duration-300" style={{transitionDelay: `${i * 50}ms`}} />
                   ))}
                 </div>
-                <p className="text-text-secondary mb-4">{review.text}</p>
-                <div className="border-t border-light-border pt-4">
-                  <p className="font-semibold">{review.name}</p>
+                <p className="text-text-secondary mb-4 group-hover:text-text-primary transition-colors duration-300">{review.text}</p>
+                <div className="border-t border-light-border group-hover:border-teamwork-blue/30 transition-colors duration-300 pt-4">
+                  <p className="font-semibold group-hover:text-teamwork-blue transition-colors duration-300">{review.name}</p>
                   <p className="text-sm text-text-secondary">{review.city}, KS</p>
                   <p className="text-xs text-text-muted mt-1">{review.date}</p>
                 </div>
