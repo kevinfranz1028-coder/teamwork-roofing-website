@@ -68,14 +68,14 @@ export default function BrandsWeInstall({
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {brandList.map((brand, index) => (
               <a
                 key={index}
                 href={brand.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group bg-white rounded-lg p-6 flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-300 border border-gray-200 hover:border-teamwork-blue min-h-[120px] relative overflow-hidden"
+                className="group bg-white rounded-lg p-8 flex flex-col items-center justify-center hover:shadow-xl hover:scale-105 transition-all duration-300 border border-gray-200 hover:border-teamwork-blue min-h-[140px] relative overflow-hidden"
                 title={`Learn more about ${brand.name}`}
               >
                 {/* Subtle background accent on hover */}
@@ -85,9 +85,9 @@ export default function BrandsWeInstall({
                 ></div>
 
                 {/* Brand name styled as logo */}
-                <div className="relative z-10 text-center">
+                <div className="relative z-10 text-center w-full">
                   <span
-                    className="text-xl font-black tracking-tight text-gray-400 group-hover:text-gray-800 transition-colors duration-300"
+                    className="block text-2xl font-black tracking-tight text-gray-400 group-hover:text-gray-800 transition-colors duration-300"
                     style={{
                       fontFamily: 'system-ui, -apple-system, sans-serif',
                       textTransform: 'uppercase',
@@ -99,7 +99,7 @@ export default function BrandsWeInstall({
 
                   {/* Underline accent */}
                   <div
-                    className="h-0.5 w-0 group-hover:w-full transition-all duration-300 mx-auto mt-1.5"
+                    className="h-1 w-0 group-hover:w-full transition-all duration-300 mx-auto mt-2"
                     style={{ backgroundColor: brand.color || '#00AEEF' }}
                   ></div>
                 </div>
