@@ -1,44 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import { FiPhone, FiMail, FiMapPin, FiCheckCircle } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
+import ContactForm from '@/components/forms/ContactForm'
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    service: '',
-    message: ''
-  })
-  const [submitted, setSubmitted] = useState(false)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Contact form submitted:', formData)
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setFormData({ name: '', phone: '', email: '', service: '', message: '' })
-    }, 3000)
-  }
-
-  if (submitted) {
-    return (
-      <section className="section-padding bg-light-bg min-h-screen flex items-center justify-center">
-        <div className="card max-w-2xl text-center">
-          <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
-            <FiCheckCircle className="w-10 h-10 text-green-500" />
-          </div>
-          <h1 className="heading-2 mb-4">Message Sent!</h1>
-          <p className="text-xl text-text-secondary">
-            Thank you for contacting Teamwork Roofing. We'll respond within 24 hours.
-          </p>
-        </div>
-      </section>
-    )
-  }
 
   return (
     <>
@@ -118,85 +84,7 @@ export default function ContactPage() {
             </div>
 
             {/* Contact Form */}
-            <div className="card">
-              <h3 className="heading-4 mb-6">Send Us a Message</h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Phone <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Service Interested In</label>
-                  <select
-                    value={formData.service}
-                    onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200"
-                  >
-                    <option value="">Select a service</option>
-                    <option value="roof-replacement">Roof Replacement</option>
-                    <option value="roof-repair">Roof Repair</option>
-                    <option value="storm-damage">Storm Damage</option>
-                    <option value="gutters">Gutters</option>
-                    <option value="siding">Siding</option>
-                    <option value="windows">Windows</option>
-                    <option value="not-sure">Not Sure</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    Message <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    rows={5}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:ring-2 focus:ring-teamwork-blue/20 focus:outline-none transition-all duration-200 resize-none"
-                    required
-                  />
-                </div>
-
-                <button type="submit" className="btn-primary w-full hover:scale-105 active:scale-95 transition-transform duration-200">
-                  Send Message
-                </button>
-
-                <p className="text-xs text-text-muted text-center">
-                  By submitting, you agree to receive calls/texts from Teamwork Roofing Services.
-                </p>
-              </form>
-            </div>
+            <ContactForm />
           </div>
         </div>
       </section>

@@ -4,19 +4,15 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { FiHome, FiDroplet, FiLayers, FiSquare, FiCloudRain } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
+import EstimateForm from '@/components/forms/EstimateForm'
 
 export default function EstimatePage() {
-  const [step, setStep] = useState<'service' | 'questions' | 'result' | 'form'>('service')
+  const [step, setStep] = useState<'service' | 'questions' | 'result'>('service')
   const [selectedService, setSelectedService] = useState('')
   const [formData, setFormData] = useState({
     size: '',
     stories: '',
-    urgency: '',
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
-    notes: ''
+    urgency: ''
   })
   const [estimatedPrice, setEstimatedPrice] = useState(0)
 
@@ -53,34 +49,6 @@ export default function EstimatePage() {
 
     setEstimatedPrice(Math.round(basePrice))
     setStep('result')
-  }
-
-  const handleFinalSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Here you would send the lead to your API
-    console.log('Lead submitted:', {
-      service: selectedService,
-      estimate: estimatedPrice,
-      ...formData
-    })
-
-    // Show success message or redirect
-    alert('Thank you! We\'ll contact you within 24 hours to schedule your same-week inspection.')
-
-    // Reset form
-    setStep('service')
-    setSelectedService('')
-    setFormData({
-      size: '',
-      stories: '',
-      urgency: '',
-      name: '',
-      phone: '',
-      email: '',
-      address: '',
-      notes: ''
-    })
   }
 
   return (
@@ -190,7 +158,7 @@ export default function EstimatePage() {
             </div>
           )}
 
-          {/* Result & Form */}
+          {/* Result & HubSpot Form */}
           {step === 'result' && (
             <div className="space-y-8">
               {/* Estimate Result */}
@@ -204,79 +172,8 @@ export default function EstimatePage() {
                 </p>
               </div>
 
-              {/* Lead Form */}
-              <div className="card max-w-2xl mx-auto">
-                <h3 className="heading-4 mb-4">Book Your Same-Week Inspection</h3>
-                <p className="text-text-secondary mb-6">
-                  Provide your contact info and we'll reach out to schedule your inspection
-                </p>
-
-                <form onSubmit={handleFinalSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      Phone <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Email (Optional)</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Address (Optional)</label>
-                    <input
-                      type="text"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Additional Notes</label>
-                    <textarea
-                      value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      rows={4}
-                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
-                    />
-                  </div>
-
-                  <button type="submit" className="btn-primary w-full">
-                    Submit & Book Inspection
-                  </button>
-
-                  <p className="text-xs text-text-muted text-center">
-                    By submitting, you agree to receive calls/texts from Teamwork Roofing Services at the number provided.
-                  </p>
-                </form>
-              </div>
+              {/* HubSpot Form */}
+              <EstimateForm />
 
               {/* What Happens Next */}
               <div className="card max-w-2xl mx-auto">
