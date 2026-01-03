@@ -11,7 +11,7 @@ export default function Footer() {
           <div>
             <Link href="/" className="inline-block mb-4">
               <Image
-                src="/teamwork-logo.png"
+                src="/brands/Teamwork Roofing Logo- Transparent.png"
                 alt="Teamwork Roofing Services"
                 width={250}
                 height={194}
@@ -163,7 +163,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li className="mt-3">
-                <Link href="/service-areas/" className="text-teamwork-green hover:text-[#0094CC] transition-colors font-medium">
+                <Link href="/service-areas/" className="text-teamwork-green hover:text-teamwork-green-dark transition-colors font-medium">
                   View All Areas →
                 </Link>
               </li>

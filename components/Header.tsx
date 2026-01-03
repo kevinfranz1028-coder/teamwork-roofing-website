@@ -29,7 +29,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center group">
             <Image
-              src="/teamwork-logo.png"
+              src="/brands/Teamwork Roofing Logo- Transparent.png"
               alt="Teamwork Roofing Services"
               width={250}
               height={194}
