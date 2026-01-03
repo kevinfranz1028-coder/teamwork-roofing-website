@@ -12,7 +12,7 @@ export default function NeighborhoodsSection({ city, neighborhoods }: Neighborho
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {neighborhoods.map((neighborhood, index) => (
               <div key={index} className="flex items-center space-x-2">
-                <span className="w-1.5 h-1.5 bg-teamwork-blue rounded-full flex-shrink-0"></span>
+                <span className="w-1.5 h-1.5 bg-teamwork-green rounded-full flex-shrink-0"></span>
                 <span className="text-text-secondary text-sm">{neighborhood}</span>
               </div>
             ))}

@@ -15,7 +15,7 @@ export default function SidingPage() {
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
-              Siding — <span className="text-teamwork-blue">Protect & Beautify</span>
+              Siding — <span className="text-teamwork-green">Protect & Beautify</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               Transform your home's exterior with professional siding installation or repair. Multiple materials, expert craftsmanship.

@@ -41,7 +41,7 @@ function BrandChips({ brands }: { brands: Brand[] }) {
           href={brand.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 bg-light-bg border border-light-border rounded-full text-sm font-semibold hover:border-teamwork-blue hover:text-teamwork-blue transition-all duration-200"
+          className="px-4 py-2 bg-light-bg border border-light-border rounded-full text-sm font-semibold hover:border-teamwork-green hover:text-teamwork-green transition-all duration-200"
         >
           {brand.name}
         </a>
@@ -58,7 +58,7 @@ export default function MaterialsPage() {
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
-              Roofing Materials & Systems <span className="text-teamwork-blue">We Install</span>
+              Roofing Materials & Systems <span className="text-teamwork-green">We Install</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               We help you choose the right roofing system for your home, budget, and Kansas City weather conditions. Every installation follows manufacturer specifications and includes photo documentation, clean site practices, and our Teamwork Warranty.

@@ -49,13 +49,13 @@ export default function LocalProjectsSection({ city, projects }: LocalProjectsSe
                 </div>
               </div>
               <div className="mb-3">
-                <span className="text-xs px-3 py-1 bg-teamwork-blue/10 text-teamwork-blue rounded-full">
+                <span className="text-xs px-3 py-1 bg-teamwork-green/10 text-teamwork-green rounded-full">
                   {project.city}
                 </span>
               </div>
               <h4 className="font-semibold mb-2">{project.title}</h4>
               <p className="text-sm text-text-secondary mb-4">{project.scope}</p>
-              <Link href="/projects/" className="text-teamwork-blue hover:underline text-sm font-semibold">
+              <Link href="/projects/" className="text-teamwork-green hover:underline text-sm font-semibold">
                 View Project →
               </Link>
             </div>

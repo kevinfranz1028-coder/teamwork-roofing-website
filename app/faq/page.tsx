@@ -124,8 +124,8 @@ export default function FAQPage() {
                   }}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
                     openCategory === category.id
-                      ? 'bg-teamwork-blue text-white shadow-lg scale-105'
-                      : 'bg-white text-text-secondary hover:text-teamwork-blue hover:border-teamwork-blue hover:shadow-md hover:scale-102 border border-light-border'
+                      ? 'bg-teamwork-green text-white shadow-lg scale-105'
+                      : 'bg-white text-text-secondary hover:text-teamwork-green hover:border-teamwork-green hover:shadow-md hover:scale-102 border border-light-border'
                   }`}
                 >
                   {category.title}
@@ -141,14 +141,14 @@ export default function FAQPage() {
                   category.faqs.map((faq, index) => {
                     const isOpen = openQuestion === index
                     return (
-                      <div key={index} className={`group card transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${isOpen ? 'border-teamwork-blue shadow-md' : 'hover:border-teamwork-blue'}`}>
+                      <div key={index} className={`group card transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${isOpen ? 'border-teamwork-green shadow-md' : 'hover:border-teamwork-green'}`}>
                         <button
                           onClick={() => setOpenQuestion(isOpen ? null : index)}
                           className="w-full flex items-center justify-between text-left"
                         >
-                          <h4 className={`font-semibold pr-4 transition-colors ${isOpen ? 'text-teamwork-blue' : 'group-hover:text-teamwork-blue'}`}>{faq.q}</h4>
+                          <h4 className={`font-semibold pr-4 transition-colors ${isOpen ? 'text-teamwork-green' : 'group-hover:text-teamwork-green'}`}>{faq.q}</h4>
                           <FiChevronDown
-                            className={`w-5 h-5 text-teamwork-blue flex-shrink-0 transition-transform duration-300 ${
+                            className={`w-5 h-5 text-teamwork-green flex-shrink-0 transition-transform duration-300 ${
                               isOpen ? 'rotate-180' : ''
                             }`}
                           />

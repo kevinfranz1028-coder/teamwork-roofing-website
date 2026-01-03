@@ -34,13 +34,13 @@ export default function RoofRepairPage() {
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
-              Roof Repair — <span className="text-teamwork-blue">Fast, Clean, Photo-Documented</span>
+              Roof Repair — <span className="text-teamwork-green">Fast, Clean, Photo-Documented</span>
             </h1>
             <p className="text-xl text-text-secondary mb-4">
               Same-week service for Kansas City Metro. Honest guidance on repair vs replace.
             </p>
             <p className="text-sm text-text-secondary mb-8">
-              <Link href="/overland-park-ks/roof-repair/" className="hover:text-teamwork-blue hover:underline transition-colors">
+              <Link href="/overland-park-ks/roof-repair/" className="hover:text-teamwork-green hover:underline transition-colors">
                 Need roof repair in Overland Park? See local options →
               </Link>
             </p>
@@ -69,7 +69,7 @@ export default function RoofRepairPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {commonIssues.map((issue, index) => (
               <div key={index} className="flex items-start space-x-3">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
                 <span className="text-text-secondary">{issue}</span>
               </div>
             ))}
@@ -97,8 +97,8 @@ export default function RoofRepairPage() {
           <div className="max-w-3xl mx-auto space-y-4">
             {processSteps.map((step, index) => (
               <div key={index} className="flex items-start space-x-4">
-                <div className="w-10 h-10 rounded-full bg-teamwork-blue/10 border-2 border-teamwork-blue flex items-center justify-center flex-shrink-0">
-                  <span className="text-teamwork-blue font-bold">{index + 1}</span>
+                <div className="w-10 h-10 rounded-full bg-teamwork-green/10 border-2 border-teamwork-green flex items-center justify-center flex-shrink-0">
+                  <span className="text-teamwork-green font-bold">{index + 1}</span>
                 </div>
                 <div className="flex items-center h-10">
                   <p className="text-text-secondary">{step}</p>

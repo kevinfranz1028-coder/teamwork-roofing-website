@@ -14,9 +14,9 @@ export default function EmergencyRoofRepairPage() {
       <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
-            <Link href="/" className="hover:text-teamwork-blue">Home</Link>
+            <Link href="/" className="hover:text-teamwork-green">Home</Link>
             <span>/</span>
-            <Link href="/overland-park-ks/" className="hover:text-teamwork-blue">Overland Park</Link>
+            <Link href="/overland-park-ks/" className="hover:text-teamwork-green">Overland Park</Link>
             <span>/</span>
             <span className="text-text-secondary">Emergency Roof Repair</span>
           </div>
@@ -83,7 +83,7 @@ export default function EmergencyRoofRepairPage() {
               </li>
             </ol>
             <p className="text-text-secondary text-sm text-center mt-6">
-              Need non-emergency help? <Link href="/overland-park-ks/roof-repair/" className="text-teamwork-blue hover:underline">See Roof Repair in Overland Park →</Link>
+              Need non-emergency help? <Link href="/overland-park-ks/roof-repair/" className="text-teamwork-green hover:underline">See Roof Repair in Overland Park →</Link>
             </p>
           </div>
         </div>
@@ -98,17 +98,17 @@ export default function EmergencyRoofRepairPage() {
               <div className="card">
                 <h4 className="font-semibold mb-3">Interior Photos</h4>
                 <ul className="space-y-2 text-sm text-text-secondary">
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Water stains on ceiling</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Active dripping areas</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Wet insulation if visible</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Water stains on ceiling</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Active dripping areas</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Wet insulation if visible</li>
                 </ul>
               </div>
               <div className="card">
                 <h4 className="font-semibold mb-3">Exterior Photos (if safe)</h4>
                 <ul className="space-y-2 text-sm text-text-secondary">
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Visible roof damage</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Missing shingles</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />General overview</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Visible roof damage</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Missing shingles</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />General overview</li>
                 </ul>
               </div>
             </div>
@@ -130,7 +130,7 @@ export default function EmergencyRoofRepairPage() {
               </ul>
             </div>
             <div className="card">
-              <h4 className="font-semibold mb-3 text-teamwork-blue">Permanent Repair</h4>
+              <h4 className="font-semibold mb-3 text-teamwork-green">Permanent Repair</h4>
               <p className="text-text-secondary text-sm mb-4">Once assessed and approved:</p>
               <ul className="space-y-2 text-sm text-text-secondary">
                 <li>Complete repair scope</li>

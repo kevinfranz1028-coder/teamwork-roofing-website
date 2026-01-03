@@ -57,9 +57,9 @@ export default function RoofingContractorPage() {
       <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
-            <Link href="/" className="hover:text-teamwork-blue">Home</Link>
+            <Link href="/" className="hover:text-teamwork-green">Home</Link>
             <span>/</span>
-            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-blue">{cityData.cityName}</Link>
+            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-green">{cityData.cityName}</Link>
             <span>/</span>
             <span className="text-text-secondary">Roofing Contractor</span>
           </div>
@@ -70,7 +70,7 @@ export default function RoofingContractorPage() {
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
-              Your {cityData.cityName} Roofing Contractor — Built on <span className="text-teamwork-blue">Teamwork</span>
+              Your {cityData.cityName} Roofing Contractor — Built on <span className="text-teamwork-green">Teamwork</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               More than a vendor — a partner from day one. Licensed, insured, and committed to trust, communication, and quality in every {cityData.cityName} project.
@@ -113,7 +113,7 @@ export default function RoofingContractorPage() {
               const Icon = guarantee.icon
               return (
                 <div key={index} className="card">
-                  <Icon className="w-12 h-12 text-teamwork-blue mb-4" />
+                  <Icon className="w-12 h-12 text-teamwork-green mb-4" />
                   <h4 className="font-semibold mb-2">{guarantee.title}</h4>
                   <p className="text-sm text-text-secondary">{guarantee.description}</p>
                 </div>
@@ -131,7 +131,7 @@ export default function RoofingContractorPage() {
             <ul className="space-y-3">
               {checklist.map((item, index) => (
                 <li key={index} className="flex items-start">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                  <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                   <span className="text-text-secondary">{item}</span>
                 </li>
               ))}

@@ -36,9 +36,9 @@ export default function RoofReplacementPage() {
       <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
-            <Link href="/" className="hover:text-teamwork-blue">Home</Link>
+            <Link href="/" className="hover:text-teamwork-green">Home</Link>
             <span>/</span>
-            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-blue">{cityData.cityName}</Link>
+            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-green">{cityData.cityName}</Link>
             <span>/</span>
             <span className="text-text-secondary">Roof Replacement</span>
           </div>
@@ -49,7 +49,7 @@ export default function RoofReplacementPage() {
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
-              Roof Replacement in <span className="text-teamwork-blue">{cityData.cityName}, {cityData.state}</span>
+              Roof Replacement in <span className="text-teamwork-green">{cityData.cityName}, {cityData.state}</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               Professional roof replacement with photo-proof documentation, clean site practices, and Teamwork Warranty backing. Serving all {cityData.cityName} neighborhoods with same-week inspections.
@@ -70,7 +70,7 @@ export default function RoofReplacementPage() {
           <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {signs.map((sign, index) => (
               <div key={index} className="flex items-start space-x-3">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
                 <span className="text-text-secondary">{sign}</span>
               </div>
             ))}
@@ -88,8 +88,8 @@ export default function RoofReplacementPage() {
             {process.map((step, index) => (
               <div key={index} className="card">
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 rounded-full bg-teamwork-blue/10 border-2 border-teamwork-blue flex items-center justify-center flex-shrink-0">
-                    <span className="text-teamwork-blue font-bold">{index + 1}</span>
+                  <div className="w-10 h-10 rounded-full bg-teamwork-green/10 border-2 border-teamwork-green flex items-center justify-center flex-shrink-0">
+                    <span className="text-teamwork-green font-bold">{index + 1}</span>
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">{step.title}</h4>
@@ -111,19 +111,19 @@ export default function RoofReplacementPage() {
             </p>
             <ul className="space-y-3">
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary">Underlayment protection across the entire roof deck</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary">Ice and water shield in critical leak-prone areas</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary">Ridge vents and intake ventilation for proper airflow</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary">Flashing upgrades around chimneys, vents, and valleys</span>
               </li>
             </ul>
@@ -136,26 +136,26 @@ export default function RoofReplacementPage() {
       <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto text-center">
-            <FiShield className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
+            <FiShield className="w-12 h-12 text-teamwork-green mx-auto mb-4" />
             <h3 className="heading-3 mb-4">Clean Site Workflow</h3>
             <p className="text-text-secondary mb-4">
               Your {cityData.cityName} property is protected before, during, and after installation:
             </p>
             <ul className="text-left space-y-2 text-text-secondary max-w-xl mx-auto">
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span>Tarps placed to protect landscaping and gutters</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span>Dumpster positioned for safe debris containment</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span>Daily cleanup and magnetic nail sweeps</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span>Final walkthrough and your approval before we leave</span>
               </li>
             </ul>

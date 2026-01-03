@@ -83,7 +83,7 @@ export default function TermsPage() {
             </p>
             <p className="mt-2">
               Teamwork Roofing Services LLC<br />
-              Phone: <a href="tel:9133963717" className="text-teamwork-blue hover:underline">913-396-3717</a>
+              Phone: <a href="tel:9133963717" className="text-teamwork-green hover:underline">913-396-3717</a>
             </p>
           </div>
         </div>

@@ -37,8 +37,8 @@ export default function PromiseStrip() {
             const Icon = promise.icon
             return (
               <div key={index} className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-teamwork-blue/10 flex items-center justify-center mb-3">
-                  <Icon className="w-6 h-6 text-teamwork-blue" />
+                <div className="w-12 h-12 rounded-full bg-teamwork-green/10 flex items-center justify-center mb-3">
+                  <Icon className="w-6 h-6 text-teamwork-green" />
                 </div>
                 <h4 className="font-semibold text-sm mb-1">{promise.title}</h4>
                 <p className="text-xs text-text-secondary">{promise.description}</p>

@@ -137,14 +137,14 @@ export default function Home() {
             <div className="max-w-4xl">
               {/* Trust Badge */}
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/20">
-                <FiShield className="w-4 h-4 text-teamwork-blue" />
+                <FiShield className="w-4 h-4 text-teamwork-green" />
                 <span className="text-sm font-semibold">Kansas City's Trusted Roofing Partner Since 2009</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 Roofing & Exteriors —<br />
-                <span className="text-teamwork-blue">The Teamwork Way</span>
+                <span className="text-teamwork-green">The Teamwork Way</span>
               </h1>
 
               <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
@@ -155,7 +155,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Link
                   href="/book/"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-teamwork-blue text-white font-semibold rounded-lg hover:bg-[#0094CC] transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-[#0094CC] transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
                   Schedule Free Inspection
                   <FiArrowRight className="ml-2 w-5 h-5" />
@@ -164,7 +164,7 @@ export default function Home() {
                   href="tel:9133963717"
                   className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-all shadow-lg"
                 >
-                  <FiPhone className="mr-2 w-5 h-5 text-teamwork-blue" />
+                  <FiPhone className="mr-2 w-5 h-5 text-teamwork-green" />
                   (913) 396-3717
                 </a>
               </div>
@@ -172,26 +172,26 @@ export default function Home() {
               {/* Trust Icons */}
               <div className="flex flex-wrap gap-6 pt-8 border-t border-white/20">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teamwork-blue/20 flex items-center justify-center">
-                    <FiCheckCircle className="w-5 h-5 text-teamwork-blue" />
+                  <div className="w-10 h-10 rounded-lg bg-teamwork-green/20 flex items-center justify-center">
+                    <FiCheckCircle className="w-5 h-5 text-teamwork-green" />
                   </div>
                   <span className="text-sm font-medium">Licensed & Insured</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teamwork-blue/20 flex items-center justify-center">
-                    <FiClock className="w-5 h-5 text-teamwork-blue" />
+                  <div className="w-10 h-10 rounded-lg bg-teamwork-green/20 flex items-center justify-center">
+                    <FiClock className="w-5 h-5 text-teamwork-green" />
                   </div>
                   <span className="text-sm font-medium">Same-Week Service</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teamwork-blue/20 flex items-center justify-center">
-                    <FiCamera className="w-5 h-5 text-teamwork-blue" />
+                  <div className="w-10 h-10 rounded-lg bg-teamwork-green/20 flex items-center justify-center">
+                    <FiCamera className="w-5 h-5 text-teamwork-green" />
                   </div>
                   <span className="text-sm font-medium">Photo Documented</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teamwork-blue/20 flex items-center justify-center">
-                    <FiShield className="w-5 h-5 text-teamwork-blue" />
+                  <div className="w-10 h-10 rounded-lg bg-teamwork-green/20 flex items-center justify-center">
+                    <FiShield className="w-5 h-5 text-teamwork-green" />
                   </div>
                   <span className="text-sm font-medium">Warranty Backed</span>
                 </div>
@@ -221,13 +221,13 @@ export default function Home() {
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <div className="h-full bg-white border border-gray-200 rounded-xl p-6 flex flex-col justify-between shadow-md hover:shadow-xl transition-shadow">
                         <div>
-                          <div className="w-14 h-14 rounded-xl bg-teamwork-blue/10 flex items-center justify-center mb-4">
-                            <Icon className="w-7 h-7 text-teamwork-blue" />
+                          <div className="w-14 h-14 rounded-xl bg-teamwork-green/10 flex items-center justify-center mb-4">
+                            <Icon className="w-7 h-7 text-teamwork-green" />
                           </div>
                           <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
                           <p className="text-text-secondary leading-relaxed">{service.frontDesc}</p>
                         </div>
-                        <div className="text-teamwork-blue text-sm font-medium flex items-center mt-4">
+                        <div className="text-teamwork-green text-sm font-medium flex items-center mt-4">
                           <span>Hover to learn more</span>
                           <FiArrowRight className="ml-2 w-4 h-4" />
                         </div>
@@ -236,7 +236,7 @@ export default function Home() {
 
                     {/* Back of Card */}
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-teamwork-blue text-white rounded-xl p-6 flex flex-col justify-between shadow-xl">
+                      <div className="h-full bg-teamwork-green text-white rounded-xl p-6 flex flex-col justify-between shadow-xl">
                         <div>
                           <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mb-4">
                             <Icon className="w-7 h-7 text-white" />
@@ -246,7 +246,7 @@ export default function Home() {
                         </div>
                         <Link
                           href={service.href}
-                          className="inline-flex items-center justify-center px-6 py-3 bg-white text-teamwork-blue font-semibold rounded-lg hover:bg-gray-100 transition-colors mt-4"
+                          className="inline-flex items-center justify-center px-6 py-3 bg-white text-teamwork-green font-semibold rounded-lg hover:bg-gray-100 transition-colors mt-4"
                         >
                           Learn More
                           <FiArrowRight className="ml-2 w-4 h-4" />
@@ -260,7 +260,7 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <Link href="/service-areas/" className="inline-flex items-center text-teamwork-blue hover:text-[#0094CC] font-medium">
+            <Link href="/service-areas/" className="inline-flex items-center text-teamwork-green hover:text-[#0094CC] font-medium">
               View All Service Areas <FiArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </div>
@@ -279,7 +279,7 @@ export default function Home() {
 
           <div className="max-w-4xl mx-auto relative">
             {/* Timeline Line */}
-            <div className="hidden lg:block absolute left-1/2 top-0 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-teamwork-blue via-teamwork-blue to-transparent"></div>
+            <div className="hidden lg:block absolute left-1/2 top-0 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-teamwork-green via-teamwork-green to-transparent"></div>
 
             <div className="space-y-4">
               {processSteps.map((step, index) => {
@@ -293,18 +293,18 @@ export default function Home() {
                       <div className="relative w-full h-[160px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                         {/* Front */}
                         <div className="absolute inset-0 [backface-visibility:hidden]">
-                          <div className="h-full bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:border-teamwork-blue transition-colors">
+                          <div className="h-full bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:border-teamwork-green transition-colors">
                             <div className="flex items-start gap-3 h-full">
-                              <div className="w-10 h-10 rounded-lg bg-teamwork-blue flex items-center justify-center flex-shrink-0">
+                              <div className="w-10 h-10 rounded-lg bg-teamwork-green flex items-center justify-center flex-shrink-0">
                                 <Icon className="w-5 h-5 text-white" />
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-baseline gap-2 mb-1">
-                                  <span className="text-xs font-bold text-teamwork-blue tracking-wider">{step.number}</span>
+                                  <span className="text-xs font-bold text-teamwork-green tracking-wider">{step.number}</span>
                                   <h3 className="text-lg font-bold">{step.title}</h3>
                                 </div>
                                 <p className="text-text-secondary text-sm mb-2">{step.frontDesc}</p>
-                                <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                                <p className="text-xs text-teamwork-green font-medium">Hover for details →</p>
                               </div>
                             </div>
                           </div>
@@ -312,7 +312,7 @@ export default function Home() {
 
                         {/* Back */}
                         <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                          <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 shadow-xl flex flex-col justify-between">
+                          <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 shadow-xl flex flex-col justify-between">
                             <div>
                               <div className="flex items-center gap-2 mb-2">
                                 <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
@@ -332,7 +332,7 @@ export default function Home() {
                     </div>
 
                     {/* Center Number Badge */}
-                    <div className="hidden lg:flex flex-shrink-0 w-12 h-12 rounded-full bg-teamwork-blue text-white items-center justify-center font-bold text-lg shadow-lg border-4 border-gray-50 z-10">
+                    <div className="hidden lg:flex flex-shrink-0 w-12 h-12 rounded-full bg-teamwork-green text-white items-center justify-center font-bold text-lg shadow-lg border-4 border-gray-50 z-10">
                       {index + 1}
                     </div>
 
@@ -356,7 +356,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {reviews.map((review, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl hover:border-teamwork-blue transition-all">
+              <div key={index} className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl hover:border-teamwork-green transition-all">
                 <div className="flex gap-1 mb-4">
                   {[...Array(review.rating)].map((_, i) => (
                     <FiStar key={i} className="w-5 h-5 text-yellow-400 fill-current" />
@@ -364,7 +364,7 @@ export default function Home() {
                 </div>
                 <p className="text-text-secondary mb-6 leading-relaxed italic">"{review.text}"</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
-                  <div className="w-12 h-12 rounded-full bg-teamwork-blue/10 flex items-center justify-center font-bold text-teamwork-blue">
+                  <div className="w-12 h-12 rounded-full bg-teamwork-green/10 flex items-center justify-center font-bold text-teamwork-green">
                     {review.name.charAt(0)}
                   </div>
                   <div>

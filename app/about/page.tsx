@@ -13,7 +13,7 @@ export default function AboutPage() {
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h1 className="heading-1 mb-6">
-              Built on <span className="text-teamwork-blue">Teamwork</span>
+              Built on <span className="text-teamwork-green">Teamwork</span>
             </h1>
             <p className="text-xl text-text-secondary">
               More than a name — it's our commitment. From day one, you're a partner, not a transaction.
@@ -47,14 +47,14 @@ export default function AboutPage() {
                 <div className="group [perspective:1000px]">
                   <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
-                        <FiShield className="w-12 h-12 text-teamwork-blue mb-4" />
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-green transition-colors">
+                        <FiShield className="w-12 h-12 text-teamwork-green mb-4" />
                         <h4 className="font-semibold mb-2">Teamwork Warranty</h4>
-                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                        <p className="text-xs text-teamwork-green font-medium">Hover for details →</p>
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiShield className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Teamwork Warranty</h4>
                         <p className="text-xs text-white/90">Backed by our partnership commitment and workmanship guarantee</p>
@@ -66,14 +66,14 @@ export default function AboutPage() {
                 <div className="group [perspective:1000px]">
                   <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
-                        <FiClock className="w-12 h-12 text-teamwork-blue mb-4" />
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-green transition-colors">
+                        <FiClock className="w-12 h-12 text-teamwork-green mb-4" />
                         <h4 className="font-semibold mb-2">Same-Week Inspection</h4>
-                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                        <p className="text-xs text-teamwork-green font-medium">Hover for details →</p>
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiClock className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Same-Week Inspection</h4>
                         <p className="text-xs text-white/90">Fast response guaranteed — inspections scheduled within the same week</p>
@@ -85,14 +85,14 @@ export default function AboutPage() {
                 <div className="group [perspective:1000px]">
                   <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
-                        <FiCheckCircle className="w-12 h-12 text-teamwork-blue mb-4" />
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-green transition-colors">
+                        <FiCheckCircle className="w-12 h-12 text-teamwork-green mb-4" />
                         <h4 className="font-semibold mb-2">Clean Site Guarantee</h4>
-                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                        <p className="text-xs text-teamwork-green font-medium">Hover for details →</p>
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiCheckCircle className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Clean Site Guarantee</h4>
                         <p className="text-xs text-white/90">Your property protected with tarps, careful handling, and thorough cleanup</p>
@@ -104,14 +104,14 @@ export default function AboutPage() {
                 <div className="group [perspective:1000px]">
                   <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
-                        <FiCamera className="w-12 h-12 text-teamwork-blue mb-4" />
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-green transition-colors">
+                        <FiCamera className="w-12 h-12 text-teamwork-green mb-4" />
                         <h4 className="font-semibold mb-2">Photo-Proof Inspection</h4>
-                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                        <p className="text-xs text-teamwork-green font-medium">Hover for details →</p>
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiCamera className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Photo-Proof Inspection</h4>
                         <p className="text-xs text-white/90">Complete documentation so you can see exactly what we see</p>
@@ -123,14 +123,14 @@ export default function AboutPage() {
                 <div className="group [perspective:1000px]">
                   <div className="relative w-full h-[200px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-blue transition-colors">
-                        <FiDollarSign className="w-12 h-12 text-teamwork-blue mb-4" />
+                      <div className="h-full card text-center flex flex-col items-center justify-center hover:border-teamwork-green transition-colors">
+                        <FiDollarSign className="w-12 h-12 text-teamwork-green mb-4" />
                         <h4 className="font-semibold mb-2">Teamwork Financing</h4>
-                        <p className="text-xs text-teamwork-blue font-medium">Hover for details →</p>
+                        <p className="text-xs text-teamwork-green font-medium">Hover for details →</p>
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiDollarSign className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Teamwork Financing</h4>
                         <p className="text-xs text-white/90">Flexible payment options to make quality work affordable</p>

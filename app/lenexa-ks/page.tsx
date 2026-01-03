@@ -65,7 +65,7 @@ export default function LenexaPage() {
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
-              Roofing & Exteriors in <span className="text-teamwork-blue">{cityData.cityName}, {cityData.state}</span> — Done The Teamwork Way
+              Roofing & Exteriors in <span className="text-teamwork-green">{cityData.cityName}, {cityData.state}</span> — Done The Teamwork Way
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               {cityData.hub.intro}
@@ -93,11 +93,11 @@ export default function LenexaPage() {
             </div>
 
             <div className="flex items-center justify-center gap-6 text-text-secondary">
-              <a href={`tel:${cityData.phone}`} className="hover:text-teamwork-blue transition-colors">
+              <a href={`tel:${cityData.phone}`} className="hover:text-teamwork-green transition-colors">
                 <FiCheckCircle className="inline w-5 h-5 mr-2" />
                 Call: {cityData.phone}
               </a>
-              <a href={`sms:${cityData.phone}`} className="hover:text-teamwork-blue transition-colors">
+              <a href={`sms:${cityData.phone}`} className="hover:text-teamwork-green transition-colors">
                 Text: {cityData.phone}
               </a>
             </div>
@@ -119,9 +119,9 @@ export default function LenexaPage() {
                 <Link
                   key={index}
                   href={service.href}
-                  className="card hover:border-teamwork-blue transition-all duration-200 group"
+                  className="card hover:border-teamwork-green transition-all duration-200 group"
                 >
-                  <Icon className="w-12 h-12 text-teamwork-blue mb-4 group-hover:scale-110 transition-transform" />
+                  <Icon className="w-12 h-12 text-teamwork-green mb-4 group-hover:scale-110 transition-transform" />
                   <h3 className="text-xl font-semibold">{service.title}</h3>
                 </Link>
               )
@@ -143,8 +143,8 @@ export default function LenexaPage() {
           <div className="grid md:grid-cols-5 gap-6">
             {processSteps.map((step, index) => (
               <div key={index} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-teamwork-blue/10 border-2 border-teamwork-blue flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-teamwork-blue">{step.number}</span>
+                <div className="w-16 h-16 rounded-full bg-teamwork-green/10 border-2 border-teamwork-green flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-teamwork-green">{step.number}</span>
                 </div>
                 <h4 className="font-semibold mb-2">{step.title}</h4>
                 <p className="text-sm text-text-secondary">{step.description}</p>
@@ -164,7 +164,7 @@ export default function LenexaPage() {
             <ul className="space-y-3 mb-4">
               {cityData.localProof.bullets.map((bullet, index) => (
                 <li key={index} className="flex items-start">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 mr-3 flex-shrink-0" />
+                  <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 mr-3 flex-shrink-0" />
                   <span className="text-text-secondary">{bullet}</span>
                 </li>
               ))}
@@ -178,7 +178,7 @@ export default function LenexaPage() {
       <section className="py-6 bg-light-bg">
         <div className="container-custom">
           <p className="text-sm text-text-secondary text-center">
-            <Link href="/service-areas/" className="hover:text-teamwork-blue hover:underline transition-colors">
+            <Link href="/service-areas/" className="hover:text-teamwork-green hover:underline transition-colors">
               Serving more than {cityData.cityName}? View Kansas City Metro coverage →
             </Link>
           </p>
@@ -228,7 +228,7 @@ export default function LenexaPage() {
                   {faq.link ? (
                     <>
                       {faq.a.split(faq.link.text)[0]}
-                      <Link href={faq.link.href} className="text-teamwork-blue hover:underline">
+                      <Link href={faq.link.href} className="text-teamwork-green hover:underline">
                         {faq.link.text}
                       </Link>
                       {faq.a.split(faq.link.text)[1]}
@@ -242,7 +242,7 @@ export default function LenexaPage() {
           </div>
 
           <div className="text-center mt-8">
-            <Link href="/faq/" className="text-teamwork-blue hover:underline">
+            <Link href="/faq/" className="text-teamwork-green hover:underline">
               View All FAQs →
             </Link>
           </div>

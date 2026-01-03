@@ -55,9 +55,9 @@ export default function RoofingCompaniesPage() {
       <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
-            <Link href="/" className="hover:text-teamwork-blue">Home</Link>
+            <Link href="/" className="hover:text-teamwork-green">Home</Link>
             <span>/</span>
-            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-blue">{cityData.cityName}</Link>
+            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-green">{cityData.cityName}</Link>
             <span>/</span>
             <span className="text-text-secondary">Choosing a Company</span>
           </div>
@@ -68,7 +68,7 @@ export default function RoofingCompaniesPage() {
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
-              Choosing Between Roofing Companies in <span className="text-teamwork-blue">{cityData.cityName}</span>
+              Choosing Between Roofing Companies in <span className="text-teamwork-green">{cityData.cityName}</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               Not all roofing companies operate the same way. Learn how to compare quotes apples-to-apples, spot red flags, and select the right partner for your {cityData.cityName} home.
@@ -94,7 +94,7 @@ export default function RoofingCompaniesPage() {
               {comparisonPoints.map((point, index) => (
                 <div key={index} className="card">
                   <div className="flex items-start">
-                    <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                    <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                     <span className="text-text-secondary">{point}</span>
                   </div>
                 </div>
@@ -130,15 +130,15 @@ export default function RoofingCompaniesPage() {
             </p>
             <ul className="space-y-3">
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary"><strong className="text-text-primary">Workmanship warranty:</strong> Covers installation errors and labor issues</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary"><strong className="text-text-primary">Material warranty:</strong> Manufacturer coverage on shingles (typically 25 years to lifetime)</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary"><strong className="text-text-primary">Transferability:</strong> Can warranty transfer if you sell your home?</span>
               </li>
             </ul>
@@ -152,27 +152,27 @@ export default function RoofingCompaniesPage() {
       <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto">
-            <FiDollarSign className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
+            <FiDollarSign className="w-12 h-12 text-teamwork-green mx-auto mb-4" />
             <h3 className="heading-3 mb-4 text-center">Financing Considerations</h3>
             <p className="text-text-secondary mb-4 text-center">
               Most {cityData.cityName} homeowners use financing for roof replacement. Ask each company:
             </p>
             <ul className="space-y-3 max-w-xl mx-auto">
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary">Do you offer financing or partner with lenders?</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary">What are the typical terms and rates?</span>
               </li>
               <li className="flex items-start">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-3 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-3 flex-shrink-0" />
                 <span className="text-text-secondary">Are there deferred interest or low-rate options?</span>
               </li>
             </ul>
             <p className="text-sm text-text-muted text-center mt-6">
-              Teamwork offers flexible financing options with multiple term lengths. <Link href="/financing/" className="text-teamwork-blue hover:underline">Learn more about financing</Link>
+              Teamwork offers flexible financing options with multiple term lengths. <Link href="/financing/" className="text-teamwork-green hover:underline">Learn more about financing</Link>
             </p>
           </div>
         </div>

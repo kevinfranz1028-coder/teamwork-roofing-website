@@ -15,7 +15,7 @@ export default function WindowsPage() {
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
-              Windows — <span className="text-teamwork-blue">Comfort & Efficiency</span>
+              Windows — <span className="text-teamwork-green">Comfort & Efficiency</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               Energy-efficient window replacement for comfort, lower energy bills, and improved curb appeal.

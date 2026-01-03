@@ -63,9 +63,9 @@ export default function RoofingCompaniesPage() {
       <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
-            <Link href="/" className="hover:text-teamwork-blue">Home</Link>
+            <Link href="/" className="hover:text-teamwork-green">Home</Link>
             <span>/</span>
-            <Link href="/overland-park-ks/" className="hover:text-teamwork-blue">Overland Park</Link>
+            <Link href="/overland-park-ks/" className="hover:text-teamwork-green">Overland Park</Link>
             <span>/</span>
             <span className="text-text-secondary">Roofing Companies Guide</span>
           </div>
@@ -76,7 +76,7 @@ export default function RoofingCompaniesPage() {
         <div className="container-custom">
           <div className="max-w-3xl mx-auto">
             <h1 className="heading-1 mb-6">
-              How to Choose a Roofing Company in <span className="text-teamwork-blue">Overland Park</span>
+              How to Choose a Roofing Company in <span className="text-teamwork-green">Overland Park</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               Your roof is a major investment. Use this checklist to make an informed decision and avoid common pitfalls when hiring a roofing company in Overland Park.
@@ -97,12 +97,12 @@ export default function RoofingCompaniesPage() {
             <div className="grid md:grid-cols-2 gap-4">
               {checklist.map((item, index) => (
                 <div key={index} className="flex items-start space-x-3">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
+                  <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
                   <div>
                     <span className="text-text-secondary">{item}</span>
                     {item === 'Emergency/urgent service availability' && (
                       <p className="text-xs text-text-muted mt-1">
-                        If you need urgent help, see <Link href="/overland-park-ks/emergency-roof-repair/" className="text-teamwork-blue hover:underline">Emergency Roof Repair in Overland Park →</Link>
+                        If you need urgent help, see <Link href="/overland-park-ks/emergency-roof-repair/" className="text-teamwork-green hover:underline">Emergency Roof Repair in Overland Park →</Link>
                       </p>
                     )}
                   </div>
@@ -150,7 +150,7 @@ export default function RoofingCompaniesPage() {
             {teamworkMatch.map((item, index) => (
               <div key={index} className="card">
                 <div className="flex items-start space-x-3">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
+                  <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold mb-1">{item.promise}</h4>
                     <p className="text-sm text-text-secondary">{item.match}</p>

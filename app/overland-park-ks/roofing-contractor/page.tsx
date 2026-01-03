@@ -56,9 +56,9 @@ export default function RoofingContractorPage() {
       <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
-            <Link href="/" className="hover:text-teamwork-blue">Home</Link>
+            <Link href="/" className="hover:text-teamwork-green">Home</Link>
             <span>/</span>
-            <Link href="/overland-park-ks/" className="hover:text-teamwork-blue">Overland Park</Link>
+            <Link href="/overland-park-ks/" className="hover:text-teamwork-green">Overland Park</Link>
             <span>/</span>
             <span className="text-text-secondary">Roofing Contractor</span>
           </div>
@@ -69,7 +69,7 @@ export default function RoofingContractorPage() {
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
-              Your Overland Park Roofing Contractor — Built on <span className="text-teamwork-blue">Teamwork</span>
+              Your Overland Park Roofing Contractor — Built on <span className="text-teamwork-green">Teamwork</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               More than a vendor — a partner from day one. Licensed, insured, and committed to trust, communication, and quality in every Overland Park project.
@@ -112,7 +112,7 @@ export default function RoofingContractorPage() {
               const Icon = guarantee.icon
               return (
                 <div key={index} className="card">
-                  <Icon className="w-12 h-12 text-teamwork-blue mb-4" />
+                  <Icon className="w-12 h-12 text-teamwork-green mb-4" />
                   <h4 className="font-semibold mb-2">{guarantee.title}</h4>
                   <p className="text-sm text-text-secondary">{guarantee.description}</p>
                 </div>
@@ -130,17 +130,17 @@ export default function RoofingContractorPage() {
               <div className="card">
                 <h4 className="font-semibold mb-3">Before We Start</h4>
                 <ul className="space-y-2 text-sm text-text-secondary">
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Tarps for landscaping</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Driveway protection</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Clear site plan</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Tarps for landscaping</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Driveway protection</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Clear site plan</li>
                 </ul>
               </div>
               <div className="card">
                 <h4 className="font-semibold mb-3">When We Finish</h4>
                 <ul className="space-y-2 text-sm text-text-secondary">
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Magnetic nail sweep</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Complete debris removal</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-1 mr-2 flex-shrink-0" />Final walkthrough</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Magnetic nail sweep</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Complete debris removal</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-1 mr-2 flex-shrink-0" />Final walkthrough</li>
                 </ul>
               </div>
             </div>

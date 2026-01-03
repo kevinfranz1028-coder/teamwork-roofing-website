@@ -24,19 +24,19 @@ export default function Footer() {
             <div className="space-y-2 text-text-secondary">
               <p>Kansas City Metro Area</p>
               <p>
-                <a href="tel:9133963717" className="hover:text-teamwork-blue transition-colors">
+                <a href="tel:9133963717" className="hover:text-teamwork-green transition-colors">
                   913-396-3717
                 </a>
               </p>
             </div>
             <div className="flex space-x-4 mt-4">
-              <a href="#" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+              <a href="#" className="text-text-secondary hover:text-teamwork-green transition-colors">
                 <FiFacebook className="w-5 h-5" />
               </a>
-              <a href="#" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+              <a href="#" className="text-text-secondary hover:text-teamwork-green transition-colors">
                 <FiInstagram className="w-5 h-5" />
               </a>
-              <a href="#" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+              <a href="#" className="text-text-secondary hover:text-teamwork-green transition-colors">
                 <FiLinkedin className="w-5 h-5" />
               </a>
             </div>
@@ -47,32 +47,32 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Services</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/services/roof-replacement/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/services/roof-replacement/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Roof Replacement
                 </Link>
               </li>
               <li>
-                <Link href="/services/roof-repair/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/services/roof-repair/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Roof Repair
                 </Link>
               </li>
               <li>
-                <Link href="/services/gutters/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/services/gutters/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Gutters
                 </Link>
               </li>
               <li>
-                <Link href="/services/siding/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/services/siding/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Siding
                 </Link>
               </li>
               <li>
-                <Link href="/services/windows/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/services/windows/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Windows
                 </Link>
               </li>
               <li>
-                <Link href="/storm/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/storm/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Storm Damage Inspection
                 </Link>
               </li>
@@ -84,37 +84,37 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/about/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/about/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/projects/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/projects/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Projects
                 </Link>
               </li>
               <li>
-                <Link href="/reviews/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/reviews/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Reviews
                 </Link>
               </li>
               <li>
-                <Link href="/materials/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/materials/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Materials & Brands
                 </Link>
               </li>
               <li>
-                <Link href="/financing/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/financing/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Financing
                 </Link>
               </li>
               <li>
-                <Link href="/warranty/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/warranty/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Warranty
                 </Link>
               </li>
               <li>
-                <Link href="/faq/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/faq/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   FAQ
                 </Link>
               </li>
@@ -126,17 +126,17 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Get Started</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/book/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/book/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Book Same-Week Inspection
                 </Link>
               </li>
               <li>
-                <Link href="/estimate/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/estimate/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Start Teamwork Estimate
                 </Link>
               </li>
               <li>
-                <Link href="/contact/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/contact/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Contact Us
                 </Link>
               </li>
@@ -148,22 +148,22 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Service Areas</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/overland-park-ks/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/overland-park-ks/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Overland Park
                 </Link>
               </li>
               <li>
-                <Link href="/leawood-ks/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/leawood-ks/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Leawood
                 </Link>
               </li>
               <li>
-                <Link href="/lenexa-ks/" className="text-text-secondary hover:text-teamwork-blue transition-colors">
+                <Link href="/lenexa-ks/" className="text-text-secondary hover:text-teamwork-green transition-colors">
                   Lenexa
                 </Link>
               </li>
               <li className="mt-3">
-                <Link href="/service-areas/" className="text-teamwork-blue hover:text-[#0094CC] transition-colors font-medium">
+                <Link href="/service-areas/" className="text-teamwork-green hover:text-[#0094CC] transition-colors font-medium">
                   View All Areas →
                 </Link>
               </li>
@@ -183,10 +183,10 @@ export default function Footer() {
               &copy; {new Date().getFullYear()} Teamwork Roofing Services LLC. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
-              <Link href="/privacy/" className="text-text-muted hover:text-teamwork-blue transition-colors">
+              <Link href="/privacy/" className="text-text-muted hover:text-teamwork-green transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/terms/" className="text-text-muted hover:text-teamwork-blue transition-colors">
+              <Link href="/terms/" className="text-text-muted hover:text-teamwork-green transition-colors">
                 Terms of Service
               </Link>
             </div>

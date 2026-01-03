@@ -74,9 +74,9 @@ export default function EstimatePage() {
                     <button
                       key={service.id}
                       onClick={() => handleServiceSelect(service.id)}
-                      className="card hover:border-teamwork-blue transition-all duration-200 text-left group"
+                      className="card hover:border-teamwork-green transition-all duration-200 text-left group"
                     >
-                      <Icon className="w-12 h-12 text-teamwork-blue mb-4 group-hover:scale-110 transition-transform" />
+                      <Icon className="w-12 h-12 text-teamwork-green mb-4 group-hover:scale-110 transition-transform" />
                       <h3 className="text-xl font-semibold">{service.title}</h3>
                     </button>
                   )
@@ -96,7 +96,7 @@ export default function EstimatePage() {
                   <select
                     value={formData.size}
                     onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-green focus:outline-none"
                     required
                   >
                     <option value="">Select size</option>
@@ -112,7 +112,7 @@ export default function EstimatePage() {
                     <select
                       value={formData.stories}
                       onChange={(e) => setFormData({ ...formData, stories: e.target.value })}
-                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                      className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-green focus:outline-none"
                       required
                     >
                       <option value="">Select stories</option>
@@ -128,7 +128,7 @@ export default function EstimatePage() {
                   <select
                     value={formData.urgency}
                     onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-blue focus:outline-none"
+                    className="w-full px-4 py-3 bg-light-bg border border-light-border rounded-lg focus:border-teamwork-green focus:outline-none"
                     required
                   >
                     <option value="">Select urgency</option>
@@ -162,12 +162,12 @@ export default function EstimatePage() {
           {step === 'result' && (
             <div className="space-y-8">
               {/* Estimate Result */}
-              <div className="card text-center max-w-2xl mx-auto bg-gradient-to-br from-teamwork-blue to-blue-700">
+              <div className="card text-center max-w-2xl mx-auto bg-gradient-to-br from-teamwork-green to-green-700">
                 <h2 className="heading-3 mb-4">Your Estimated Starting Price</h2>
                 <div className="text-6xl font-bold mb-4">
                   ${estimatedPrice.toLocaleString()}
                 </div>
-                <p className="text-blue-100 mb-6">
+                <p className="text-green-100 mb-6">
                   This is a starting estimate. Book your same-week inspection for exact pricing.
                 </p>
               </div>
@@ -180,19 +180,19 @@ export default function EstimatePage() {
                 <h4 className="font-semibold mb-4">What Happens Next</h4>
                 <ol className="space-y-3 text-text-secondary">
                   <li className="flex">
-                    <span className="font-bold text-teamwork-blue mr-3">1.</span>
+                    <span className="font-bold text-teamwork-green mr-3">1.</span>
                     <span>We'll call or text within 24 hours</span>
                   </li>
                   <li className="flex">
-                    <span className="font-bold text-teamwork-blue mr-3">2.</span>
+                    <span className="font-bold text-teamwork-green mr-3">2.</span>
                     <span>Schedule your same-week inspection</span>
                   </li>
                   <li className="flex">
-                    <span className="font-bold text-teamwork-blue mr-3">3.</span>
+                    <span className="font-bold text-teamwork-green mr-3">3.</span>
                     <span>Receive photo documentation and exact pricing</span>
                   </li>
                   <li className="flex">
-                    <span className="font-bold text-teamwork-blue mr-3">4.</span>
+                    <span className="font-bold text-teamwork-green mr-3">4.</span>
                     <span>Review options with our Teamwork Financing available</span>
                   </li>
                 </ol>

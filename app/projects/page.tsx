@@ -39,8 +39,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('all')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${
                   filter === 'all'
-                    ? 'bg-teamwork-blue text-white shadow-lg scale-105'
-                    : 'bg-white text-text-secondary hover:text-teamwork-blue hover:border-teamwork-blue hover:shadow-md hover:scale-102 border border-light-border'
+                    ? 'bg-teamwork-green text-white shadow-lg scale-105'
+                    : 'bg-white text-text-secondary hover:text-teamwork-green hover:border-teamwork-green hover:shadow-md hover:scale-102 border border-light-border'
                 }`}
               >
                 All Projects
@@ -49,8 +49,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('roofing')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${
                   filter === 'roofing'
-                    ? 'bg-teamwork-blue text-white shadow-lg scale-105'
-                    : 'bg-white text-text-secondary hover:text-teamwork-blue hover:border-teamwork-blue hover:shadow-md hover:scale-102 border border-light-border'
+                    ? 'bg-teamwork-green text-white shadow-lg scale-105'
+                    : 'bg-white text-text-secondary hover:text-teamwork-green hover:border-teamwork-green hover:shadow-md hover:scale-102 border border-light-border'
                 }`}
               >
                 Roofing
@@ -59,8 +59,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('storm')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${
                   filter === 'storm'
-                    ? 'bg-teamwork-blue text-white shadow-lg scale-105'
-                    : 'bg-white text-text-secondary hover:text-teamwork-blue hover:border-teamwork-blue hover:shadow-md hover:scale-102 border border-light-border'
+                    ? 'bg-teamwork-green text-white shadow-lg scale-105'
+                    : 'bg-white text-text-secondary hover:text-teamwork-green hover:border-teamwork-green hover:shadow-md hover:scale-102 border border-light-border'
                 }`}
               >
                 Storm
@@ -69,8 +69,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('gutters')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${
                   filter === 'gutters'
-                    ? 'bg-teamwork-blue text-white shadow-lg scale-105'
-                    : 'bg-white text-text-secondary hover:text-teamwork-blue hover:border-teamwork-blue hover:shadow-md hover:scale-102 border border-light-border'
+                    ? 'bg-teamwork-green text-white shadow-lg scale-105'
+                    : 'bg-white text-text-secondary hover:text-teamwork-green hover:border-teamwork-green hover:shadow-md hover:scale-102 border border-light-border'
                 }`}
               >
                 Gutters
@@ -79,8 +79,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('siding')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${
                   filter === 'siding'
-                    ? 'bg-teamwork-blue text-white shadow-lg scale-105'
-                    : 'bg-white text-text-secondary hover:text-teamwork-blue hover:border-teamwork-blue hover:shadow-md hover:scale-102 border border-light-border'
+                    ? 'bg-teamwork-green text-white shadow-lg scale-105'
+                    : 'bg-white text-text-secondary hover:text-teamwork-green hover:border-teamwork-green hover:shadow-md hover:scale-102 border border-light-border'
                 }`}
               >
                 Siding
@@ -89,8 +89,8 @@ export default function ProjectsPage() {
                 onClick={() => setFilter('windows')}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${
                   filter === 'windows'
-                    ? 'bg-teamwork-blue text-white shadow-lg scale-105'
-                    : 'bg-white text-text-secondary hover:text-teamwork-blue hover:border-teamwork-blue hover:shadow-md hover:scale-102 border border-light-border'
+                    ? 'bg-teamwork-green text-white shadow-lg scale-105'
+                    : 'bg-white text-text-secondary hover:text-teamwork-green hover:border-teamwork-green hover:shadow-md hover:scale-102 border border-light-border'
                 }`}
               >
                 Windows
@@ -101,19 +101,19 @@ export default function ProjectsPage() {
           {/* Project Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project) => (
-              <div key={project.id} className="group card cursor-pointer hover:border-teamwork-blue transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <div key={project.id} className="group card cursor-pointer hover:border-teamwork-green transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <div className="relative h-48 bg-light-bg rounded-lg mb-4 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-teamwork-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute inset-0 flex items-center justify-center text-text-muted group-hover:text-teamwork-blue transition-colors duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-teamwork-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 flex items-center justify-center text-text-muted group-hover:text-teamwork-green transition-colors duration-300">
                     Project Photo
                   </div>
                 </div>
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold mb-1 group-hover:text-teamwork-blue transition-colors duration-300">{project.service}</h4>
+                    <h4 className="font-semibold mb-1 group-hover:text-teamwork-green transition-colors duration-300">{project.service}</h4>
                     <p className="text-sm text-text-secondary">{project.city}, KS</p>
                   </div>
-                  <span className="text-xs px-3 py-1 bg-teamwork-blue/10 text-teamwork-blue rounded-full group-hover:bg-teamwork-blue group-hover:text-white transition-all duration-300">
+                  <span className="text-xs px-3 py-1 bg-teamwork-green/10 text-teamwork-green rounded-full group-hover:bg-teamwork-green group-hover:text-white transition-all duration-300">
                     {project.city}
                   </span>
                 </div>

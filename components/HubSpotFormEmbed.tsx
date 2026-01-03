@@ -80,8 +80,8 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
               inputs.forEach((input: HTMLElement) => {
                 input.classList.add(
                   'w-full', 'px-4', 'py-3', 'bg-light-bg', 'border', 'border-light-border',
-                  'rounded-lg', 'focus:border-teamwork-blue', 'focus:ring-2',
-                  'focus:ring-teamwork-blue/20', 'focus:outline-none', 'transition-all', 'duration-200'
+                  'rounded-lg', 'focus:border-teamwork-green', 'focus:ring-2',
+                  'focus:ring-teamwork-green/20', 'focus:outline-none', 'transition-all', 'duration-200'
                 )
               })
 
@@ -90,7 +90,7 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
               if (submitBtn) {
                 submitBtn.classList.add(
                   'btn-primary', 'w-full', 'hover:scale-105', 'active:scale-95',
-                  'transition-transform', 'duration-200', '!bg-teamwork-blue', '!text-white'
+                  'transition-transform', 'duration-200', '!bg-teamwork-green', '!text-white'
                 )
               }
 

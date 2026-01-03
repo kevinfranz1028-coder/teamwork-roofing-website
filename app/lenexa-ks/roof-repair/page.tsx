@@ -66,9 +66,9 @@ export default function LenexaRoofRepairPage() {
       <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
-            <Link href="/" className="hover:text-teamwork-blue">Home</Link>
+            <Link href="/" className="hover:text-teamwork-green">Home</Link>
             <span>/</span>
-            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-blue">{cityData.cityName}</Link>
+            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-green">{cityData.cityName}</Link>
             <span>/</span>
             <span className="text-text-secondary">Roof Repair</span>
           </div>
@@ -80,7 +80,7 @@ export default function LenexaRoofRepairPage() {
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
-              Roof Repair in <span className="text-teamwork-blue">{cityData.cityName}, {cityData.state}</span>
+              Roof Repair in <span className="text-teamwork-green">{cityData.cityName}, {cityData.state}</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               Fast, professional roof repair with photo-proof documentation, honest guidance, and clean site practices. Serving all {cityData.cityName} neighborhoods with same-week inspections.
@@ -101,7 +101,7 @@ export default function LenexaRoofRepairPage() {
             </div>
 
             <div className="flex items-start space-x-2 text-sm text-text-muted">
-              <FiShield className="w-5 h-5 text-teamwork-blue mt-0.5 flex-shrink-0" />
+              <FiShield className="w-5 h-5 text-teamwork-green mt-0.5 flex-shrink-0" />
               <span>All repairs backed by Teamwork Warranty</span>
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function LenexaRoofRepairPage() {
             {commonProblems.map((problem, index) => (
               <div key={index} className="card">
                 <h4 className="font-semibold mb-2 flex items-start">
-                  <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />
+                  <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-0.5 mr-2 flex-shrink-0" />
                   {problem.title}
                 </h4>
                 <p className="text-sm text-text-secondary ml-7">{problem.description}</p>
@@ -181,8 +181,8 @@ export default function LenexaRoofRepairPage() {
           <div className="max-w-3xl mx-auto space-y-4">
             {timeline.map((step, index) => (
               <div key={index} className="flex items-start space-x-4">
-                <div className="w-10 h-10 rounded-full bg-teamwork-blue/10 border-2 border-teamwork-blue flex items-center justify-center flex-shrink-0">
-                  <span className="text-teamwork-blue font-bold">{index + 1}</span>
+                <div className="w-10 h-10 rounded-full bg-teamwork-green/10 border-2 border-teamwork-green flex items-center justify-center flex-shrink-0">
+                  <span className="text-teamwork-green font-bold">{index + 1}</span>
                 </div>
                 <div className="flex items-center h-10">
                   <p className="text-text-secondary">{step}</p>
@@ -201,12 +201,12 @@ export default function LenexaRoofRepairPage() {
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="card max-w-3xl mx-auto text-center">
-            <FiShield className="w-12 h-12 text-teamwork-blue mx-auto mb-4" />
+            <FiShield className="w-12 h-12 text-teamwork-green mx-auto mb-4" />
             <h3 className="heading-3 mb-4">Repairs Backed by Teamwork Warranty</h3>
             <p className="text-text-secondary mb-6">
               Our repair work is covered under our Teamwork Warranty. Quality workmanship, clean site practices, and your peace of mind.
             </p>
-            <Link href="/warranty/" className="text-teamwork-blue hover:underline">
+            <Link href="/warranty/" className="text-teamwork-green hover:underline">
               Learn About Our Warranty →
             </Link>
           </div>

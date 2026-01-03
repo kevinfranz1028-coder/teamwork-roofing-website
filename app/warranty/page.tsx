@@ -12,7 +12,7 @@ export default function WarrantyPage() {
       <section className="section-padding bg-light-bg">
         <div className="container-custom">
           <div className="text-center mb-16 max-w-3xl mx-auto">
-            <FiShield className="w-16 h-16 text-teamwork-blue mx-auto mb-6" />
+            <FiShield className="w-16 h-16 text-teamwork-green mx-auto mb-6" />
             <h1 className="heading-1 mb-6">The Teamwork Warranty</h1>
             <p className="text-xl text-text-secondary">
               Our installation work is backed by our partnership commitment — we stand behind every project
@@ -20,34 +20,34 @@ export default function WarrantyPage() {
           </div>
 
           <div className="max-w-4xl mx-auto space-y-12">
-            <div className="group card hover:border-teamwork-blue transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-              <h2 className="heading-3 mb-6 group-hover:text-teamwork-blue transition-colors">What's Covered</h2>
+            <div className="group card hover:border-teamwork-green transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <h2 className="heading-3 mb-6 group-hover:text-teamwork-green transition-colors">What's Covered</h2>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
-                  <FiCheckCircle className="w-6 h-6 text-teamwork-blue mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                  <FiCheckCircle className="w-6 h-6 text-teamwork-green mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
                   <div>
-                    <h4 className="font-semibold mb-1 group-hover/item:text-teamwork-blue transition-colors">Installation Workmanship</h4>
+                    <h4 className="font-semibold mb-1 group-hover/item:text-teamwork-green transition-colors">Installation Workmanship</h4>
                     <p className="text-text-secondary text-sm">Our installation labor and methods are warranted against defects</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
-                  <FiCheckCircle className="w-6 h-6 text-teamwork-blue mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                  <FiCheckCircle className="w-6 h-6 text-teamwork-green mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
                   <div>
-                    <h4 className="font-semibold mb-1 group-hover/item:text-teamwork-blue transition-colors">Material Defects</h4>
+                    <h4 className="font-semibold mb-1 group-hover/item:text-teamwork-green transition-colors">Material Defects</h4>
                     <p className="text-text-secondary text-sm">Manufacturer warranties honored (varies by product: 25 years to lifetime)</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
-                  <FiCheckCircle className="w-6 h-6 text-teamwork-blue mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                  <FiCheckCircle className="w-6 h-6 text-teamwork-green mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
                   <div>
-                    <h4 className="font-semibold mb-1 group-hover/item:text-teamwork-blue transition-colors">Leak-Free Performance</h4>
+                    <h4 className="font-semibold mb-1 group-hover/item:text-teamwork-green transition-colors">Leak-Free Performance</h4>
                     <p className="text-text-secondary text-sm">Proper installation to prevent leaks from workmanship issues</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
-                  <FiCheckCircle className="w-6 h-6 text-teamwork-blue mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                  <FiCheckCircle className="w-6 h-6 text-teamwork-green mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
                   <div>
-                    <h4 className="font-semibold mb-1 group-hover/item:text-teamwork-blue transition-colors">Clean Site Performance</h4>
+                    <h4 className="font-semibold mb-1 group-hover/item:text-teamwork-green transition-colors">Clean Site Performance</h4>
                     <p className="text-text-secondary text-sm">Property protection during and after installation</p>
                   </div>
                 </div>
@@ -88,25 +88,25 @@ export default function WarrantyPage() {
               </div>
             </div>
 
-            <div className="group card bg-white hover:border-teamwork-blue transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-              <h2 className="heading-3 mb-6 group-hover:text-teamwork-blue transition-colors">How to Request Warranty Support</h2>
+            <div className="group card bg-white hover:border-teamwork-green transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <h2 className="heading-3 mb-6 group-hover:text-teamwork-green transition-colors">How to Request Warranty Support</h2>
               <div className="space-y-4">
                 <p className="text-text-secondary">If you experience an issue you believe is covered under warranty:</p>
                 <ol className="space-y-3">
                   <li className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
-                    <span className="font-bold text-teamwork-blue group-hover/item:scale-110 transition-transform">1.</span>
-                    <span className="text-text-secondary">Call us at <a href="tel:9133963717" className="text-teamwork-blue hover:underline">913-396-3717</a> or use our contact form</span>
+                    <span className="font-bold text-teamwork-green group-hover/item:scale-110 transition-transform">1.</span>
+                    <span className="text-text-secondary">Call us at <a href="tel:9133963717" className="text-teamwork-green hover:underline">913-396-3717</a> or use our contact form</span>
                   </li>
                   <li className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
-                    <span className="font-bold text-teamwork-blue group-hover/item:scale-110 transition-transform">2.</span>
+                    <span className="font-bold text-teamwork-green group-hover/item:scale-110 transition-transform">2.</span>
                     <span className="text-text-secondary">Describe the issue and provide photos if possible</span>
                   </li>
                   <li className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
-                    <span className="font-bold text-teamwork-blue group-hover/item:scale-110 transition-transform">3.</span>
+                    <span className="font-bold text-teamwork-green group-hover/item:scale-110 transition-transform">3.</span>
                     <span className="text-text-secondary">We'll schedule an inspection to assess the claim</span>
                   </li>
                   <li className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
-                    <span className="font-bold text-teamwork-blue group-hover/item:scale-110 transition-transform">4.</span>
+                    <span className="font-bold text-teamwork-green group-hover/item:scale-110 transition-transform">4.</span>
                     <span className="text-text-secondary">If covered, we'll repair or replace at no cost to you</span>
                   </li>
                 </ol>

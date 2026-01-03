@@ -5,27 +5,27 @@ export default function NotFound() {
   return (
     <section className="section-padding bg-light-bg min-h-screen flex items-center justify-center">
       <div className="container-custom max-w-3xl text-center">
-        <h1 className="text-9xl font-bold text-teamwork-blue mb-4">404</h1>
+        <h1 className="text-9xl font-bold text-teamwork-green mb-4">404</h1>
         <h2 className="heading-2 mb-6">Page Not Found</h2>
         <p className="text-xl text-text-secondary mb-12">
           Looks like this page doesn't exist. Let's get you back on track.
         </p>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Link href="/" className="card hover:border-teamwork-blue transition-all group">
-            <FiHome className="w-12 h-12 text-teamwork-blue mx-auto mb-4 group-hover:scale-110 transition-transform" />
+          <Link href="/" className="card hover:border-teamwork-green transition-all group">
+            <FiHome className="w-12 h-12 text-teamwork-green mx-auto mb-4 group-hover:scale-110 transition-transform" />
             <h3 className="font-semibold mb-2">Home</h3>
             <p className="text-sm text-text-secondary">Return to homepage</p>
           </Link>
 
-          <Link href="/services/" className="card hover:border-teamwork-blue transition-all group">
-            <FiTool className="w-12 h-12 text-teamwork-blue mx-auto mb-4 group-hover:scale-110 transition-transform" />
+          <Link href="/services/" className="card hover:border-teamwork-green transition-all group">
+            <FiTool className="w-12 h-12 text-teamwork-green mx-auto mb-4 group-hover:scale-110 transition-transform" />
             <h3 className="font-semibold mb-2">Services</h3>
             <p className="text-sm text-text-secondary">View our services</p>
           </Link>
 
-          <Link href="/contact/" className="card hover:border-teamwork-blue transition-all group">
-            <FiPhone className="w-12 h-12 text-teamwork-blue mx-auto mb-4 group-hover:scale-110 transition-transform" />
+          <Link href="/contact/" className="card hover:border-teamwork-green transition-all group">
+            <FiPhone className="w-12 h-12 text-teamwork-green mx-auto mb-4 group-hover:scale-110 transition-transform" />
             <h3 className="font-semibold mb-2">Contact</h3>
             <p className="text-sm text-text-secondary">Get in touch</p>
           </Link>

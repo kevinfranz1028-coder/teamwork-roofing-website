@@ -66,24 +66,24 @@ export default function ServicesPage() {
                   <div className="relative w-full h-[340px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Front */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <div className="h-full card hover:border-teamwork-blue transition-colors flex flex-col">
-                        <Icon className="w-12 h-12 text-teamwork-blue mb-4 group-hover:scale-110 transition-transform" />
+                      <div className="h-full card hover:border-teamwork-green transition-colors flex flex-col">
+                        <Icon className="w-12 h-12 text-teamwork-green mb-4 group-hover:scale-110 transition-transform" />
                         <h3 className="heading-4 mb-3">{service.title}</h3>
                         <p className="text-text-secondary mb-4 flex-grow">{service.description}</p>
                         <ul className="space-y-2">
                           {service.features.map((feature, idx) => (
                             <li key={idx} className="flex items-center text-sm text-text-muted">
-                              <span className="w-1.5 h-1.5 bg-teamwork-blue rounded-full mr-2"></span>
+                              <span className="w-1.5 h-1.5 bg-teamwork-green rounded-full mr-2"></span>
                               {feature}
                             </li>
                           ))}
                         </ul>
-                        <p className="text-xs text-teamwork-blue font-medium mt-4">Hover for details →</p>
+                        <p className="text-xs text-teamwork-green font-medium mt-4">Hover for details →</p>
                       </div>
                     </div>
                     {/* Back */}
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-blue to-[#0094CC] text-white rounded-lg p-6 shadow-xl flex flex-col justify-between">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-6 shadow-xl flex flex-col justify-between">
                         <div>
                           <Icon className="w-12 h-12 mb-4 opacity-90" />
                           <h3 className="text-xl font-bold mb-3">{service.title}</h3>
@@ -99,7 +99,7 @@ export default function ServicesPage() {
                         </div>
                         <Link
                           href={service.href}
-                          className="block w-full text-center bg-white text-teamwork-blue py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                          className="block w-full text-center bg-white text-teamwork-green py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
                         >
                           Learn More →
                         </Link>
@@ -124,40 +124,40 @@ export default function ServicesPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="group relative overflow-hidden card hover:border-teamwork-blue transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-              <div className="absolute inset-0 bg-gradient-to-br from-teamwork-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="group relative overflow-hidden card hover:border-teamwork-green transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <div className="absolute inset-0 bg-gradient-to-br from-teamwork-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative z-10">
-                <h3 className="heading-4 mb-3 group-hover:text-teamwork-blue transition-colors">Repair</h3>
+                <h3 className="heading-4 mb-3 group-hover:text-teamwork-green transition-colors">Repair</h3>
                 <p className="text-text-secondary mb-4">
                   Minor damage, isolated issues, or quick fixes
                 </p>
-                <Link href="/services/roof-repair/" className="inline-flex items-center text-teamwork-blue hover:underline font-medium">
+                <Link href="/services/roof-repair/" className="inline-flex items-center text-teamwork-green hover:underline font-medium">
                   Roof Repair →
                 </Link>
               </div>
             </div>
 
-            <div className="group relative overflow-hidden card hover:border-teamwork-blue transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-              <div className="absolute inset-0 bg-gradient-to-br from-teamwork-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="group relative overflow-hidden card hover:border-teamwork-green transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <div className="absolute inset-0 bg-gradient-to-br from-teamwork-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative z-10">
-                <h3 className="heading-4 mb-3 group-hover:text-teamwork-blue transition-colors">Replace</h3>
+                <h3 className="heading-4 mb-3 group-hover:text-teamwork-green transition-colors">Replace</h3>
                 <p className="text-text-secondary mb-4">
                   Age, widespread damage, or full upgrade
                 </p>
-                <Link href="/services/roof-replacement/" className="inline-flex items-center text-teamwork-blue hover:underline font-medium">
+                <Link href="/services/roof-replacement/" className="inline-flex items-center text-teamwork-green hover:underline font-medium">
                   Roof Replacement →
                 </Link>
               </div>
             </div>
 
-            <div className="group relative overflow-hidden card hover:border-teamwork-blue transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-              <div className="absolute inset-0 bg-gradient-to-br from-teamwork-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="group relative overflow-hidden card hover:border-teamwork-green transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <div className="absolute inset-0 bg-gradient-to-br from-teamwork-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative z-10">
-                <h3 className="heading-4 mb-3 group-hover:text-teamwork-blue transition-colors">Storm Damage</h3>
+                <h3 className="heading-4 mb-3 group-hover:text-teamwork-green transition-colors">Storm Damage</h3>
                 <p className="text-text-secondary mb-4">
                   Recent storm? We inspect roof, gutters, siding, and windows
                 </p>
-                <Link href="/storm/" className="inline-flex items-center text-teamwork-blue hover:underline font-medium">
+                <Link href="/storm/" className="inline-flex items-center text-teamwork-green hover:underline font-medium">
                   Storm Help →
                 </Link>
               </div>

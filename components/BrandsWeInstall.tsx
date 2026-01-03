@@ -75,7 +75,7 @@ export default function BrandsWeInstall({
                 href={brand.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group bg-white rounded-lg p-8 flex flex-col items-center justify-center hover:shadow-xl hover:scale-105 transition-all duration-300 border border-gray-200 hover:border-teamwork-blue min-h-[140px] relative overflow-hidden"
+                className="group bg-white rounded-lg p-8 flex flex-col items-center justify-center hover:shadow-xl hover:scale-105 transition-all duration-300 border border-gray-200 hover:border-teamwork-green min-h-[140px] relative overflow-hidden"
                 title={`Learn more about ${brand.name}`}
               >
                 {/* Subtle background accent on hover */}

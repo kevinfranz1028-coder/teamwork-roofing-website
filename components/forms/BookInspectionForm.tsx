@@ -25,7 +25,7 @@ export default function BookInspectionForm() {
           Thank you for choosing Teamwork Roofing. We'll contact you within 24 hours to confirm your same-week inspection.
         </p>
         <p className="text-text-muted">
-          Questions? Call us at <a href="tel:9133963717" className="text-teamwork-blue hover:underline">913-396-3717</a>
+          Questions? Call us at <a href="tel:9133963717" className="text-teamwork-green hover:underline">913-396-3717</a>
         </p>
       </div>
     )

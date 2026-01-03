@@ -16,13 +16,13 @@ export default function StormPage() {
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="heading-1 mb-6">
-              Storm Damage? <span className="text-teamwork-blue">Start With Teamwork</span>
+              Storm Damage? <span className="text-teamwork-green">Start With Teamwork</span>
             </h1>
             <p className="text-xl text-text-secondary mb-4">
               Full exterior storm assessment with professional photo documentation you can share with your insurer and adjuster.
             </p>
             <p className="text-sm text-text-secondary mb-8">
-              <Link href="/service-areas/" className="hover:text-teamwork-blue hover:underline transition-colors">
+              <Link href="/service-areas/" className="hover:text-teamwork-green hover:underline transition-colors">
                 Storm inspection by city →
               </Link>
             </p>
@@ -67,23 +67,23 @@ export default function StormPage() {
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Photo Documentation</h2>
           <div className="card max-w-3xl mx-auto">
-            <FiCamera className="w-12 h-12 text-teamwork-blue mb-4 mx-auto" />
+            <FiCamera className="w-12 h-12 text-teamwork-green mb-4 mx-auto" />
             <h3 className="heading-4 mb-4 text-center">What You Get From Teamwork</h3>
             <ul className="space-y-3 mb-6">
               <li className="flex items-start space-x-3">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
                 <span className="text-text-secondary">Detailed photos of visible exterior damage and affected areas</span>
               </li>
               <li className="flex items-start space-x-3">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
                 <span className="text-text-secondary">A written scope of observed damage and recommended repairs</span>
               </li>
               <li className="flex items-start space-x-3">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
                 <span className="text-text-secondary">A repair estimate for your records and to share with your insurer/adjuster</span>
               </li>
               <li className="flex items-start space-x-3">
-                <FiCheckCircle className="w-5 h-5 text-teamwork-blue mt-1 flex-shrink-0" />
+                <FiCheckCircle className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
                 <span className="text-text-secondary">On-site availability during the adjuster visit (at your request) to answer construction questions about materials, code-related items, and repair methods</span>
               </li>
             </ul>
@@ -110,8 +110,8 @@ export default function StormPage() {
               'Schedule the adjuster inspection (we can be on-site if you want us there)'
             ].map((step, index) => (
               <div key={index} className="flex items-start space-x-4">
-                <div className="w-10 h-10 rounded-full bg-teamwork-blue/10 border-2 border-teamwork-blue flex items-center justify-center flex-shrink-0">
-                  <span className="text-teamwork-blue font-bold">{index + 1}</span>
+                <div className="w-10 h-10 rounded-full bg-teamwork-green/10 border-2 border-teamwork-green flex items-center justify-center flex-shrink-0">
+                  <span className="text-teamwork-green font-bold">{index + 1}</span>
                 </div>
                 <div className="flex items-center h-10">
                   <p className="text-text-secondary">{step}</p>

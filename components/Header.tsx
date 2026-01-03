@@ -46,7 +46,7 @@ export default function Header() {
               onMouseEnter={() => setServicesDropdownOpen(true)}
               onMouseLeave={() => setServicesDropdownOpen(false)}
             >
-              <button className="flex items-center space-x-1 px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+              <button className="flex items-center space-x-1 px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
                 <span>Services</span>
                 <FiChevronDown className={`w-4 h-4 transition-transform ${servicesDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -56,56 +56,56 @@ export default function Header() {
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Our Services</p>
                   </div>
-                  <Link href="/services/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-blue-50 transition-all group">
-                    <div className="w-8 h-8 rounded-lg bg-teamwork-blue/10 flex items-center justify-center mr-3 group-hover:bg-teamwork-blue/20 transition-colors">
-                      <span className="text-xs font-bold text-teamwork-blue">All</span>
+                  <Link href="/services/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-green-50 transition-all group">
+                    <div className="w-8 h-8 rounded-lg bg-teamwork-green/10 flex items-center justify-center mr-3 group-hover:bg-teamwork-green/20 transition-colors">
+                      <span className="text-xs font-bold text-teamwork-green">All</span>
                     </div>
                     <span className="font-medium">All Services</span>
                   </Link>
-                  <Link href="/services/roof-replacement/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-blue-50 transition-all">
-                    <div className="w-2 h-2 rounded-full bg-teamwork-blue/40 mr-4"></div>
+                  <Link href="/services/roof-replacement/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-green-50 transition-all">
+                    <div className="w-2 h-2 rounded-full bg-teamwork-green/40 mr-4"></div>
                     <span>Roof Replacement</span>
                   </Link>
-                  <Link href="/services/roof-repair/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-blue-50 transition-all">
-                    <div className="w-2 h-2 rounded-full bg-teamwork-blue/40 mr-4"></div>
+                  <Link href="/services/roof-repair/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-green-50 transition-all">
+                    <div className="w-2 h-2 rounded-full bg-teamwork-green/40 mr-4"></div>
                     <span>Roof Repair</span>
                   </Link>
-                  <Link href="/services/gutters/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-blue-50 transition-all">
-                    <div className="w-2 h-2 rounded-full bg-teamwork-blue/40 mr-4"></div>
+                  <Link href="/services/gutters/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-green-50 transition-all">
+                    <div className="w-2 h-2 rounded-full bg-teamwork-green/40 mr-4"></div>
                     <span>Gutters</span>
                   </Link>
-                  <Link href="/services/siding/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-blue-50 transition-all">
-                    <div className="w-2 h-2 rounded-full bg-teamwork-blue/40 mr-4"></div>
+                  <Link href="/services/siding/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-green-50 transition-all">
+                    <div className="w-2 h-2 rounded-full bg-teamwork-green/40 mr-4"></div>
                     <span>Siding</span>
                   </Link>
-                  <Link href="/services/windows/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-blue-50 transition-all">
-                    <div className="w-2 h-2 rounded-full bg-teamwork-blue/40 mr-4"></div>
+                  <Link href="/services/windows/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-green-50 transition-all">
+                    <div className="w-2 h-2 rounded-full bg-teamwork-green/40 mr-4"></div>
                     <span>Windows</span>
                   </Link>
-                  <Link href="/storm/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-blue-50 transition-all">
-                    <div className="w-2 h-2 rounded-full bg-teamwork-blue/40 mr-4"></div>
+                  <Link href="/storm/" className="flex items-center px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-green-50 transition-all">
+                    <div className="w-2 h-2 rounded-full bg-teamwork-green/40 mr-4"></div>
                     <span>Storm Damage</span>
                   </Link>
                 </div>
               )}
             </div>
 
-            <Link href="/financing/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+            <Link href="/financing/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Financing
             </Link>
-            <Link href="/warranty/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+            <Link href="/warranty/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Warranty
             </Link>
-            <Link href="/projects/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+            <Link href="/projects/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Projects
             </Link>
-            <Link href="/reviews/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+            <Link href="/reviews/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Reviews
             </Link>
-            <Link href="/faq/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+            <Link href="/faq/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               FAQ
             </Link>
-            <Link href="/contact/" className="px-3 py-2 text-text-secondary hover:text-teamwork-blue transition-colors font-medium rounded-lg hover:bg-gray-50">
+            <Link href="/contact/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Contact
             </Link>
           </nav>
@@ -114,16 +114,16 @@ export default function Header() {
           <div className="hidden lg:flex items-center gap-3">
             <a
               href="tel:9133963717"
-              className="flex items-center gap-2 px-4 py-2.5 text-teamwork-blue hover:bg-blue-50 rounded-lg transition-all font-semibold group"
+              className="flex items-center gap-2 px-4 py-2.5 text-teamwork-green hover:bg-green-50 rounded-lg transition-all font-semibold group"
             >
-              <div className="w-9 h-9 rounded-lg bg-teamwork-blue/10 flex items-center justify-center group-hover:bg-teamwork-blue/20 transition-colors">
+              <div className="w-9 h-9 rounded-lg bg-teamwork-green/10 flex items-center justify-center group-hover:bg-teamwork-green/20 transition-colors">
                 <FiPhone className="w-4 h-4" />
               </div>
               <span className="hidden xl:inline">(913) 396-3717</span>
             </a>
             <Link
               href="/book/"
-              className="px-6 py-2.5 bg-teamwork-blue text-white font-semibold rounded-lg hover:bg-[#0094CC] transition-all shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+              className="px-6 py-2.5 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-all shadow-md hover:shadow-lg transform hover:scale-[1.02]"
             >
               Book Inspection
             </Link>
@@ -142,46 +142,46 @@ export default function Header() {
         {mobileMenuOpen && (
           <nav className="lg:hidden py-6 border-t border-light-border animate-in slide-in-from-top duration-300">
             <div className="flex flex-col space-y-1">
-              <Link href="/services/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/services/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 All Services
               </Link>
-              <Link href="/services/roof-replacement/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors pl-8">
+              <Link href="/services/roof-replacement/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors pl-8">
                 Roof Replacement
               </Link>
-              <Link href="/services/roof-repair/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors pl-8">
+              <Link href="/services/roof-repair/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors pl-8">
                 Roof Repair
               </Link>
-              <Link href="/services/gutters/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors pl-8">
+              <Link href="/services/gutters/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors pl-8">
                 Gutters
               </Link>
-              <Link href="/services/siding/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors pl-8">
+              <Link href="/services/siding/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors pl-8">
                 Siding
               </Link>
-              <Link href="/services/windows/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors pl-8">
+              <Link href="/services/windows/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors pl-8">
                 Windows
               </Link>
-              <Link href="/storm/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors pl-8">
+              <Link href="/storm/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors pl-8">
                 Storm Damage
               </Link>
-              <Link href="/financing/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/financing/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Financing
               </Link>
-              <Link href="/warranty/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/warranty/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Warranty
               </Link>
-              <Link href="/projects/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/projects/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Projects
               </Link>
-              <Link href="/reviews/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/reviews/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Reviews
               </Link>
-              <Link href="/faq/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/faq/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 FAQ
               </Link>
-              <Link href="/about/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/about/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 About
               </Link>
-              <Link href="/contact/" className="px-4 py-3 text-text-secondary hover:text-teamwork-blue hover:bg-gray-50 rounded-lg transition-colors font-medium">
+              <Link href="/contact/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Contact
               </Link>
 
@@ -189,14 +189,14 @@ export default function Header() {
               <div className="pt-4 px-4 space-y-3 border-t border-gray-200 mt-4">
                 <a
                   href="tel:9133963717"
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-teamwork-blue rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-teamwork-green rounded-lg font-semibold hover:bg-gray-200 transition-colors"
                 >
                   <FiPhone className="w-4 h-4" />
                   (913) 396-3717
                 </a>
                 <Link
                   href="/book/"
-                  className="flex items-center justify-center px-6 py-3 bg-teamwork-blue text-white font-semibold rounded-lg hover:bg-[#0094CC] transition-colors"
+                  className="flex items-center justify-center px-6 py-3 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-colors"
                 >
                   Book Inspection
                 </Link>
@@ -207,10 +207,10 @@ export default function Header() {
       </div>
 
       {/* Service Area Line - Subtle and Modern */}
-      <div className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-gray-50 border-t border-gray-100">
+      <div className="bg-gradient-to-r from-gray-50 via-green-50/30 to-gray-50 border-t border-gray-100">
         <div className="container-custom py-2.5">
           <p className="text-center text-xs text-text-muted flex items-center justify-center gap-2">
-            <FiMapPin className="w-3.5 h-3.5 text-teamwork-blue" />
+            <FiMapPin className="w-3.5 h-3.5 text-teamwork-green" />
             <span>Serving Kansas City Metro — KCK, KCMO, Johnson County, and surrounding areas</span>
           </p>
         </div>

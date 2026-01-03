@@ -8,7 +8,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'teamwork-blue': '#00A5E3',
+        'teamwork-green': '#A4D65E',
+        'teamwork-green-dark': '#8BC34A',
+        'teamwork-charcoal': '#3A3A3A',
         'light-bg': '#FFFFFF',
         'light-surface': '#F8F9FA',
         'light-border': '#E5E7EB',

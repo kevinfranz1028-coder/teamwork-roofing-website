@@ -17,9 +17,9 @@ export default function EmergencyRoofRepairPage() {
       <div className="bg-white border-b border-light-border">
         <div className="container-custom py-4">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
-            <Link href="/" className="hover:text-teamwork-blue">Home</Link>
+            <Link href="/" className="hover:text-teamwork-green">Home</Link>
             <span>/</span>
-            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-blue">{cityData.cityName}</Link>
+            <Link href={`/${cityData.slug}/`} className="hover:text-teamwork-green">{cityData.cityName}</Link>
             <span>/</span>
             <span className="text-text-secondary">Emergency Roof Repair</span>
           </div>
@@ -86,7 +86,7 @@ export default function EmergencyRoofRepairPage() {
               </li>
             </ol>
             <p className="text-text-secondary text-sm text-center mt-6">
-              Need non-emergency help? <Link href={`/${cityData.slug}/roof-repair/`} className="text-teamwork-blue hover:underline">See Roof Repair in {cityData.cityName} →</Link>
+              Need non-emergency help? <Link href={`/${cityData.slug}/roof-repair/`} className="text-teamwork-green hover:underline">See Roof Repair in {cityData.cityName} →</Link>
             </p>
           </div>
         </div>
@@ -101,17 +101,17 @@ export default function EmergencyRoofRepairPage() {
               <div className="card">
                 <h4 className="font-semibold mb-3">Interior Photos</h4>
                 <ul className="space-y-2 text-sm text-text-secondary">
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />Ceiling stains or drips</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />Water pooling on floor</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />Wet walls or insulation</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-0.5 mr-2 flex-shrink-0" />Ceiling stains or drips</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-0.5 mr-2 flex-shrink-0" />Water pooling on floor</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-0.5 mr-2 flex-shrink-0" />Wet walls or insulation</li>
                 </ul>
               </div>
               <div className="card">
                 <h4 className="font-semibold mb-3">Exterior Photos (if safe)</h4>
                 <ul className="space-y-2 text-sm text-text-secondary">
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />Missing shingles</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />Visible damage from ground</li>
-                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />Debris or tree damage</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-0.5 mr-2 flex-shrink-0" />Missing shingles</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-0.5 mr-2 flex-shrink-0" />Visible damage from ground</li>
+                  <li className="flex items-start"><FiCheckCircle className="w-4 h-4 text-teamwork-green mt-0.5 mr-2 flex-shrink-0" />Debris or tree damage</li>
                 </ul>
               </div>
             </div>

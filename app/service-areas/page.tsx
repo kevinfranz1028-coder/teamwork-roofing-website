@@ -47,13 +47,13 @@ export default function ServiceAreasPage() {
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
-              Service Areas — <span className="text-teamwork-blue">Kansas City Metro</span>
+              Service Areas — <span className="text-teamwork-green">Kansas City Metro</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               Teamwork serves the Kansas City Metro with roofing and exterior services — roof repair, roof replacement, gutters, siding, windows, and storm inspections.
             </p>
             <p className="text-text-secondary">
-              If you don't see your city listed, call or text us at <a href="tel:9133963717" className="text-teamwork-blue hover:underline">913-396-3717</a>
+              If you don't see your city listed, call or text us at <a href="tel:9133963717" className="text-teamwork-green hover:underline">913-396-3717</a>
             </p>
           </div>
         </div>
@@ -67,10 +67,10 @@ export default function ServiceAreasPage() {
             {cities.map((city, index) => (
               <div key={index} className="card">
                 <div className="flex items-start mb-4">
-                  <FiMapPin className="w-6 h-6 text-teamwork-blue mt-1 mr-3 flex-shrink-0" />
+                  <FiMapPin className="w-6 h-6 text-teamwork-green mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="heading-4 mb-2">
-                      <Link href={`/${city.slug}/`} className="hover:text-teamwork-blue transition-colors">
+                      <Link href={`/${city.slug}/`} className="hover:text-teamwork-green transition-colors">
                         {city.name}
                       </Link>
                     </h3>
@@ -82,9 +82,9 @@ export default function ServiceAreasPage() {
                     <li key={subIndex}>
                       <Link
                         href={subpage.href}
-                        className="text-sm text-text-secondary hover:text-teamwork-blue transition-colors flex items-start"
+                        className="text-sm text-text-secondary hover:text-teamwork-green transition-colors flex items-start"
                       >
-                        <FiCheckCircle className="w-4 h-4 text-teamwork-blue mt-0.5 mr-2 flex-shrink-0" />
+                        <FiCheckCircle className="w-4 h-4 text-teamwork-green mt-0.5 mr-2 flex-shrink-0" />
                         {subpage.title}
                       </Link>
                     </li>
@@ -94,7 +94,7 @@ export default function ServiceAreasPage() {
                 <div className="mt-4 pt-4 border-t border-light-border">
                   <Link
                     href={`/${city.slug}/`}
-                    className="text-sm text-teamwork-blue hover:underline font-medium"
+                    className="text-sm text-teamwork-green hover:underline font-medium"
                   >
                     View All Services in {city.name.replace(', KS', '')} →
                   </Link>
