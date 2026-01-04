@@ -15,11 +15,11 @@
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-teamwork-blue text-white font-semibold rounded-lg hover:bg-[#0094CC] transition-all duration-200 shadow-md hover:shadow-lg;
+    @apply px-6 py-3 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-all duration-200 shadow-md hover:shadow-lg;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-transparent border-2 border-teamwork-blue text-teamwork-blue font-semibold rounded-lg hover:bg-teamwork-blue hover:text-white transition-all duration-200;
+    @apply px-6 py-3 bg-transparent border-2 border-teamwork-green text-teamwork-green font-semibold rounded-lg hover:bg-teamwork-green hover:text-white transition-all duration-200;
   }
 
   .card {
