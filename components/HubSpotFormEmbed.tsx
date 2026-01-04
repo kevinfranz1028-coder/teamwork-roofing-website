@@ -49,11 +49,23 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
   }
 
   useEffect(() => {
-    let formCreated = false
+    // Load HubSpot forms script if not already loaded
+    if (typeof window !== 'undefined' && !(window as any).hbspt) {
+      const script = document.createElement('script')
+      script.src = `https://js-${region}.hsforms.net/forms/embed/v2.js`
+      script.async = true
+      script.defer = true
+      document.body.appendChild(script)
+
+      script.onload = () => {
+        createForm()
+      }
+    } else if ((window as any).hbspt) {
+      createForm()
+    }
 
     function createForm() {
-      if ((window as any).hbspt && formContainer.current && !formCreated) {
-        formCreated = true
+      if ((window as any).hbspt && formContainer.current) {
         ;(window as any).hbspt.forms.create({
           region,
           portalId,
@@ -115,37 +127,6 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
           }
         })
       }
-    }
-
-    // Use multiple RAF calls to ensure DOM is fully painted
-    function waitForPaintAndCreate() {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            createForm()
-          })
-        })
-      })
-    }
-
-    // Load HubSpot forms script if not already loaded
-    if (typeof window !== 'undefined' && !(window as any).hbspt) {
-      const script = document.createElement('script')
-      script.src = `https://js-${region}.hsforms.net/forms/embed/v2.js`
-      script.async = true
-      script.defer = true
-      document.body.appendChild(script)
-
-      script.onload = () => {
-        waitForPaintAndCreate()
-      }
-    } else if ((window as any).hbspt) {
-      // HubSpot already loaded, wait for paint
-      waitForPaintAndCreate()
-    }
-
-    return () => {
-      formCreated = true // Prevent form creation after unmount
     }
   }, [formId, pathname, portalId, region, onSubmit])
 
