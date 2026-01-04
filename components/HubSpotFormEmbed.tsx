@@ -58,14 +58,17 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
       document.body.appendChild(script)
 
       script.onload = () => {
-        createForm()
+        setTimeout(() => createForm(), 2000)
       }
     } else if ((window as any).hbspt) {
-      createForm()
+      setTimeout(() => createForm(), 2000)
     }
 
     function createForm() {
-      if ((window as any).hbspt && formContainer.current) {
+      const targetDiv = document.getElementById(`hubspot-form-${formId}`)
+      console.log('Target div exists:', targetDiv, 'Ref exists:', formContainer.current)
+
+      if ((window as any).hbspt && formContainer.current && targetDiv) {
         ;(window as any).hbspt.forms.create({
           region,
           portalId,
