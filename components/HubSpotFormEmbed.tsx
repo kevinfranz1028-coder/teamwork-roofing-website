@@ -69,18 +69,19 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
     }
 
     function createForm() {
-      if (formCreated.current) return
+      if (formCreated.current || !formContainer.current) return
+      if (!(window as any).hbspt) return
 
-      const targetDiv = document.getElementById(`hubspot-form-${formId}`)
-      console.log('Target div exists:', targetDiv, 'Ref exists:', formContainer.current)
+      formCreated.current = true
 
-      if ((window as any).hbspt && formContainer.current && targetDiv) {
-        formCreated.current = true
-        ;(window as any).hbspt.forms.create({
-          region,
-          portalId,
-          formId,
-          target: `#hubspot-form-${formId}`,
+      // Clear any existing content
+      formContainer.current.innerHTML = ''
+
+      ;(window as any).hbspt.forms.create({
+        region,
+        portalId,
+        formId,
+        target: formContainer.current,
           onFormReady: ($form: any) => {
             // Apply Tailwind styling to form elements
             const form = $form[0]
@@ -148,7 +149,7 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
           {subtitle && <p className="text-text-secondary">{subtitle}</p>}
         </div>
       )}
-      <div id={`hubspot-form-${formId}`} ref={formContainer} />
+      <div ref={formContainer} />
     </div>
   )
 }
