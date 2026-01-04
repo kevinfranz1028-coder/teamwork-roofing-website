@@ -53,35 +53,32 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
     // Prevent duplicate form creation
     if (formCreated.current) return
 
-    // Load HubSpot forms script if not already loaded
+    // Load HubSpot forms script
     if (typeof window !== 'undefined' && !(window as any).hbspt) {
       const script = document.createElement('script')
       script.src = `https://js-${region}.hsforms.net/forms/embed/v2.js`
       script.async = true
-      script.defer = true
       document.body.appendChild(script)
 
       script.onload = () => {
-        setTimeout(() => createForm(), 2000)
+        createForm()
       }
     } else if ((window as any).hbspt) {
-      setTimeout(() => createForm(), 2000)
+      createForm()
     }
 
     function createForm() {
-      if (formCreated.current || !formContainer.current) return
+      if (formCreated.current) return
       if (!(window as any).hbspt) return
+      if (!formContainer.current) return
 
       formCreated.current = true
-
-      // Clear any existing content
-      formContainer.current.innerHTML = ''
 
       ;(window as any).hbspt.forms.create({
         region,
         portalId,
         formId,
-        target: formContainer.current,
+        target: `#hs-form-${formId}`,
           onFormReady: ($form: any) => {
             // Apply Tailwind styling to form elements
             const form = $form[0]
@@ -149,7 +146,7 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
           {subtitle && <p className="text-text-secondary">{subtitle}</p>}
         </div>
       )}
-      <div ref={formContainer} />
+      <div id={`hs-form-${formId}`} ref={formContainer} />
     </div>
   )
 }
