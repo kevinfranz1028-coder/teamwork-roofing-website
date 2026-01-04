@@ -23,6 +23,7 @@ interface HubSpotFormEmbedProps {
  */
 export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: HubSpotFormEmbedProps) {
   const formContainer = useRef<HTMLDivElement>(null)
+  const formCreated = useRef(false)
   const pathname = usePathname()
   const portalId = process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID || '244741088'
   const region = process.env.NEXT_PUBLIC_HUBSPOT_REGION || 'na2'
@@ -49,6 +50,9 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
   }
 
   useEffect(() => {
+    // Prevent duplicate form creation
+    if (formCreated.current) return
+
     // Load HubSpot forms script if not already loaded
     if (typeof window !== 'undefined' && !(window as any).hbspt) {
       const script = document.createElement('script')
@@ -65,10 +69,13 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
     }
 
     function createForm() {
+      if (formCreated.current) return
+
       const targetDiv = document.getElementById(`hubspot-form-${formId}`)
       console.log('Target div exists:', targetDiv, 'Ref exists:', formContainer.current)
 
       if ((window as any).hbspt && formContainer.current && targetDiv) {
+        formCreated.current = true
         ;(window as any).hbspt.forms.create({
           region,
           portalId,
@@ -131,7 +138,7 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
         })
       }
     }
-  }, [formId, pathname, portalId, region, onSubmit])
+  }, [formId])
 
   return (
     <div>
