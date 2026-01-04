@@ -23,7 +23,6 @@ interface HubSpotFormEmbedProps {
  */
 export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: HubSpotFormEmbedProps) {
   const formContainer = useRef<HTMLDivElement>(null)
-  const formCreated = useRef(false)
   const pathname = usePathname()
   const portalId = process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID || '244741088'
   const region = process.env.NEXT_PUBLIC_HUBSPOT_REGION || 'na2'
@@ -50,14 +49,12 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
   }
 
   useEffect(() => {
-    // Prevent duplicate form creation
-    if (formCreated.current) return
-
-    // Load HubSpot forms script
+    // Load HubSpot forms script if not already loaded
     if (typeof window !== 'undefined' && !(window as any).hbspt) {
       const script = document.createElement('script')
       script.src = `https://js-${region}.hsforms.net/forms/embed/v2.js`
       script.async = true
+      script.defer = true
       document.body.appendChild(script)
 
       script.onload = () => {
@@ -68,17 +65,12 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
     }
 
     function createForm() {
-      if (formCreated.current) return
-      if (!(window as any).hbspt) return
-      if (!formContainer.current) return
-
-      formCreated.current = true
-
-      ;(window as any).hbspt.forms.create({
-        region,
-        portalId,
-        formId,
-        target: `#hs-form-${formId}`,
+      if ((window as any).hbspt && formContainer.current) {
+        ;(window as any).hbspt.forms.create({
+          region,
+          portalId,
+          formId,
+          target: `#hubspot-form-${formId}`,
           onFormReady: ($form: any) => {
             // Apply Tailwind styling to form elements
             const form = $form[0]
@@ -136,7 +128,7 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
         })
       }
     }
-  }, [formId])
+  }, [formId, pathname, portalId, region, onSubmit])
 
   return (
     <div>
@@ -146,7 +138,7 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
           {subtitle && <p className="text-text-secondary">{subtitle}</p>}
         </div>
       )}
-      <div id={`hs-form-${formId}`} ref={formContainer} />
+      <div id={`hubspot-form-${formId}`} ref={formContainer} />
     </div>
   )
 }
