@@ -49,25 +49,24 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
   }
 
   useEffect(() => {
-    // Load HubSpot forms script if not already loaded
-    if (typeof window !== 'undefined' && !(window as any).hbspt) {
-      const script = document.createElement('script')
-      script.src = `https://js-${region}.hsforms.net/forms/embed/v2.js`
-      script.async = true
-      script.defer = true
-      document.body.appendChild(script)
+    let formCreated = false
 
-      script.onload = () => {
-        // Give React time to render the DOM element
-        setTimeout(() => createForm(), 100)
+    // Polling function to wait for both HubSpot script and DOM element
+    function waitForElementAndCreateForm(attempts = 0) {
+      const maxAttempts = 50 // 5 seconds total (50 * 100ms)
+      const targetElement = document.getElementById(`hubspot-form-${formId}`)
+
+      // Check if both HubSpot is loaded and target element exists
+      if ((window as any).hbspt && targetElement && !formCreated) {
+        formCreated = true
+        createForm()
+      } else if (attempts < maxAttempts) {
+        // Keep trying
+        setTimeout(() => waitForElementAndCreateForm(attempts + 1), 100)
       }
-    } else if ((window as any).hbspt) {
-      // Give React time to render the DOM element
-      setTimeout(() => createForm(), 100)
     }
 
     function createForm() {
-      // Ensure DOM element exists before creating form
       const targetElement = document.getElementById(`hubspot-form-${formId}`)
       if ((window as any).hbspt && formContainer.current && targetElement) {
         ;(window as any).hbspt.forms.create({
@@ -131,6 +130,22 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
           }
         })
       }
+    }
+
+    // Load HubSpot forms script if not already loaded
+    if (typeof window !== 'undefined' && !(window as any).hbspt) {
+      const script = document.createElement('script')
+      script.src = `https://js-${region}.hsforms.net/forms/embed/v2.js`
+      script.async = true
+      script.defer = true
+      document.body.appendChild(script)
+
+      script.onload = () => {
+        waitForElementAndCreateForm()
+      }
+    } else if ((window as any).hbspt) {
+      // HubSpot already loaded, start polling
+      waitForElementAndCreateForm()
     }
   }, [formId, pathname, portalId, region, onSubmit])
 
