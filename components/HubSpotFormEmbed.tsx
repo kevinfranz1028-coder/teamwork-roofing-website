@@ -51,24 +51,9 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
   useEffect(() => {
     let formCreated = false
 
-    // Polling function to wait for both HubSpot script and DOM element
-    function waitForElementAndCreateForm(attempts = 0) {
-      const maxAttempts = 50 // 5 seconds total (50 * 100ms)
-      const targetElement = document.getElementById(`hubspot-form-${formId}`)
-
-      // Check if both HubSpot is loaded and target element exists
-      if ((window as any).hbspt && targetElement && !formCreated) {
-        formCreated = true
-        createForm()
-      } else if (attempts < maxAttempts) {
-        // Keep trying
-        setTimeout(() => waitForElementAndCreateForm(attempts + 1), 100)
-      }
-    }
-
     function createForm() {
-      const targetElement = document.getElementById(`hubspot-form-${formId}`)
-      if ((window as any).hbspt && formContainer.current && targetElement) {
+      if ((window as any).hbspt && formContainer.current && !formCreated) {
+        formCreated = true
         ;(window as any).hbspt.forms.create({
           region,
           portalId,
@@ -132,6 +117,17 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
       }
     }
 
+    // Use multiple RAF calls to ensure DOM is fully painted
+    function waitForPaintAndCreate() {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            createForm()
+          })
+        })
+      })
+    }
+
     // Load HubSpot forms script if not already loaded
     if (typeof window !== 'undefined' && !(window as any).hbspt) {
       const script = document.createElement('script')
@@ -141,11 +137,15 @@ export default function HubSpotFormEmbed({ formId, title, subtitle, onSubmit }: 
       document.body.appendChild(script)
 
       script.onload = () => {
-        waitForElementAndCreateForm()
+        waitForPaintAndCreate()
       }
     } else if ((window as any).hbspt) {
-      // HubSpot already loaded, start polling
-      waitForElementAndCreateForm()
+      // HubSpot already loaded, wait for paint
+      waitForPaintAndCreate()
+    }
+
+    return () => {
+      formCreated = true // Prevent form creation after unmount
     }
   }, [formId, pathname, portalId, region, onSubmit])
 
