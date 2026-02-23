@@ -371,7 +371,7 @@ function ContentOptionsSection({
               const thumb = getThumbnail(opt);
               const slides = getAllSlides(opt);
               const isExpanded = expanded === opt.ideaId;
-              const isScheduled = !!scheduledInfo[opt.scriptId];
+              const status = cardStatus[opt.scriptId];
               let script: any = {};
               try { script = JSON.parse(opt.scriptJson || '{}'); } catch {}
 
@@ -379,9 +379,13 @@ function ContentOptionsSection({
                 <div
                   key={opt.ideaId}
                   className={`bg-gray-900 border rounded-xl overflow-hidden transition-all ${
-                    isScheduled
+                    status?.type === 'posted'
                       ? 'border-green-500 ring-1 ring-green-500'
-                      : 'border-gray-800 hover:border-gray-700'
+                      : status?.type === 'scheduled'
+                        ? 'border-blue-500 ring-1 ring-blue-500'
+                        : status?.type === 'error'
+                          ? 'border-red-500/50'
+                          : 'border-gray-800 hover:border-gray-700'
                   }`}
                 >
                   {/* Thumbnail */}
@@ -858,7 +862,7 @@ function ReadyContentSection({
           const slides = getItemSlides(item);
           const thumb = slides.length > 0 ? slides[0] : null;
           const isExpanded = expanded === item.id;
-          const isScheduled = !!scheduledInfo[item.id];
+          const status = cardStatus[item.id];
           const isApproved = item.idea_status === 'approved';
           let script: any = {};
           try { script = JSON.parse(item.script_json || '{}'); } catch {}
@@ -869,11 +873,15 @@ function ReadyContentSection({
             <div
               key={item.id}
               className={`bg-gray-900 border rounded-xl overflow-hidden transition-all ${
-                isScheduled
+                status?.type === 'posted'
                   ? 'border-green-500 ring-1 ring-green-500'
-                  : isApproved
-                    ? 'border-blue-500/50'
-                    : 'border-gray-800 hover:border-gray-700'
+                  : status?.type === 'scheduled'
+                    ? 'border-blue-500 ring-1 ring-blue-500'
+                    : status?.type === 'error'
+                      ? 'border-red-500/50'
+                      : isApproved
+                        ? 'border-blue-500/50'
+                        : 'border-gray-800 hover:border-gray-700'
               }`}
             >
               {/* Thumbnail */}
