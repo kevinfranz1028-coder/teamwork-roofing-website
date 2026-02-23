@@ -34,9 +34,12 @@ export async function renderCarouselSlides(
         html = valueSlideHtml(slide, renderConfig);
       }
 
-      await page.setContent(html, { waitUntil: 'networkidle0' });
-      // Allow fonts to load
-      await page.evaluate(() => document.fonts.ready);
+      await page.setContent(html, { waitUntil: 'domcontentloaded' });
+      // Allow fonts to load (with 3s timeout fallback)
+      await page.evaluate(() => Promise.race([
+        document.fonts.ready,
+        new Promise(r => setTimeout(r, 3000)),
+      ]));
 
       const outputPath = path.join(outputDir, `slide-${String(slide.slideNumber).padStart(2, '0')}.png`);
       await page.screenshot({ path: outputPath, type: 'png' });

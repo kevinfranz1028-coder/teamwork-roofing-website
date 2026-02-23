@@ -96,12 +96,18 @@ export async function renderScript(scriptId: number): Promise<RenderedAssets | n
     // Upload to Cloudinary if configured
     let publicUrls: string[] = [];
     if (CONFIG.cloudinary.cloudName && CONFIG.cloudinary.apiKey) {
-      console.log(chalk.gray('  Uploading to Cloudinary...'));
-      if (script.content_type === 'reel') {
-        const url = await uploadVideo(localPaths[0]);
-        publicUrls = [url];
-      } else {
-        publicUrls = await uploadImages(localPaths);
+      try {
+        console.log(chalk.gray('  Uploading to Cloudinary...'));
+        if (script.content_type === 'reel') {
+          const url = await uploadVideo(localPaths[0]);
+          publicUrls = [url];
+        } else {
+          publicUrls = await uploadImages(localPaths);
+        }
+        console.log(chalk.green(`  Uploaded ${publicUrls.length} files to Cloudinary`));
+      } catch (uploadErr: any) {
+        console.log(chalk.yellow(`  Cloudinary upload failed: ${uploadErr.message}`));
+        console.log(chalk.yellow('  Files saved locally — fix Cloudinary config to enable publishing'));
       }
     }
 

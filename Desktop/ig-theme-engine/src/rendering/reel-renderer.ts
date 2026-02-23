@@ -97,8 +97,11 @@ async function renderTextOverlays(
   try {
     for (let i = 0; i < segments.length; i++) {
       const html = reelOverlayHtml(segments[i].text, config);
-      await page.setContent(html, { waitUntil: 'networkidle0' });
-      await page.evaluate(() => document.fonts.ready);
+      await page.setContent(html, { waitUntil: 'domcontentloaded' });
+      await page.evaluate(() => Promise.race([
+        document.fonts.ready,
+        new Promise(r => setTimeout(r, 3000)),
+      ]));
 
       const outputPath = path.join(outputDir, `overlay-${i}.png`);
       await page.screenshot({ path: outputPath, type: 'png', omitBackground: true });

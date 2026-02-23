@@ -26,8 +26,11 @@ export async function renderStorySlides(
   try {
     for (const slide of slides) {
       const html = storySlideHtml(slide, renderConfig);
-      await page.setContent(html, { waitUntil: 'networkidle0' });
-      await page.evaluate(() => document.fonts.ready);
+      await page.setContent(html, { waitUntil: 'domcontentloaded' });
+      await page.evaluate(() => Promise.race([
+        document.fonts.ready,
+        new Promise(r => setTimeout(r, 3000)),
+      ]));
 
       const outputPath = path.join(outputDir, `story-${String(slide.slideNumber).padStart(2, '0')}.png`);
       await page.screenshot({ path: outputPath, type: 'png' });
