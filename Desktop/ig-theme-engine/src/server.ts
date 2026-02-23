@@ -4,11 +4,11 @@ import path from 'path';
 import { CONFIG } from './config/env.js';
 import { getDb, getRows } from './database/db.js';
 import { getState, runDailyPipeline } from './orchestrator/master.js';
-import { approveContent, rejectContent, publishContent, getPendingApproval, getReadyToPublish } from './orchestrator/approval-gate.js';
+import { approveContent, rejectContent, publishContent, getPendingApproval, getReadyToPublish, approveAndSchedule } from './orchestrator/approval-gate.js';
 import { generateWeeklyScorecard, refreshAnalytics } from './orchestrator/analytics-loop.js';
 import { scanTrends } from './modules/04-daily-output/trend-scanner.js';
 import { generateDesignSystem, getDesignDirection } from './modules/05-design-system/design-manager.js';
-import { generateContentCalendar, getUpcomingCalendar, getTodaysSchedule } from './modules/06-growth-strategy/scheduler.js';
+import { generateContentCalendar, getUpcomingCalendar, getTodaysSchedule, getScheduledQueue, removeFromSchedule } from './modules/06-growth-strategy/scheduler.js';
 import { generateEngagementProtocol } from './modules/06-growth-strategy/engagement-engine.js';
 import { generateRevenueStrategy, getRevenueOverview } from './modules/07-monetization/revenue-tracker.js';
 import { generateRoadmap, getCurrentPhase } from './modules/08-scaling/roadmap-engine.js';
@@ -17,6 +17,10 @@ import { adaptForPlatform, getCrossPlatformLog, getDistributionStats } from './m
 import { auditQueue } from './modules/00-originality/fingerprint-check.js';
 import { renderScript, renderDailyPackage } from './rendering/asset-pipeline.js';
 import { autoPublish } from './orchestrator/auto-publisher.js';
+import { generateContentOptions, getLatestBatch } from './modules/04-daily-output/options-engine.js';
+import { runMigrations } from './database/migrations.js';
+
+runMigrations();
 
 const app = express();
 app.use(cors());
@@ -280,6 +284,48 @@ app.post('/api/cross-platform/adapt', async (req, res) => {
   }
 });
 
+// ─── Schedule (unified content page) ───────────────
+app.get('/api/schedule', (_req, res) => {
+  res.json(getScheduledQueue());
+});
+
+app.post('/api/queue/:id/approve-and-schedule', (req, res) => {
+  try {
+    const slot = approveAndSchedule(parseInt(req.params.id));
+    res.json({ success: true, ...slot });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/schedule/:calendarId/remove', (req, res) => {
+  try {
+    removeFromSchedule(parseInt(req.params.calendarId));
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/schedule/:calendarId/publish-now', async (req, res) => {
+  try {
+    const db = getDb();
+    const entry = db.prepare('SELECT script_id FROM content_calendar WHERE id = ?')
+      .get(parseInt(req.params.calendarId)) as any;
+    if (!entry || !entry.script_id) {
+      return res.status(404).json({ error: 'Calendar entry not found' });
+    }
+    const result = await publishContent(entry.script_id, { method: 'manual' });
+    if (result.success) {
+      db.prepare('UPDATE content_calendar SET status = ? WHERE id = ?')
+        .run('published', parseInt(req.params.calendarId));
+    }
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── Rendering & Auto-Publish ──────────────────────
 app.post('/api/render/:id', async (req, res) => {
   try {
@@ -313,6 +359,24 @@ app.post('/api/fingerprint/audit', async (_req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ─── Content Options ────────────────────────────────
+app.post('/api/options/generate', async (_req, res) => {
+  try {
+    const batch = await generateContentOptions();
+    res.json(batch);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/options/latest', (_req, res) => {
+  const batch = getLatestBatch();
+  res.json(batch || {});
+});
+
+// ─── Serve Rendered Assets ─────────────────────────
+app.use('/assets', express.static(path.resolve('data/assets')));
 
 // ─── Serve Dashboard Static Files ───────────────────
 const dashboardPath = path.resolve('dist/dashboard');

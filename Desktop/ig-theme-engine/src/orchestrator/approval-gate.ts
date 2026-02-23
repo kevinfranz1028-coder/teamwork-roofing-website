@@ -2,6 +2,7 @@ import { getDb, insertRow } from '../database/db.js';
 import { publishCarouselPost, publishReel, publishImagePost } from '../integrations/instagram-api.js';
 import { addToQueue as bufferQueue } from '../integrations/buffer-api.js';
 import { getRenderedAssets } from '../rendering/asset-pipeline.js';
+import { scheduleNextSlot } from '../modules/06-growth-strategy/scheduler.js';
 import { CONFIG } from '../config/env.js';
 
 type PublishMethod = 'instagram_direct' | 'buffer' | 'manual';
@@ -115,6 +116,27 @@ export async function publishContent(
   } catch (error: any) {
     return { success: false, platform: 'instagram', error: error.message };
   }
+}
+
+/**
+ * Approve content and auto-schedule it to the next available time slot.
+ */
+export function approveAndSchedule(scriptId: number): { calendarId: number; scheduledDate: string; scheduledTime: string; contentType: string } {
+  const db = getDb();
+  const script = db.prepare(`
+    SELECT cs.*, ci.content_type
+    FROM content_scripts cs
+    JOIN content_ideas ci ON cs.idea_id = ci.id
+    WHERE cs.id = ?
+  `).get(scriptId) as any;
+  if (!script) throw new Error(`Script ${scriptId} not found`);
+
+  // Mark idea as approved
+  db.prepare('UPDATE content_ideas SET status = ? WHERE id = ?').run('approved', script.idea_id);
+
+  // Schedule to next available slot
+  const slot = scheduleNextSlot(scriptId, script.content_type);
+  return slot;
 }
 
 /**

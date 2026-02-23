@@ -48,6 +48,28 @@ const MIGRATIONS: Migration[] = [
       );
     `,
   },
+  {
+    version: 5,
+    name: 'add_content_option_batches',
+    up: `
+      ALTER TABLE content_ideas ADD COLUMN batch_id TEXT;
+      CREATE TABLE IF NOT EXISTS content_option_batches (
+        id TEXT PRIMARY KEY,
+        status TEXT DEFAULT 'generating' CHECK(status IN ('generating', 'ready', 'selected', 'expired')),
+        option_count INTEGER DEFAULT 5,
+        selected_idea_id INTEGER REFERENCES content_ideas(id),
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `,
+  },
+  {
+    version: 6,
+    name: 'add_calendar_indexes',
+    up: `
+      CREATE INDEX IF NOT EXISTS idx_calendar_date_status ON content_calendar(scheduled_date, status);
+      CREATE INDEX IF NOT EXISTS idx_calendar_script ON content_calendar(script_id);
+    `,
+  },
 ];
 
 export function runMigrations(): void {

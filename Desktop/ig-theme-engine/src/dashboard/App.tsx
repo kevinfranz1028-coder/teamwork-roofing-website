@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PipelineStatus from './pages/PipelineStatus.js';
-import ContentQueue from './pages/ContentQueue.js';
+import Content from './pages/Content.js';
 import Analytics from './pages/Analytics.js';
 import Scorecard from './pages/Scorecard.js';
 import Revenue from './pages/Revenue.js';
@@ -8,7 +8,7 @@ import BuildChecklist from './pages/BuildChecklist.js';
 
 const tabs = [
   { id: 'status', label: 'Pipeline' },
-  { id: 'queue', label: 'Content Queue' },
+  { id: 'content', label: 'Content' },
   { id: 'analytics', label: 'Analytics' },
   { id: 'scorecard', label: 'Scorecard' },
   { id: 'revenue', label: 'Revenue' },
@@ -51,7 +51,7 @@ export default function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
         {activeTab === 'status' && <PipelineStatus />}
-        {activeTab === 'queue' && <ContentQueue />}
+        {activeTab === 'content' && <Content />}
         {activeTab === 'analytics' && <Analytics />}
         {activeTab === 'scorecard' && <Scorecard />}
         {activeTab === 'revenue' && <Revenue />}
