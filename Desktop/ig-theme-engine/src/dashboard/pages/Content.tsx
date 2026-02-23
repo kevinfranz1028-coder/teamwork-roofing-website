@@ -56,9 +56,14 @@ interface QueueItem {
   caption: string;
   hashtags: string;
   title: string;
+  hook: string;
   idea_status: string;
   send_trigger: string;
+  send_probability: string;
   dm_trigger_keyword: string;
+  batch_id: string | null;
+  local_paths: string[];
+  public_urls: string[];
 }
 
 // ─── Helpers ────────────────────────────────────────
@@ -710,9 +715,9 @@ function UpcomingScheduleSection({
   );
 }
 
-// ─── Section 3: Pending Review ──────────────────────
+// ─── Section 3: Ready Content (previously in Queue) ─
 
-function PendingReviewSection({
+function ReadyContentSection({
   onScheduled,
 }: {
   onScheduled: () => void;
@@ -720,10 +725,12 @@ function PendingReviewSection({
   const [items, setItems] = useState<QueueItem[]>([]);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [scheduling, setScheduling] = useState<number | null>(null);
+  const [scheduledInfo, setScheduledInfo] = useState<Record<number, { date: string; time: string }>>({});
+  const [preview, setPreview] = useState<{ item: QueueItem; startIndex: number } | null>(null);
 
   const fetchQueue = async () => {
     try {
-      const res = await fetch('/api/queue/pending');
+      const res = await fetch('/api/queue');
       setItems(await res.json());
     } catch {
       // Server not running
@@ -735,9 +742,16 @@ function PendingReviewSection({
   const handleApproveSchedule = async (scriptId: number) => {
     setScheduling(scriptId);
     try {
-      await fetch(`/api/queue/${scriptId}/approve-and-schedule`, { method: 'POST' });
-      onScheduled();
-      fetchQueue();
+      const res = await fetch(`/api/queue/${scriptId}/approve-and-schedule`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setScheduledInfo(prev => ({
+          ...prev,
+          [scriptId]: { date: data.scheduledDate, time: data.scheduledTime },
+        }));
+        onScheduled();
+        fetchQueue();
+      }
     } catch (err) {
       console.error('Schedule failed:', err);
     }
@@ -749,112 +763,219 @@ function PendingReviewSection({
     fetchQueue();
   };
 
+  const getItemSlides = (item: QueueItem): string[] => {
+    const paths = item.public_urls && item.public_urls.length > 0 ? item.public_urls : item.local_paths;
+    if (!paths || paths.length === 0) return [];
+    return paths.map(p => item.public_urls && item.public_urls.length > 0 ? p : toUrl(p));
+  };
+
   if (items.length === 0) return null;
 
   return (
-    <details className="group">
-      <summary className="cursor-pointer text-xl font-bold flex items-center gap-2 select-none">
-        Pending Review
-        <span className="text-sm font-normal text-gray-500">({items.length} items)</span>
-        <span className="text-gray-500 text-sm group-open:rotate-90 transition-transform">&gt;</span>
-      </summary>
+    <div className="space-y-4">
+      {preview && (
+        <SlidePreview
+          slides={getItemSlides(preview.item)}
+          startIndex={preview.startIndex}
+          title={preview.item.title}
+          caption={preview.item.caption || ''}
+          hashtags={preview.item.hashtags ? (typeof preview.item.hashtags === 'string' ? JSON.parse(preview.item.hashtags) : preview.item.hashtags) : []}
+          onClose={() => setPreview(null)}
+        />
+      )}
 
-      <div className="mt-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold">Ready Content</h2>
+        <span className="text-sm text-gray-500">{items.length} items</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {items.map((item) => {
+          const slides = getItemSlides(item);
+          const thumb = slides.length > 0 ? slides[0] : null;
+          const isExpanded = expanded === item.id;
+          const isScheduled = !!scheduledInfo[item.id];
+          const isApproved = item.idea_status === 'approved';
           let script: any = {};
-          try { script = JSON.parse(item.script_json); } catch {}
+          try { script = JSON.parse(item.script_json || '{}'); } catch {}
+          let hashtags: string[] = [];
+          try { hashtags = item.hashtags ? (typeof item.hashtags === 'string' ? JSON.parse(item.hashtags) : item.hashtags) : []; } catch {}
 
           return (
-            <div key={item.id} className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+            <div
+              key={item.id}
+              className={`bg-gray-900 border rounded-xl overflow-hidden transition-all ${
+                isScheduled
+                  ? 'border-green-500 ring-1 ring-green-500'
+                  : isApproved
+                    ? 'border-blue-500/50'
+                    : 'border-gray-800 hover:border-gray-700'
+              }`}
+            >
+              {/* Thumbnail */}
               <div
-                className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-800/50 transition-colors"
-                onClick={() => setExpanded(expanded === item.id ? null : item.id)}
+                className="relative aspect-square bg-gray-800 cursor-pointer group"
+                onClick={() => slides.length > 0 && setPreview({ item, startIndex: 0 })}
               >
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
-                    {item.content_type}
+                {thumb ? (
+                  <>
+                    <img src={thumb} alt={item.title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                      <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-4 py-2 rounded-lg">
+                        Preview {slides.length > 1 ? `All ${slides.length} Slides` : 'Post'}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-600">
+                    <span className="text-4xl">
+                      {item.content_type === 'carousel' ? '[ ]' : item.content_type === 'reel' ? '|>' : '#'}
+                    </span>
+                  </div>
+                )}
+                <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
+                  {item.content_type}
+                </span>
+                {slides.length > 1 && (
+                  <span className="absolute bottom-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
+                    {slides.length} slides
                   </span>
-                  <span className="font-medium">{item.title || script?.idea?.title || 'Untitled'}</span>
-                  <span className="text-xs text-yellow-400">{item.idea_status}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleApproveSchedule(item.id); }}
-                    disabled={scheduling === item.id}
-                    className={`px-3 py-1 text-sm rounded-lg transition-colors ${
-                      scheduling === item.id
-                        ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                        : 'bg-green-700 hover:bg-green-600'
-                    }`}
-                  >
-                    {scheduling === item.id ? 'Scheduling...' : 'Approve & Schedule'}
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleReject(item.id); }}
-                    className="px-3 py-1 bg-red-900 hover:bg-red-800 text-sm rounded-lg transition-colors"
-                  >
-                    Reject
-                  </button>
-                  <span className="text-gray-500 text-sm">{expanded === item.id ? '\u25B2' : '\u25BC'}</span>
-                </div>
+                )}
+                {isApproved && (
+                  <span className="absolute top-2 right-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
+                    approved
+                  </span>
+                )}
               </div>
 
-              {expanded === item.id && (
+              {/* Info */}
+              <div className="p-4 space-y-2">
+                <h3 className="font-medium text-sm leading-tight">{item.title || 'Untitled'}</h3>
+                {item.hook && <p className="text-xs text-gray-400 line-clamp-2">{item.hook}</p>}
+
+                {item.send_probability && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-gray-500">Send:</span>
+                    <span className={probColors[item.send_probability] || 'text-gray-400'}>
+                      {item.send_probability?.replace('_', ' ')}
+                    </span>
+                  </div>
+                )}
+
+                {item.send_trigger && (
+                  <p className="text-xs text-purple-300 italic">"{item.send_trigger}"</p>
+                )}
+
+                {/* Action buttons */}
+                <div className="pt-2 flex gap-2">
+                  {slides.length > 0 && (
+                    <button
+                      onClick={() => setPreview({ item, startIndex: 0 })}
+                      className="flex-1 px-3 py-1.5 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs rounded-lg transition-colors"
+                    >
+                      Preview Full Post
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setExpanded(isExpanded ? null : item.id)}
+                    className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
+                  >
+                    {isExpanded ? 'Less' : 'Info'}
+                  </button>
+                </div>
+
+                {isScheduled ? (
+                  <div className="w-full px-3 py-2 text-xs rounded-lg bg-green-900/40 border border-green-700 text-green-300 text-center font-medium">
+                    Scheduled: {scheduledInfo[item.id].date} at {scheduledInfo[item.id].time}
+                  </div>
+                ) : item.idea_status === 'scripted' ? (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleApproveSchedule(item.id)}
+                      disabled={scheduling === item.id}
+                      className={`flex-1 px-3 py-2 text-xs rounded-lg transition-colors font-medium ${
+                        scheduling === item.id
+                          ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                          : 'bg-green-700 hover:bg-green-600 text-white'
+                      }`}
+                    >
+                      {scheduling === item.id ? 'Scheduling...' : 'Approve & Schedule'}
+                    </button>
+                    <button
+                      onClick={() => handleReject(item.id)}
+                      className="px-3 py-2 bg-red-900 hover:bg-red-800 text-red-200 text-xs rounded-lg transition-colors"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-full px-3 py-2 text-xs rounded-lg bg-blue-900/30 border border-blue-700 text-blue-300 text-center font-medium">
+                    Approved — schedule above or publish from queue
+                  </div>
+                )}
+              </div>
+
+              {/* Expanded details */}
+              {isExpanded && (
                 <div className="border-t border-gray-800 p-4 space-y-4">
-                  {item.send_trigger && (
+                  {slides.length > 1 && (
                     <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Send Trigger</p>
-                      <p className="text-sm text-purple-300">{item.send_trigger}</p>
-                    </div>
-                  )}
-                  {item.caption && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Caption</p>
-                      <p className="text-sm text-gray-300 whitespace-pre-wrap">{item.caption}</p>
-                    </div>
-                  )}
-                  {script?.slides && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Slides ({script.slides.length})</p>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        {script.slides.map((slide: any, i: number) => (
-                          <div key={i} className="bg-gray-800 rounded-lg p-3">
-                            <p className="text-xs text-gray-500">Slide {slide.slideNumber || i + 1}</p>
-                            <p className="text-sm font-medium mt-1">{slide.headline}</p>
-                            {slide.bodyText && <p className="text-xs text-gray-400 mt-1">{slide.bodyText}</p>}
-                          </div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+                        All Slides — click any to preview full-size
+                      </p>
+                      <div className="grid grid-cols-5 gap-1.5">
+                        {slides.map((src, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setPreview({ item, startIndex: i })}
+                            className="relative aspect-square rounded-md overflow-hidden border border-gray-700 hover:border-purple-500 transition-colors"
+                          >
+                            <img src={src} alt={`Slide ${i + 1}`} className="w-full h-full object-cover" />
+                            <span className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-gray-300 text-center py-0.5">
+                              {i + 1}
+                            </span>
+                          </button>
                         ))}
                       </div>
                     </div>
                   )}
+
+                  {item.caption && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Caption</p>
+                      <p className="text-xs text-gray-300 whitespace-pre-wrap">{item.caption}</p>
+                    </div>
+                  )}
+
                   {script?.hook && item.content_type === 'reel' && (
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Reel Script</p>
                       <div className="bg-gray-800 rounded-lg p-3 space-y-2">
                         <div>
                           <span className="text-xs text-pink-400">HOOK (0-1.7s):</span>
-                          <p className="text-sm">{script.hook.onScreenText}</p>
+                          <p className="text-xs mt-0.5">{script.hook.onScreenText}</p>
                         </div>
                         {script.body?.map((seg: any, i: number) => (
                           <div key={i}>
                             <span className="text-xs text-gray-500">{seg.timestamp}s:</span>
-                            <p className="text-sm">{seg.onScreenText}</p>
+                            <p className="text-xs mt-0.5">{seg.onScreenText}</p>
                           </div>
                         ))}
                         {script.cta && (
                           <div>
                             <span className="text-xs text-green-400">CTA:</span>
-                            <p className="text-sm">{script.cta.onScreenText}</p>
+                            <p className="text-xs mt-0.5">{script.cta.onScreenText}</p>
                           </div>
                         )}
                       </div>
                     </div>
                   )}
-                  {item.hashtags && (
+
+                  {hashtags.length > 0 && (
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Hashtags</p>
                       <div className="flex flex-wrap gap-1">
-                        {JSON.parse(item.hashtags).map((tag: string, i: number) => (
+                        {hashtags.map((tag: string, i: number) => (
                           <span key={i} className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">
                             #{tag.replace('#', '')}
                           </span>
@@ -862,9 +983,12 @@ function PendingReviewSection({
                       </div>
                     </div>
                   )}
+
                   {item.dm_trigger_keyword && (
                     <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-3">
-                      <p className="text-xs text-purple-400">DM Trigger Keyword: "{item.dm_trigger_keyword}"</p>
+                      <p className="text-xs text-purple-400">
+                        DM Trigger: "{item.dm_trigger_keyword}"
+                      </p>
                     </div>
                   )}
                 </div>
@@ -873,7 +997,7 @@ function PendingReviewSection({
           );
         })}
       </div>
-    </details>
+    </div>
   );
 }
 
@@ -903,7 +1027,7 @@ export default function Content() {
 
       <div className="border-t border-gray-800" />
 
-      <PendingReviewSection onScheduled={fetchSchedule} />
+      <ReadyContentSection onScheduled={fetchSchedule} />
     </div>
   );
 }

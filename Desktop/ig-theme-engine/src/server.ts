@@ -47,13 +47,22 @@ app.post('/api/pipeline/run', async (req, res) => {
 app.get('/api/queue', (req, res) => {
   const db = getDb();
   const scripts = db.prepare(`
-    SELECT cs.*, ci.title, ci.status as idea_status, ci.send_trigger
+    SELECT cs.id, cs.idea_id, cs.content_type, cs.script_json, cs.caption,
+           cs.hashtags, cs.dm_trigger_keyword, cs.created_at,
+           ci.title, ci.status as idea_status, ci.send_trigger,
+           ci.hook, ci.send_probability, ci.batch_id,
+           ra.local_paths, ra.public_urls
     FROM content_scripts cs
     JOIN content_ideas ci ON cs.idea_id = ci.id
+    LEFT JOIN rendered_assets ra ON ra.script_id = cs.id
     WHERE ci.status IN ('scripted', 'approved')
     ORDER BY cs.created_at DESC
     LIMIT 50
-  `).all();
+  `).all().map((row: any) => ({
+    ...row,
+    local_paths: row.local_paths ? JSON.parse(row.local_paths) : [],
+    public_urls: row.public_urls ? JSON.parse(row.public_urls) : [],
+  }));
   res.json(scripts);
 });
 
