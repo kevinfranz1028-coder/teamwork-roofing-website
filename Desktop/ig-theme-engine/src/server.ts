@@ -16,7 +16,7 @@ import { createDMFlow, generateLeadMagnets, getActiveDMFlows, getEmailListStats 
 import { adaptForPlatform, getCrossPlatformLog, getDistributionStats } from './modules/10-cross-platform/distributor.js';
 import { auditQueue } from './modules/00-originality/fingerprint-check.js';
 import { renderScript, renderDailyPackage } from './rendering/asset-pipeline.js';
-import { autoPublish } from './orchestrator/auto-publisher.js';
+import { autoPublish, autoPublishScript } from './orchestrator/auto-publisher.js';
 import { generateContentOptions, getLatestBatch } from './modules/04-daily-output/options-engine.js';
 import { runMigrations } from './database/migrations.js';
 
@@ -296,6 +296,23 @@ app.post('/api/cross-platform/adapt', async (req, res) => {
 // ─── Schedule (unified content page) ───────────────
 app.get('/api/schedule', (_req, res) => {
   res.json(getScheduledQueue());
+});
+
+app.post('/api/queue/:id/approve-and-post', async (req, res) => {
+  try {
+    const scriptId = parseInt(req.params.id);
+    // Approve first
+    approveContent(scriptId);
+    // Publish directly to Instagram
+    const result = await autoPublishScript(scriptId);
+    if (result.success) {
+      res.json({ success: true });
+    } else {
+      res.status(500).json({ success: false, error: result.error });
+    }
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 app.post('/api/queue/:id/approve-and-schedule', (req, res) => {
