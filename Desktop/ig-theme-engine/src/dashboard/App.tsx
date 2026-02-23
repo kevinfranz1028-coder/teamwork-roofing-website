@@ -5,10 +5,12 @@ import Analytics from './pages/Analytics.js';
 import Scorecard from './pages/Scorecard.js';
 import Revenue from './pages/Revenue.js';
 import BuildChecklist from './pages/BuildChecklist.js';
+import CreativeBrief from './pages/CreativeBrief.js';
 
 const tabs = [
   { id: 'status', label: 'Pipeline' },
   { id: 'content', label: 'Content' },
+  { id: 'brief', label: 'Brief' },
   { id: 'analytics', label: 'Analytics' },
   { id: 'scorecard', label: 'Scorecard' },
   { id: 'revenue', label: 'Revenue' },
@@ -52,6 +54,7 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 py-6">
         {activeTab === 'status' && <PipelineStatus />}
         {activeTab === 'content' && <Content />}
+        {activeTab === 'brief' && <CreativeBrief />}
         {activeTab === 'analytics' && <Analytics />}
         {activeTab === 'scorecard' && <Scorecard />}
         {activeTab === 'revenue' && <Revenue />}

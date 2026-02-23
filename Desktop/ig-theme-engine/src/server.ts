@@ -386,6 +386,72 @@ app.post('/api/fingerprint/audit', async (_req, res) => {
   }
 });
 
+// ─── Creative Briefs ────────────────────────────────
+app.get('/api/briefs', (_req, res) => {
+  const db = getDb();
+  const briefs = db.prepare('SELECT * FROM creative_briefs ORDER BY created_at DESC').all();
+  res.json(briefs);
+});
+
+app.get('/api/briefs/active', (_req, res) => {
+  const db = getDb();
+  const brief = db.prepare(
+    'SELECT * FROM creative_briefs WHERE is_active = 1 ORDER BY updated_at DESC LIMIT 1'
+  ).get();
+  res.json(brief || null);
+});
+
+app.post('/api/briefs', (req, res) => {
+  const db = getDb();
+  const { title, notes, competitor_links, content_angles, mood_themes, visual_style, target_emotions } = req.body;
+  // Deactivate all existing briefs
+  db.prepare('UPDATE creative_briefs SET is_active = 0').run();
+  const id = db.prepare(`
+    INSERT INTO creative_briefs (title, notes, competitor_links, content_angles, mood_themes, visual_style, target_emotions, is_active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+  `).run(
+    title, notes || null,
+    competitor_links ? JSON.stringify(competitor_links) : null,
+    content_angles ? JSON.stringify(content_angles) : null,
+    mood_themes || null, visual_style || null, target_emotions || null
+  ).lastInsertRowid;
+  const brief = db.prepare('SELECT * FROM creative_briefs WHERE id = ?').get(id);
+  res.json(brief);
+});
+
+app.put('/api/briefs/:id', (req, res) => {
+  const db = getDb();
+  const { title, notes, competitor_links, content_angles, mood_themes, visual_style, target_emotions } = req.body;
+  db.prepare(`
+    UPDATE creative_briefs
+    SET title = ?, notes = ?, competitor_links = ?, content_angles = ?, mood_themes = ?, visual_style = ?, target_emotions = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).run(
+    title, notes || null,
+    competitor_links ? JSON.stringify(competitor_links) : null,
+    content_angles ? JSON.stringify(content_angles) : null,
+    mood_themes || null, visual_style || null, target_emotions || null,
+    parseInt(req.params.id)
+  );
+  const brief = db.prepare('SELECT * FROM creative_briefs WHERE id = ?').get(parseInt(req.params.id));
+  res.json(brief);
+});
+
+app.post('/api/briefs/:id/activate', (req, res) => {
+  const db = getDb();
+  db.prepare('UPDATE creative_briefs SET is_active = 0').run();
+  db.prepare('UPDATE creative_briefs SET is_active = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+    .run(parseInt(req.params.id));
+  const brief = db.prepare('SELECT * FROM creative_briefs WHERE id = ?').get(parseInt(req.params.id));
+  res.json(brief);
+});
+
+app.delete('/api/briefs/:id', (req, res) => {
+  const db = getDb();
+  db.prepare('DELETE FROM creative_briefs WHERE id = ?').run(parseInt(req.params.id));
+  res.json({ success: true });
+});
+
 // ─── Content Options ────────────────────────────────
 app.post('/api/options/generate', async (_req, res) => {
   try {

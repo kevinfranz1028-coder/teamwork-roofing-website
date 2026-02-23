@@ -1,5 +1,48 @@
 import { CONFIG } from '../../config/env.js';
 
+export interface CreativeBrief {
+  id: number;
+  title: string;
+  notes: string | null;
+  competitor_links: string | null;
+  content_angles: string | null;
+  mood_themes: string | null;
+  visual_style: string | null;
+  target_emotions: string | null;
+  is_active: number;
+}
+
+export function formatBriefContext(brief: CreativeBrief | null): string {
+  if (!brief) return '';
+
+  const sections: string[] = ['\n\n── CREATIVE BRIEF ──'];
+
+  if (brief.title) sections.push(`Brief: ${brief.title}`);
+
+  if (brief.notes) sections.push(`\nInspiration & Notes:\n${brief.notes}`);
+
+  if (brief.competitor_links) {
+    try {
+      const links = JSON.parse(brief.competitor_links) as string[];
+      if (links.length > 0) sections.push(`\nCompetitor References: ${links.join(', ')}`);
+    } catch { /* ignore parse errors */ }
+  }
+
+  if (brief.content_angles) {
+    try {
+      const angles = JSON.parse(brief.content_angles) as string[];
+      if (angles.length > 0) sections.push(`\nContent Angles to Explore: ${angles.join(', ')}`);
+    } catch { /* ignore parse errors */ }
+  }
+
+  if (brief.mood_themes) sections.push(`\nMood & Themes: ${brief.mood_themes}`);
+  if (brief.visual_style) sections.push(`\nVisual Style Direction: ${brief.visual_style}`);
+  if (brief.target_emotions) sections.push(`\nTarget Emotions: ${brief.target_emotions}`);
+
+  sections.push('── END BRIEF ──');
+  return sections.join('\n');
+}
+
 export const DAILY_ENGINE_SYSTEM = (niche: string, performanceContext: string) => `You are the autonomous content operator for a "${niche}" Instagram theme page.
 
 YOUR PRIME DIRECTIVES:
@@ -44,3 +87,28 @@ Deliver ALL of the following as a single JSON object:
 5. designDirection: Today's color palette (hex codes), font pairing, mood
 
 Return as a single JSON object with all 5 sections.`;
+
+export const OPTIONS_ENGINE_USER = (niche: string, slideCount: number) => `Generate exactly 5 diverse content ideas for a "${niche}" Instagram theme page. Each idea should have a different angle and format mix.
+
+Return a JSON object with an "options" array of 5 items. Each item must have:
+- title: string (compelling, specific title)
+- content_type: "carousel" or "reel"
+- hook: string (under 1.7 seconds, scroll-stopping)
+- value_proposition: string (what the viewer learns or feels)
+- emotional_trigger: string (curiosity, fear, aspiration, humor, relatability)
+- send_trigger: string (why someone would DM this to a friend)
+- send_probability: "high" | "very_high" | "extreme"
+- save_probability: "high" | "very_high" | "extreme"
+- caption_seo_keywords: string[] (5-8 SEO keywords)
+- formatNotes: string (AI image style guidance — describe the visual mood, lighting, color palette for background images. E.g. "soft morning light, dewy leaves, warm green tones" or "dramatic dark background with spotlight on subject")
+
+REQUIRED MIX — follow this exactly:
+- Option 1: Educational how-to carousel (${slideCount} slides teaching a step-by-step process)
+- Option 2: Diagnosis/identification carousel (${slideCount} slides — "signs your plant has X" or "how to tell if...")
+- Option 3: Listicle or before/after transformation carousel (${slideCount} slides)
+- Option 4: Reel with shock/curiosity hook (15-30 seconds, visual reveal or time-lapse)
+- Option 5: Community/relatability carousel OR reel (memes, "every plant parent knows...", relatable moments)
+
+Make each idea HIGHLY SPECIFIC — not generic. Use real plant names, real problems, real scenarios. Every idea must be 100% original content, never repost.
+
+Return ONLY the JSON object: { "options": [...] }`;

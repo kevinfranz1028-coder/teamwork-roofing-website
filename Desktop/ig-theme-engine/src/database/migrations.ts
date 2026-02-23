@@ -70,6 +70,25 @@ const MIGRATIONS: Migration[] = [
       CREATE INDEX IF NOT EXISTS idx_calendar_script ON content_calendar(script_id);
     `,
   },
+  {
+    version: 7,
+    name: 'add_creative_briefs',
+    up: `
+      CREATE TABLE IF NOT EXISTS creative_briefs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        notes TEXT,
+        competitor_links TEXT,
+        content_angles TEXT,
+        mood_themes TEXT,
+        visual_style TEXT,
+        target_emotions TEXT,
+        is_active BOOLEAN DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `,
+  },
 ];
 
 export function runMigrations(): void {
