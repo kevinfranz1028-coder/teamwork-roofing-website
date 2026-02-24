@@ -42,9 +42,11 @@ export interface ReelSegment {
 export interface ReelScript {
   hook: string;
   hookVisual?: string;
+  hookDuration?: number;
   segments: ReelSegment[];
   cta: string;
   ctaVisual?: string;
+  ctaDuration?: number;
   totalLength: number;
   voiceoverText: string;
 }

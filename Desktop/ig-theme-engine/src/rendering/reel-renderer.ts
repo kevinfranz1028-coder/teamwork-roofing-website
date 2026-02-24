@@ -50,6 +50,7 @@ export async function renderReel(
   }
 
   // Step 2: Generate voiceover, fallback to silent audio if TTS fails
+  const totalDuration = allSegments.reduce((sum, s) => sum + s.durationSeconds, 0);
   console.log('  Generating voiceover...');
   let voiceoverPath: string;
   try {
@@ -60,6 +61,9 @@ export async function renderReel(
     console.log(`  TTS failed (${err.message}), generating silent audio...`);
     voiceoverPath = await generateSilentAudio(outputDir, allSegments);
   }
+
+  // Pad voiceover with silence to match total video duration so -shortest doesn't truncate
+  voiceoverPath = await padAudioToLength(voiceoverPath, totalDuration, outputDir);
 
   // Step 3: Render text overlays as transparent PNGs
   console.log('  Rendering text overlays...');
@@ -89,6 +93,23 @@ function generateSilentAudio(outputDir: string, segments: ReelSegment[]): Promis
   });
 }
 
+function padAudioToLength(audioPath: string, targetSeconds: number, outputDir: string): Promise<string> {
+  const paddedPath = path.join(outputDir, 'voiceover-padded.mp3');
+  return new Promise((resolve, reject) => {
+    ffmpeg()
+      .input(audioPath)
+      .input('anullsrc=r=44100:cl=mono')
+      .inputFormat('lavfi')
+      .complexFilter(`[0:a][1:a]concat=n=2:v=0:a=1[out]`)
+      .outputOptions(['-map', '[out]', '-t', `${targetSeconds}`])
+      .audioCodec('libmp3lame')
+      .output(paddedPath)
+      .on('end', () => resolve(paddedPath))
+      .on('error', (err) => reject(new Error(`Audio padding failed: ${err.message}`)))
+      .run();
+  });
+}
+
 async function generateGradientBackground(
   outputDir: string,
   filename: string,
@@ -113,10 +134,10 @@ async function generateGradientBackground(
 function buildSegmentList(script: ReelScript): ReelSegment[] {
   const segments: ReelSegment[] = [];
 
-  // Hook segment — use Claude's visual description if available
+  // Hook segment — use parsed duration from timestamp, fallback to 3s
   segments.push({
     text: script.hook,
-    durationSeconds: 3,
+    durationSeconds: script.hookDuration || 3,
     visualDescription: script.hookVisual || 'attention-grabbing dramatic visual',
     segmentType: 'hook',
   });
@@ -126,10 +147,10 @@ function buildSegmentList(script: ReelScript): ReelSegment[] {
     segments.push({ ...seg, segmentType: seg.segmentType || 'body' });
   }
 
-  // CTA segment — use Claude's visual description if available
+  // CTA segment — use parsed duration from timestamp, fallback to 4s
   segments.push({
     text: script.cta,
-    durationSeconds: 4,
+    durationSeconds: script.ctaDuration || 4,
     visualDescription: script.ctaVisual || 'call to action motivational visual',
     segmentType: 'cta',
   });
@@ -276,6 +297,27 @@ function composeVideo(
 }
 
 /**
+ * Parse a timestamp range string into a duration in seconds.
+ * Supports: "0:02-0:05" (mm:ss), "1.7-4s", "4-7s", "19-23s" (seconds).
+ */
+function parseDurationFromTimestamp(timestamp: string): number | null {
+  // Format: "0:02-0:05" (mm:ss-mm:ss)
+  const mmss = timestamp.match(/(\d+):(\d+)\s*-\s*(\d+):(\d+)/);
+  if (mmss) {
+    const start = parseInt(mmss[1]) * 60 + parseInt(mmss[2]);
+    const end = parseInt(mmss[3]) * 60 + parseInt(mmss[4]);
+    return end - start;
+  }
+  // Format: "1.7-4s", "4-7s", "19-23s", "0-1.7s" (seconds with optional 's' suffix)
+  const secs = timestamp.match(/([\d.]+)\s*s?\s*-\s*([\d.]+)\s*s?/);
+  if (secs) {
+    const dur = parseFloat(secs[2]) - parseFloat(secs[1]);
+    if (dur > 0) return dur;
+  }
+  return null;
+}
+
+/**
  * Parse a content_scripts row's script_json into a ReelScript.
  */
 export function parseReelScript(scriptJson: string): ReelScript {
@@ -291,24 +333,33 @@ export function parseReelScript(scriptJson: string): ReelScript {
   const ctaRaw = reel.cta;
   const cta = typeof ctaRaw === 'string' ? ctaRaw : ctaRaw?.onScreenText || ctaRaw?.text || '';
 
+  // Parse hook/CTA durations from timestamps
+  const hookDuration = (typeof hookRaw === 'object' && hookRaw?.timestamp)
+    ? parseDurationFromTimestamp(hookRaw.timestamp) ?? 3
+    : 3;
+  const ctaDuration = (typeof ctaRaw === 'object' && ctaRaw?.timestamp)
+    ? parseDurationFromTimestamp(ctaRaw.timestamp) ?? 4
+    : 4;
+
   // Segments can use body[], segments[], or other shapes
   const rawSegments = reel.segments || reel.body || [];
 
   const segments = rawSegments.map((s: any) => {
     const text = s.text || s.onScreenText || s.line || '';
-    // Parse duration from timestamp like "0:02-0:05" or use explicit value
-    let durationSeconds = s.durationSeconds || s.duration || 4;
-    if (typeof durationSeconds !== 'number' && s.timestamp) {
-      const match = s.timestamp.match(/(\d+):(\d+)-(\d+):(\d+)/);
-      if (match) {
-        const start = parseInt(match[1]) * 60 + parseInt(match[2]);
-        const end = parseInt(match[3]) * 60 + parseInt(match[4]);
-        durationSeconds = end - start;
-      }
+    let durationSeconds: number | null = null;
+
+    // Use explicit duration fields first
+    if (typeof s.durationSeconds === 'number') durationSeconds = s.durationSeconds;
+    else if (typeof s.duration === 'number') durationSeconds = s.duration;
+
+    // Parse duration from timestamp if not set explicitly
+    if (durationSeconds === null && s.timestamp) {
+      durationSeconds = parseDurationFromTimestamp(s.timestamp);
     }
+
     return {
       text,
-      durationSeconds: typeof durationSeconds === 'number' ? durationSeconds : 4,
+      durationSeconds: durationSeconds && durationSeconds > 0 ? durationSeconds : 4,
       visualDescription: s.visualDescription || s.visual || '',
       segmentType: s.segmentType || 'body',
     };
@@ -330,9 +381,11 @@ export function parseReelScript(scriptJson: string): ReelScript {
   return {
     hook,
     hookVisual,
+    hookDuration,
     segments,
     cta,
     ctaVisual,
+    ctaDuration,
     totalLength: reel.totalLength || 30,
     voiceoverText,
   };
