@@ -706,7 +706,7 @@ app.get('/api/build-doc', (_req, res) => {
 
   // 1. Discover database tables + columns
   const tableNames = db.prepare(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_%' AND name NOT LIKE 'sqlite_%' ORDER BY name"
+    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '\\_%' ESCAPE '\\' AND name NOT LIKE 'sqlite_%' ORDER BY name"
   ).all() as { name: string }[];
   const tables = tableNames.map((t) => {
     const columns = db.prepare(`PRAGMA table_info('${t.name}')`).all() as {
@@ -718,13 +718,28 @@ app.get('/api/build-doc', (_req, res) => {
 
   // 2. Discover API routes from Express
   const routes: { method: string; path: string }[] = [];
-  (app as any)._router.stack.forEach((layer: any) => {
-    if (layer.route) {
-      Object.keys(layer.route.methods).forEach((method: string) => {
-        routes.push({ method: method.toUpperCase(), path: layer.route.path });
+  try {
+    const router = (app as any)._router || (app as any).router;
+    if (router?.stack) {
+      router.stack.forEach((layer: any) => {
+        if (layer.route) {
+          Object.keys(layer.route.methods).forEach((method: string) => {
+            routes.push({ method: method.toUpperCase(), path: layer.route.path });
+          });
+        } else if (layer.name === 'router' && layer.handle?.stack) {
+          layer.handle.stack.forEach((subLayer: any) => {
+            if (subLayer.route) {
+              Object.keys(subLayer.route.methods).forEach((method: string) => {
+                routes.push({ method: method.toUpperCase(), path: subLayer.route.path });
+              });
+            }
+          });
+        }
       });
     }
-  });
+  } catch {
+    // Express 5 may not expose routes the same way — skip route discovery
+  }
 
   // 3. Discover migrations
   const migrations = db.prepare('SELECT version, name, applied_at FROM _migrations ORDER BY version').all();
