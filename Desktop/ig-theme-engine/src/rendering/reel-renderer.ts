@@ -1,5 +1,5 @@
 import path from 'path';
-import { mkdirSync, existsSync } from 'fs';
+import { mkdirSync, existsSync, copyFileSync } from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import sharp from 'sharp';
@@ -14,10 +14,10 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 /**
  * Render a reel as an MP4 video:
- * 1. Generate AI backgrounds per segment (Replicate Flux)
- * 2. Generate voiceover (OpenAI TTS)
+ * 1. Generate per-segment voiceover (OpenAI TTS) — audio drives timing
+ * 2. Generate AI backgrounds per segment (Replicate Flux)
  * 3. Render text overlays as transparent PNGs (Puppeteer)
- * 4. Compose everything with ffmpeg
+ * 4. Compose everything with ffmpeg — each segment's visual matches its audio
  */
 export async function renderReel(
   script: ReelScript,
@@ -29,7 +29,31 @@ export async function renderReel(
 
   const allSegments = buildSegmentList(script);
 
-  // Step 1: Generate AI backgrounds (parallel), fallback to gradient if Replicate fails
+  // Step 1: Generate per-segment voiceover audio — this drives timing for everything
+  console.log('  Generating per-segment voiceover...');
+  const segmentAudioPaths: string[] = [];
+  for (let i = 0; i < allSegments.length; i++) {
+    const seg = allSegments[i];
+    const voText = seg.voiceoverText || seg.text;
+    const audioFile = `vo-${i}.mp3`;
+    try {
+      const audioPath = await generateSpeech(voText, outputDir, audioFile);
+      segmentAudioPaths.push(audioPath);
+      // Probe actual duration and update segment to match
+      const audioDur = await probeAudioDuration(audioPath);
+      if (audioDur > 0) {
+        // Add a small buffer (0.3s) so the voice doesn't feel rushed against the visual cut
+        allSegments[i] = { ...seg, durationSeconds: audioDur + 0.3 };
+      }
+      console.log(`    Segment ${i} (${seg.segmentType}): ${audioDur.toFixed(1)}s audio → ${allSegments[i].durationSeconds.toFixed(1)}s visual`);
+    } catch (err: any) {
+      console.log(`    TTS failed for segment ${i}: ${err.message}, using ${seg.durationSeconds}s silence`);
+      const silentPath = await generateSilentSegment(outputDir, audioFile, seg.durationSeconds);
+      segmentAudioPaths.push(silentPath);
+    }
+  }
+
+  // Step 2: Generate AI backgrounds (parallel), fallback to gradient if Replicate fails
   console.log('  Generating AI backgrounds...');
   let bgPaths: string[];
   try {
@@ -49,42 +73,31 @@ export async function renderReel(
     );
   }
 
-  // Step 2: Generate voiceover, fallback to silent audio if TTS fails
-  const totalDuration = allSegments.reduce((sum, s) => sum + s.durationSeconds, 0);
-  console.log('  Generating voiceover...');
-  let voiceoverPath: string;
-  try {
-    const voiceoverText = script.voiceoverText
-      || [script.hook, ...allSegments.map(s => s.text), script.cta].join('. ');
-    voiceoverPath = await generateSpeech(voiceoverText, outputDir, 'voiceover.mp3');
-  } catch (err: any) {
-    console.log(`  TTS failed (${err.message}), generating silent audio...`);
-    voiceoverPath = await generateSilentAudio(outputDir, allSegments);
-  }
-
-  // Pad voiceover with silence to match total video duration so -shortest doesn't truncate
-  voiceoverPath = await padAudioToLength(voiceoverPath, totalDuration, outputDir);
-
   // Step 3: Render text overlays as transparent PNGs
   console.log('  Rendering text overlays...');
   const overlayPaths = await renderTextOverlays(allSegments, renderConfig, outputDir);
 
-  // Step 4: Compose video with ffmpeg
+  // Step 4: Concatenate per-segment audio into one track
+  console.log('  Stitching audio...');
+  const voiceoverPath = await concatenateAudio(segmentAudioPaths, outputDir);
+
+  // Step 5: Compose video with ffmpeg — visuals synced to audio durations
   console.log('  Composing video...');
+  const totalDur = allSegments.reduce((s, seg) => s + seg.durationSeconds, 0);
+  console.log(`  Total reel: ${totalDur.toFixed(1)}s across ${allSegments.length} segments`);
   const outputPath = path.join(outputDir, 'reel.mp4');
   await composeVideo(bgPaths, overlayPaths, allSegments, voiceoverPath, outputPath);
 
   return outputPath;
 }
 
-function generateSilentAudio(outputDir: string, segments: ReelSegment[]): Promise<string> {
-  const totalDuration = segments.reduce((sum, s) => sum + s.durationSeconds, 0);
-  const outputPath = path.join(outputDir, 'voiceover.mp3');
+function generateSilentSegment(outputDir: string, filename: string, durationSeconds: number): Promise<string> {
+  const outputPath = path.join(outputDir, filename);
   return new Promise((resolve, reject) => {
     ffmpeg()
       .input('anullsrc=r=44100:cl=mono')
       .inputFormat('lavfi')
-      .duration(totalDuration)
+      .duration(durationSeconds)
       .audioCodec('libmp3lame')
       .output(outputPath)
       .on('end', () => resolve(outputPath))
@@ -93,19 +106,36 @@ function generateSilentAudio(outputDir: string, segments: ReelSegment[]): Promis
   });
 }
 
-function padAudioToLength(audioPath: string, targetSeconds: number, outputDir: string): Promise<string> {
-  const paddedPath = path.join(outputDir, 'voiceover-padded.mp3');
+function probeAudioDuration(audioPath: string): Promise<number> {
   return new Promise((resolve, reject) => {
-    ffmpeg()
-      .input(audioPath)
-      .input('anullsrc=r=44100:cl=mono')
-      .inputFormat('lavfi')
-      .complexFilter(`[0:a][1:a]concat=n=2:v=0:a=1[out]`)
-      .outputOptions(['-map', '[out]', '-t', `${targetSeconds}`])
+    ffmpeg.ffprobe(audioPath, (err, metadata) => {
+      if (err) return reject(err);
+      resolve(metadata.format.duration || 0);
+    });
+  });
+}
+
+function concatenateAudio(audioPaths: string[], outputDir: string): Promise<string> {
+  const outputPath = path.join(outputDir, 'voiceover.mp3');
+  if (audioPaths.length === 1) {
+    // Single segment — just copy
+    copyFileSync(audioPaths[0], outputPath);
+    return Promise.resolve(outputPath);
+  }
+  return new Promise((resolve, reject) => {
+    const inputLabels = audioPaths.map((_, i) => `[${i}:a]`).join('');
+    const filter = `${inputLabels}concat=n=${audioPaths.length}:v=0:a=1[out]`;
+    const cmd = ffmpeg();
+    for (const p of audioPaths) {
+      cmd.input(p);
+    }
+    cmd
+      .complexFilter(filter)
+      .outputOptions(['-map', '[out]'])
       .audioCodec('libmp3lame')
-      .output(paddedPath)
-      .on('end', () => resolve(paddedPath))
-      .on('error', (err) => reject(new Error(`Audio padding failed: ${err.message}`)))
+      .output(outputPath)
+      .on('end', () => resolve(outputPath))
+      .on('error', (err) => reject(new Error(`Audio concat failed: ${err.message}`)))
       .run();
   });
 }
@@ -134,22 +164,24 @@ async function generateGradientBackground(
 function buildSegmentList(script: ReelScript): ReelSegment[] {
   const segments: ReelSegment[] = [];
 
-  // Hook segment — use parsed duration from timestamp, fallback to 3s
+  // Hook segment
   segments.push({
     text: script.hook,
+    voiceoverText: script.hookVoiceover || script.hook,
     durationSeconds: script.hookDuration || 3,
     visualDescription: script.hookVisual || 'attention-grabbing dramatic visual',
     segmentType: 'hook',
   });
 
-  // Body segments
+  // Body segments — voiceoverText already attached by parseReelScript
   for (const seg of script.segments) {
     segments.push({ ...seg, segmentType: seg.segmentType || 'body' });
   }
 
-  // CTA segment — use parsed duration from timestamp, fallback to 4s
+  // CTA segment
   segments.push({
     text: script.cta,
+    voiceoverText: script.ctaVoiceover || script.cta,
     durationSeconds: script.ctaDuration || 4,
     visualDescription: script.ctaVisual || 'call to action motivational visual',
     segmentType: 'cta',
@@ -285,7 +317,6 @@ function composeVideo(
         '-crf', '23',
         '-c:a', 'aac',
         '-b:a', '128k',
-        '-shortest',
         '-pix_fmt', 'yuv420p',
         '-movflags', '+faststart',
       ])
@@ -344,6 +375,13 @@ export function parseReelScript(scriptJson: string): ReelScript {
   // Segments can use body[], segments[], or other shapes
   const rawSegments = reel.segments || reel.body || [];
 
+  // Helper: extract voiceover text from a raw segment object, cleaning stage directions
+  const extractVO = (obj: any): string => {
+    const raw = obj?.voiceover || obj?.voiceoverScript || obj?.audio || '';
+    // Strip stage directions like "Voiceover (male, deadpan serious): 'text'"
+    return raw.replace(/^[^:]*:\s*['"]?/, '').replace(/['"]?\s*$/, '');
+  };
+
   const segments = rawSegments.map((s: any) => {
     const text = s.text || s.onScreenText || s.line || '';
     let durationSeconds: number | null = null;
@@ -357,31 +395,22 @@ export function parseReelScript(scriptJson: string): ReelScript {
       durationSeconds = parseDurationFromTimestamp(s.timestamp);
     }
 
+    // Attach per-segment voiceover text (falls back to on-screen text)
+    const voiceoverText = extractVO(s) || text;
+
     return {
       text,
+      voiceoverText,
       durationSeconds: durationSeconds && durationSeconds > 0 ? durationSeconds : 4,
       visualDescription: s.visualDescription || s.visual || '',
       segmentType: s.segmentType || 'body',
     };
   });
 
-  // Build voiceover from all segment voiceover fields
-  // Claude uses varying field names: voiceover, voiceoverScript, audio
-  const voiceoverParts: string[] = [];
-  if (typeof hookRaw === 'object') {
-    const hookVO = hookRaw?.voiceover || hookRaw?.voiceoverScript || hookRaw?.audio || '';
-    // Strip stage directions like "Voiceover (male, deadpan serious): 'text'"
-    const cleaned = hookVO.replace(/^[^:]*:\s*['"]?/, '').replace(/['"]?\s*$/, '');
-    if (cleaned) voiceoverParts.push(cleaned);
-  }
-  for (const s of rawSegments) {
-    const segVO = s.voiceover || s.voiceoverScript || s.audio || '';
-    if (segVO) voiceoverParts.push(segVO);
-  }
-  if (typeof ctaRaw === 'object') {
-    const ctaVO = ctaRaw?.voiceover || ctaRaw?.voiceoverScript || ctaRaw?.audio || '';
-    if (ctaVO) voiceoverParts.push(ctaVO);
-  }
+  // Build combined voiceover text (kept for compatibility)
+  const hookVoiceover = (typeof hookRaw === 'object') ? (extractVO(hookRaw) || hook) : hook;
+  const ctaVoiceover = (typeof ctaRaw === 'object') ? (extractVO(ctaRaw) || cta) : cta;
+  const voiceoverParts = [hookVoiceover, ...segments.map(s => s.voiceoverText || s.text), ctaVoiceover];
   const voiceoverText = reel.voiceoverText || voiceoverParts.join('. ') || '';
 
   // Extract visual descriptions for hook and CTA
@@ -392,10 +421,12 @@ export function parseReelScript(scriptJson: string): ReelScript {
     hook,
     hookVisual,
     hookDuration,
+    hookVoiceover,
     segments,
     cta,
     ctaVisual,
     ctaDuration,
+    ctaVoiceover,
     totalLength: reel.totalLength || 30,
     voiceoverText,
   };

@@ -34,6 +34,7 @@ export interface StoryScript {
 
 export interface ReelSegment {
   text: string;
+  voiceoverText?: string;
   durationSeconds: number;
   visualDescription: string;
   segmentType?: 'hook' | 'body' | 'cta';
@@ -43,10 +44,12 @@ export interface ReelScript {
   hook: string;
   hookVisual?: string;
   hookDuration?: number;
+  hookVoiceover?: string;
   segments: ReelSegment[];
   cta: string;
   ctaVisual?: string;
   ctaDuration?: number;
+  ctaVoiceover?: string;
   totalLength: number;
   voiceoverText: string;
 }
