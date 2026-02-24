@@ -373,7 +373,9 @@ async function generateGradientBackground(
 
 // ─── Timestamp Parsing ───
 
-function parseDurationFromTimestamp(timestamp: string): number | null {
+function parseDurationFromTimestamp(timestamp: string | number): number | null {
+  if (typeof timestamp === 'number') return timestamp > 0 ? timestamp : null;
+  if (typeof timestamp !== 'string') return null;
   const mmss = timestamp.match(/(\d+):(\d+)\s*-\s*(\d+):(\d+)/);
   if (mmss) {
     const start = parseInt(mmss[1]) * 60 + parseInt(mmss[2]);

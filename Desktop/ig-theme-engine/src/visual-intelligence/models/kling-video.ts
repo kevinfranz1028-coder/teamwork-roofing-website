@@ -1,5 +1,5 @@
 // Kling 2.6 Pro via fal.ai — Image-to-Video generation
-import fal from '@fal-ai/serverless-client';
+import * as fal from '@fal-ai/serverless-client';
 import { writeFile, readFile } from 'fs/promises';
 import path from 'path';
 import { mkdirSync, existsSync } from 'fs';

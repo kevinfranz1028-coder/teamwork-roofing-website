@@ -83,22 +83,31 @@ function repairJSON(text: string): string {
 // Structured output helper — asks Claude to respond in JSON
 export async function askClaudeJSON<T>(request: ClaudeRequest): Promise<T> {
   const enhancedSystem = request.systemPrompt +
-    '\n\nIMPORTANT: Respond with valid JSON only. No markdown, no backticks, no preamble. Just the JSON object.';
+    '\n\nIMPORTANT: Respond with valid JSON only. No markdown, no backticks, no preamble. Just the JSON.';
 
   const response = await askClaude({ ...request, systemPrompt: enhancedSystem });
 
+  // Strip markdown code fences if present (```json ... ``` or ``` ... ```)
+  let text = response.text.trim();
+  text = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/, '').trim();
+
   // Try direct parse first
   try {
-    return JSON.parse(response.text) as T;
+    return JSON.parse(text) as T;
   } catch {
-    // Try extracting JSON block
-    const jsonMatch = response.text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
+    // Try extracting JSON array or object
+    const arrayMatch = text.match(/\[[\s\S]*\]/);
+    const objMatch = text.match(/\{[\s\S]*\}/);
+    // Prefer whichever starts first in the text
+    const match = arrayMatch && objMatch
+      ? (text.indexOf('[') < text.indexOf('{') ? arrayMatch : objMatch)
+      : arrayMatch || objMatch;
+
+    if (match) {
       try {
-        return JSON.parse(jsonMatch[0]) as T;
+        return JSON.parse(match[0]) as T;
       } catch {
-        // Try repairing truncated JSON
-        const repaired = repairJSON(jsonMatch[0]);
+        const repaired = repairJSON(match[0]);
         try {
           return JSON.parse(repaired) as T;
         } catch {}
@@ -106,9 +115,9 @@ export async function askClaudeJSON<T>(request: ClaudeRequest): Promise<T> {
     }
     // Last resort: try repairing the full text
     try {
-      return JSON.parse(repairJSON(response.text)) as T;
+      return JSON.parse(repairJSON(text)) as T;
     } catch {
-      throw new Error(`Failed to parse Claude response as JSON: ${response.text.slice(0, 200)}`);
+      throw new Error(`Failed to parse Claude response as JSON: ${text.slice(0, 200)}`);
     }
   }
 }
