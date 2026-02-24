@@ -366,12 +366,22 @@ export function parseReelScript(scriptJson: string): ReelScript {
   });
 
   // Build voiceover from all segment voiceover fields
+  // Claude uses varying field names: voiceover, voiceoverScript, audio
   const voiceoverParts: string[] = [];
-  if (hookRaw?.voiceover) voiceoverParts.push(hookRaw.voiceover);
-  for (const s of rawSegments) {
-    if (s.voiceover) voiceoverParts.push(s.voiceover);
+  if (typeof hookRaw === 'object') {
+    const hookVO = hookRaw?.voiceover || hookRaw?.voiceoverScript || hookRaw?.audio || '';
+    // Strip stage directions like "Voiceover (male, deadpan serious): 'text'"
+    const cleaned = hookVO.replace(/^[^:]*:\s*['"]?/, '').replace(/['"]?\s*$/, '');
+    if (cleaned) voiceoverParts.push(cleaned);
   }
-  if (ctaRaw?.voiceover) voiceoverParts.push(ctaRaw.voiceover);
+  for (const s of rawSegments) {
+    const segVO = s.voiceover || s.voiceoverScript || s.audio || '';
+    if (segVO) voiceoverParts.push(segVO);
+  }
+  if (typeof ctaRaw === 'object') {
+    const ctaVO = ctaRaw?.voiceover || ctaRaw?.voiceoverScript || ctaRaw?.audio || '';
+    if (ctaVO) voiceoverParts.push(ctaVO);
+  }
   const voiceoverText = reel.voiceoverText || voiceoverParts.join('. ') || '';
 
   // Extract visual descriptions for hook and CTA
