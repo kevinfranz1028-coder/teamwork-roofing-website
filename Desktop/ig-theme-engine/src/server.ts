@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import archiver from 'archiver';
 import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
 import { CONFIG } from './config/env.js';
 import { getDb, getRows } from './database/db.js';
@@ -825,6 +826,57 @@ app.get('/api/build-doc', (_req, res) => {
     configSummary,
     sourceContents,
   });
+});
+
+// ─── Download Rendered Assets ─────────────────────
+app.get('/api/download/:scriptId', (req, res) => {
+  const db = getDb();
+  const scriptId = parseInt(req.params.scriptId);
+  const script = db.prepare(`
+    SELECT cs.id, ci.content_type, ci.title
+    FROM content_scripts cs
+    JOIN content_ideas ci ON cs.idea_id = ci.id
+    WHERE cs.id = ?
+  `).get(scriptId) as any;
+
+  if (!script) return res.status(404).json({ error: 'Script not found' });
+
+  const asset = db.prepare(
+    'SELECT local_paths, content_type FROM rendered_assets WHERE script_id = ? ORDER BY rendered_at DESC LIMIT 1'
+  ).get(scriptId) as any;
+
+  if (!asset) return res.status(404).json({ error: 'No rendered assets found' });
+
+  const localPaths: string[] = JSON.parse(asset.local_paths || '[]');
+  if (localPaths.length === 0) return res.status(404).json({ error: 'No files to download' });
+
+  // Sanitize title for filename
+  const safeTitle = (script.title || `content-${scriptId}`)
+    .replace(/[^a-zA-Z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+    .slice(0, 60);
+
+  if (asset.content_type === 'reel') {
+    // Single MP4 file
+    const reelPath = localPaths.find((p: string) => p.endsWith('.mp4')) || localPaths[0];
+    const filename = `${safeTitle}.mp4`;
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Type', 'video/mp4');
+    res.sendFile(path.resolve(reelPath));
+  } else {
+    // For carousels/stories with multiple images, send as zip
+    const filename = `${safeTitle}-slides.zip`;
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Type', 'application/zip');
+    const archive = archiver('zip', { zlib: { level: 5 } });
+    archive.pipe(res);
+    localPaths.forEach((filePath: string, i: number) => {
+      const ext = path.extname(filePath);
+      archive.file(path.resolve(filePath), { name: `slide-${i + 1}${ext}` });
+    });
+    archive.finalize();
+  }
 });
 
 // ─── Serve Rendered Assets ─────────────────────────

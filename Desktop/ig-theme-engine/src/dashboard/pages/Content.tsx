@@ -103,6 +103,10 @@ const getThumbnail = (opt: { publicUrls: string[]; localPaths: string[] }): stri
 
 const isVideo = (url: string): boolean => /\.(mp4|mov|webm)(\?|$)/i.test(url);
 
+const handleDownload = (scriptId: number) => {
+  window.open(`/api/download/${scriptId}`, '_blank');
+};
+
 function formatScheduleDate(dateStr: string): string {
   const d = new Date(dateStr + 'T12:00:00');
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
@@ -116,6 +120,7 @@ function SlidePreview({
   title,
   caption,
   hashtags,
+  scriptId,
   onClose,
 }: {
   slides: string[];
@@ -123,6 +128,7 @@ function SlidePreview({
   title: string;
   caption: string;
   hashtags: string[];
+  scriptId?: number;
   onClose: () => void;
 }) {
   const [current, setCurrent] = useState(startIndex);
@@ -142,12 +148,22 @@ function SlidePreview({
       className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center"
       onClick={onClose}
     >
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10 w-10 h-10 flex items-center justify-center"
-      >
-        X
-      </button>
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+        {scriptId && (
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDownload(scriptId); }}
+            className="px-4 py-2 bg-cyan-900/60 hover:bg-cyan-800 border border-cyan-700 text-cyan-300 text-sm rounded-lg transition-colors"
+          >
+            Download
+          </button>
+        )}
+        <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center"
+        >
+          X
+        </button>
+      </div>
 
       <div className="absolute top-4 left-1/2 -translate-x-1/2 text-gray-400 text-sm">
         Slide {current + 1} of {slides.length}
@@ -379,6 +395,7 @@ function ContentOptionsSection({
           title={preview.opt.title}
           caption={preview.opt.caption || ''}
           hashtags={preview.opt.hashtags || []}
+          scriptId={preview.opt.scriptId}
           onClose={() => setPreview(null)}
         />
       )}
@@ -582,6 +599,13 @@ function ContentOptionsSection({
                               Preview Full Post
                             </button>
                           )}
+                          <button
+                            onClick={() => handleDownload(opt.scriptId)}
+                            className="px-3 py-1.5 bg-cyan-900/40 hover:bg-cyan-800/60 border border-cyan-700 text-cyan-300 text-xs rounded-lg transition-colors"
+                            title="Download"
+                          >
+                            Download
+                          </button>
                           <button
                             onClick={() => setExpanded(isExpanded ? null : opt.ideaId)}
                             className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
@@ -1030,6 +1054,7 @@ function ReadyContentSection({
           title={preview.item.title}
           caption={preview.item.caption || ''}
           hashtags={preview.item.hashtags ? (typeof preview.item.hashtags === 'string' ? JSON.parse(preview.item.hashtags) : preview.item.hashtags) : []}
+          scriptId={preview.item.id}
           onClose={() => setPreview(null)}
         />
       )}
@@ -1216,6 +1241,13 @@ function ReadyContentSection({
                           Preview Full Post
                         </button>
                       )}
+                      <button
+                        onClick={() => handleDownload(item.id)}
+                        className="px-3 py-1.5 bg-cyan-900/40 hover:bg-cyan-800/60 border border-cyan-700 text-cyan-300 text-xs rounded-lg transition-colors"
+                        title="Download"
+                      >
+                        Download
+                      </button>
                       <button
                         onClick={() => setExpanded(isExpanded ? null : item.id)}
                         className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
