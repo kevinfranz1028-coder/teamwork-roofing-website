@@ -129,7 +129,7 @@ export async function renderScript(scriptId: number): Promise<RenderedAssets | n
     };
   } catch (err: any) {
     console.log(chalk.red(`  Render failed for script ${scriptId}: ${err.message}`));
-    return null;
+    throw err;
   }
 }
 

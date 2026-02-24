@@ -209,11 +209,11 @@ function composeVideo(
     inputs.push(voiceoverPath);
 
     // Build filter graph
-    // Scale backgrounds to 1080x1920, set duration, add Ken Burns (subtle 3% zoom)
+    // Scale backgrounds to 1080x1920, then use zoompan to generate video frames with Ken Burns effect
     for (let i = 0; i < segmentCount; i++) {
       const dur = segments[i].durationSeconds;
       const frames = dur * 25;
-      filterComplex += `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,loop=loop=${frames}:size=1:start=0,fps=25,trim=duration=${dur},setpts=PTS-STARTPTS,zoompan=z='min(zoom+0.0005,1.03)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1080x1920:fps=25[bg${i}];`;
+      filterComplex += `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,zoompan=z='min(zoom+0.0005,1.03)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1080x1920:fps=25,setpts=PTS-STARTPTS[bg${i}];`;
     }
 
     // Scale overlays
@@ -242,6 +242,9 @@ function composeVideo(
       // Single segment, just rename
       filterComplex += `[seg0]copy[outv];`;
     }
+
+    // Remove trailing semicolon — ffmpeg rejects it
+    filterComplex = filterComplex.replace(/;$/, '');
 
     const audioIdx = inputs.length - 1;
 
