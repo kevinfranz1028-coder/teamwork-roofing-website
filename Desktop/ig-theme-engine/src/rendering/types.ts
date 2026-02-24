@@ -1,4 +1,5 @@
 // Shared interfaces for the rendering pipeline
+import type { GeneratedImage, GeneratedVideo, VisualPlan } from '../visual-intelligence/types.js';
 
 export interface SlideContent {
   slideNumber: number;
@@ -6,6 +7,8 @@ export interface SlideContent {
   bodyText: string;
   designNotes?: string;
   type: 'hook' | 'value' | 'cta';
+  visualPlan?: VisualPlan;
+  generatedImage?: GeneratedImage;
 }
 
 export interface CarouselScript {
@@ -38,6 +41,9 @@ export interface ReelSegment {
   durationSeconds: number;
   visualDescription: string;
   segmentType?: 'hook' | 'body' | 'cta';
+  visualPlan?: VisualPlan;
+  generatedImage?: GeneratedImage;
+  generatedVideo?: GeneratedVideo;
 }
 
 export interface ReelScript {

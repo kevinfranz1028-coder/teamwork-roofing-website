@@ -109,6 +109,45 @@ const MIGRATIONS: Migration[] = [
       );
     `,
   },
+  {
+    version: 9,
+    name: 'add_visual_quality_log',
+    up: `
+      CREATE TABLE IF NOT EXISTS visual_quality_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        model TEXT NOT NULL,
+        content_type TEXT NOT NULL,
+        segment_type TEXT,
+        prompt TEXT NOT NULL,
+        quality_score INTEGER NOT NULL,
+        issues TEXT,
+        retry_count INTEGER DEFAULT 0,
+        final_prompt TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_quality_log_model ON visual_quality_log(model);
+      CREATE INDEX IF NOT EXISTS idx_quality_log_score ON visual_quality_log(quality_score);
+    `,
+  },
+  {
+    version: 10,
+    name: 'add_visual_intelligence_ai_settings',
+    up: `
+      ALTER TABLE ai_settings ADD COLUMN default_image_model TEXT DEFAULT 'flux-2-pro';
+      ALTER TABLE ai_settings ADD COLUMN default_video_model TEXT DEFAULT 'kling-2.6-pro';
+      ALTER TABLE ai_settings ADD COLUMN enable_video_generation BOOLEAN DEFAULT 1;
+      ALTER TABLE ai_settings ADD COLUMN video_motion_style TEXT;
+      ALTER TABLE ai_settings ADD COLUMN quality_gate_enabled BOOLEAN DEFAULT 1;
+      ALTER TABLE ai_settings ADD COLUMN quality_gate_min_score INTEGER DEFAULT 7;
+      ALTER TABLE ai_settings ADD COLUMN hook_visual_style TEXT;
+      ALTER TABLE ai_settings ADD COLUMN body_visual_style TEXT;
+      ALTER TABLE ai_settings ADD COLUMN cta_visual_style TEXT;
+      ALTER TABLE ai_settings ADD COLUMN camera_body TEXT DEFAULT 'Canon R5';
+      ALTER TABLE ai_settings ADD COLUMN default_lens TEXT DEFAULT '100mm f/2.8L Macro IS';
+      ALTER TABLE ai_settings ADD COLUMN default_lighting TEXT DEFAULT 'soft north-facing window light with warm fill';
+      ALTER TABLE ai_settings ADD COLUMN default_color_profile TEXT DEFAULT 'Kodak Portra 400';
+    `,
+  },
 ];
 
 export function runMigrations(): void {

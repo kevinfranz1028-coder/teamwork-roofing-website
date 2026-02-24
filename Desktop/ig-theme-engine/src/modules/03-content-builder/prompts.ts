@@ -17,9 +17,37 @@ RULES:
 - Max 5 hashtags, used for categorization only
 - Every piece must answer: "Who would DM this to whom?"`;
 
-export const DEFAULT_CAROUSEL_DESIGN_INSTRUCTION = `AI background image prompt — describe a SPECIFIC, CONCRETE scene that directly illustrates THIS slide's topic. Include: subject/object, setting, lighting direction, camera angle, color palette. Do NOT use generic/abstract imagery like "motivational background" or "professional setting". Every slide must have a unique scene tied to its headline. No text in the image.`;
+export const DEFAULT_CAROUSEL_DESIGN_INSTRUCTION = `You are writing a brief for a professional photographer, NOT describing a concept.
+Describe ONLY what a real camera would photograph in a single exposure.
+Use specific photographic language: lens, lighting, depth of field, color.
 
-export const DEFAULT_REEL_VISUAL_INSTRUCTION = `AI image generation prompt — describe a specific scene, subject, lighting, and camera angle that directly illustrates the message. NOT generic ("dramatic visual"), but concrete ("close-up of a cracked smartphone screen on a dark desk, harsh overhead light casting sharp shadows, 9:16 vertical"). Be concrete, not generic.`;
+GOOD EXAMPLES:
+- "Extreme macro of yellow fungus gnats on dark wet soil surface, shallow focus, warm amber backlight from window, 100mm macro lens, f/2.8, rich brown and green tones"
+- "Overhead flat-lay of healthy green pothos leaves on white marble surface, even studio lighting, 35mm lens, f/8, fresh clean aesthetic"
+
+BAD EXAMPLES (NEVER DO THIS):
+- "Yellow sticky trap with brand name text next to product bag" (NO products with labels)
+- "Split screen showing before and after" (NO collages)
+- "Generic motivational background" (NO abstract concepts)
+
+REMEMBER: All text, labels, step numbers, and brand names go in the text overlay — NEVER in the visualDescription. No text in the image.`;
+
+export const DEFAULT_REEL_VISUAL_INSTRUCTION = `You are writing a brief for a professional photographer, NOT describing a concept.
+Describe ONLY what a real camera would photograph in a single exposure.
+Use specific photographic language: lens, lighting, depth of field, color.
+
+GOOD EXAMPLES:
+- "Extreme macro of tiny fungus gnats on dark wet soil surface, shallow focus isolating two gnats in flight, warm amber backlight from window, 100mm macro lens, f/2.8, rich brown and green tones"
+- "Close-up of bright yellow adhesive trap card stuck in soil of a potted monstera, soft diffused daylight, 50mm lens, f/4, clean background blur"
+- "Overhead flat-lay of healthy green pothos leaves on white marble surface, even studio lighting, 35mm lens, f/8, fresh clean aesthetic"
+
+BAD EXAMPLES (NEVER DO THIS):
+- "Yellow sticky trap with brand name text next to Mosquito Bits bag" (NO products with labels)
+- "Split screen showing before and after with clock showing 3:00" (NO collages, NO clocks)
+- "Hour 24: Total annihilation of gnats" (NO abstract concepts as visuals)
+- "Digital timer counting down with dead insects" (NO digital displays)
+
+REMEMBER: All text, labels, step numbers, timers, and brand names go in the on-screen text overlay — NEVER in the visualDescription.`;
 
 // ─── Dynamic Getters ─────────────────────────────────
 

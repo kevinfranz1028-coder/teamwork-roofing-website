@@ -199,15 +199,18 @@ export function ctaSlideHtml(slide: SlideContent, config: RenderConfig, backgrou
 
 // ─── Story Slide Templates ────────────────────────────
 
-export function storySlideHtml(slide: StorySlideContent, config: RenderConfig): string {
+export function storySlideHtml(slide: StorySlideContent, config: RenderConfig, bgUrl?: string): string {
   const interactiveHtml = getInteractiveElementHtml(slide, config);
+  const bgStyle = bgUrl
+    ? `background: url('${bgUrl}') center/cover no-repeat;`
+    : `background: linear-gradient(180deg, ${config.brandColors.primary} 0%, ${config.brandColors.background} 100%);`;
 
   return `<!DOCTYPE html>
 <html><head><style>
   ${baseStyles(config)}
   body {
     width: 1080px; height: 1920px;
-    background: linear-gradient(180deg, ${config.brandColors.primary} 0%, ${config.brandColors.background} 100%);
+    ${bgStyle}
     display: flex; flex-direction: column; justify-content: center; align-items: center;
     padding: 120px 70px; font-family: '${config.fonts.body}', sans-serif;
     color: ${config.brandColors.text}; text-align: center;

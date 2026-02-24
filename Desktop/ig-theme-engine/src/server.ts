@@ -620,25 +620,39 @@ app.get('/api/ai-settings/defaults', (_req, res) => {
 
 app.post('/api/ai-settings', (req, res) => {
   const db = getDb();
-  const {
-    name, content_builder_system, carousel_design_instruction, reel_visual_instruction,
-    image_style_prefix, image_style_suffix, image_negative_prompt, temperature,
-  } = req.body;
+  const b = req.body;
   // Deactivate all existing
   db.prepare('UPDATE ai_settings SET is_active = 0').run();
   const id = db.prepare(`
     INSERT INTO ai_settings (name, content_builder_system, carousel_design_instruction, reel_visual_instruction,
-      image_style_prefix, image_style_suffix, image_negative_prompt, temperature, is_active)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+      image_style_prefix, image_style_suffix, image_negative_prompt, temperature, is_active,
+      default_image_model, default_video_model, enable_video_generation, video_motion_style,
+      quality_gate_enabled, quality_gate_min_score,
+      hook_visual_style, body_visual_style, cta_visual_style,
+      camera_body, default_lens, default_lighting, default_color_profile)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
-    name,
-    content_builder_system || null,
-    carousel_design_instruction || null,
-    reel_visual_instruction || null,
-    image_style_prefix || null,
-    image_style_suffix || null,
-    image_negative_prompt || null,
-    temperature ?? 0.7,
+    b.name,
+    b.content_builder_system || null,
+    b.carousel_design_instruction || null,
+    b.reel_visual_instruction || null,
+    b.image_style_prefix || null,
+    b.image_style_suffix || null,
+    b.image_negative_prompt || null,
+    b.temperature ?? 0.7,
+    b.default_image_model || 'flux-2-pro',
+    b.default_video_model || 'kling-2.6-pro',
+    b.enable_video_generation ?? true ? 1 : 0,
+    b.video_motion_style || null,
+    b.quality_gate_enabled ?? true ? 1 : 0,
+    b.quality_gate_min_score ?? 7,
+    b.hook_visual_style || null,
+    b.body_visual_style || null,
+    b.cta_visual_style || null,
+    b.camera_body || null,
+    b.default_lens || null,
+    b.default_lighting || null,
+    b.default_color_profile || null,
   ).lastInsertRowid;
   const setting = db.prepare('SELECT * FROM ai_settings WHERE id = ?').get(id);
   res.json(setting);
@@ -646,25 +660,39 @@ app.post('/api/ai-settings', (req, res) => {
 
 app.put('/api/ai-settings/:id', (req, res) => {
   const db = getDb();
-  const {
-    name, content_builder_system, carousel_design_instruction, reel_visual_instruction,
-    image_style_prefix, image_style_suffix, image_negative_prompt, temperature,
-  } = req.body;
+  const b = req.body;
   db.prepare(`
     UPDATE ai_settings
     SET name = ?, content_builder_system = ?, carousel_design_instruction = ?, reel_visual_instruction = ?,
         image_style_prefix = ?, image_style_suffix = ?, image_negative_prompt = ?, temperature = ?,
+        default_image_model = ?, default_video_model = ?, enable_video_generation = ?, video_motion_style = ?,
+        quality_gate_enabled = ?, quality_gate_min_score = ?,
+        hook_visual_style = ?, body_visual_style = ?, cta_visual_style = ?,
+        camera_body = ?, default_lens = ?, default_lighting = ?, default_color_profile = ?,
         updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
   `).run(
-    name,
-    content_builder_system || null,
-    carousel_design_instruction || null,
-    reel_visual_instruction || null,
-    image_style_prefix || null,
-    image_style_suffix || null,
-    image_negative_prompt || null,
-    temperature ?? 0.7,
+    b.name,
+    b.content_builder_system || null,
+    b.carousel_design_instruction || null,
+    b.reel_visual_instruction || null,
+    b.image_style_prefix || null,
+    b.image_style_suffix || null,
+    b.image_negative_prompt || null,
+    b.temperature ?? 0.7,
+    b.default_image_model || 'flux-2-pro',
+    b.default_video_model || 'kling-2.6-pro',
+    b.enable_video_generation ?? true ? 1 : 0,
+    b.video_motion_style || null,
+    b.quality_gate_enabled ?? true ? 1 : 0,
+    b.quality_gate_min_score ?? 7,
+    b.hook_visual_style || null,
+    b.body_visual_style || null,
+    b.cta_visual_style || null,
+    b.camera_body || null,
+    b.default_lens || null,
+    b.default_lighting || null,
+    b.default_color_profile || null,
     parseInt(req.params.id),
   );
   const setting = db.prepare('SELECT * FROM ai_settings WHERE id = ?').get(parseInt(req.params.id));

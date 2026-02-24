@@ -24,6 +24,20 @@ interface AISettingsForm {
   image_style_suffix: string;
   image_negative_prompt: string;
   temperature: number;
+  // Visual Intelligence fields
+  default_image_model: string;
+  default_video_model: string;
+  enable_video_generation: boolean;
+  video_motion_style: string;
+  quality_gate_enabled: boolean;
+  quality_gate_min_score: number;
+  hook_visual_style: string;
+  body_visual_style: string;
+  cta_visual_style: string;
+  camera_body: string;
+  default_lens: string;
+  default_lighting: string;
+  default_color_profile: string;
 }
 
 interface Defaults {
@@ -42,9 +56,22 @@ const emptyForm: AISettingsForm = {
   image_style_suffix: '',
   image_negative_prompt: '',
   temperature: 0.7,
+  default_image_model: 'flux-2-pro',
+  default_video_model: 'kling-2.6-pro',
+  enable_video_generation: true,
+  video_motion_style: '',
+  quality_gate_enabled: true,
+  quality_gate_min_score: 7,
+  hook_visual_style: '',
+  body_visual_style: '',
+  cta_visual_style: '',
+  camera_body: 'Canon R5',
+  default_lens: '100mm f/2.8L Macro IS',
+  default_lighting: 'soft north-facing window light with warm fill',
+  default_color_profile: 'Kodak Portra 400',
 };
 
-function parseSettingToForm(s: AISetting): AISettingsForm {
+function parseSettingToForm(s: any): AISettingsForm {
   return {
     name: s.name,
     content_builder_system: s.content_builder_system || '',
@@ -54,6 +81,19 @@ function parseSettingToForm(s: AISetting): AISettingsForm {
     image_style_suffix: s.image_style_suffix || '',
     image_negative_prompt: s.image_negative_prompt || '',
     temperature: s.temperature,
+    default_image_model: s.default_image_model || 'flux-2-pro',
+    default_video_model: s.default_video_model || 'kling-2.6-pro',
+    enable_video_generation: s.enable_video_generation ?? true,
+    video_motion_style: s.video_motion_style || '',
+    quality_gate_enabled: s.quality_gate_enabled ?? true,
+    quality_gate_min_score: s.quality_gate_min_score ?? 7,
+    hook_visual_style: s.hook_visual_style || '',
+    body_visual_style: s.body_visual_style || '',
+    cta_visual_style: s.cta_visual_style || '',
+    camera_body: s.camera_body || 'Canon R5',
+    default_lens: s.default_lens || '100mm f/2.8L Macro IS',
+    default_lighting: s.default_lighting || 'soft north-facing window light with warm fill',
+    default_color_profile: s.default_color_profile || 'Kodak Portra 400',
   };
 }
 
@@ -205,6 +245,26 @@ export default function AISettings() {
               <span className="text-gray-500 text-xs uppercase tracking-wide">Temperature</span>
               <p className="text-gray-300 mt-1">{activeSetting.temperature}</p>
             </div>
+            {(activeSetting as any).default_image_model && (
+              <div>
+                <span className="text-gray-500 text-xs uppercase tracking-wide">Image Model</span>
+                <p className="text-gray-300 mt-1">{(activeSetting as any).default_image_model}</p>
+              </div>
+            )}
+            {(activeSetting as any).default_video_model && (
+              <div>
+                <span className="text-gray-500 text-xs uppercase tracking-wide">Video Model</span>
+                <p className="text-gray-300 mt-1">{(activeSetting as any).default_video_model}</p>
+              </div>
+            )}
+            <div>
+              <span className="text-gray-500 text-xs uppercase tracking-wide">Video Gen</span>
+              <p className="text-gray-300 mt-1">{(activeSetting as any).enable_video_generation ? 'Enabled' : 'Disabled'}</p>
+            </div>
+            <div>
+              <span className="text-gray-500 text-xs uppercase tracking-wide">Quality Gate</span>
+              <p className="text-gray-300 mt-1">{(activeSetting as any).quality_gate_enabled !== false ? `Enabled (min ${(activeSetting as any).quality_gate_min_score || 7})` : 'Disabled'}</p>
+            </div>
           </div>
           <p className="text-gray-600 text-xs mt-4">Created {formatDate(activeSetting.created_at)}</p>
         </div>
@@ -311,11 +371,129 @@ export default function AISettings() {
             </div>
           </div>
 
-          {/* Section 3: Image Generation Style */}
+          {/* Section 3: Visual Intelligence */}
+          <div className="border-t border-gray-800 pt-5">
+            <h4 className="text-sm font-medium text-gray-300 uppercase tracking-wide mb-3">Visual Intelligence Layer</h4>
+            <p className="text-gray-600 text-xs mb-4">
+              Controls the multi-model image/video generation pipeline. The Creative Director uses these settings to decide how to generate visuals.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Default Image Model</label>
+                <select
+                  value={form.default_image_model}
+                  onChange={e => setForm({ ...form, default_image_model: e.target.value })}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
+                >
+                  <option value="flux-2-pro">FLUX 2 Pro (Photorealistic)</option>
+                  <option value="gpt-image-1.5">GPT Image 1.5 (Text/Complex)</option>
+                  <option value="ideogram-3">Ideogram 3.0 (Typography)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Default Video Model</label>
+                <select
+                  value={form.default_video_model}
+                  onChange={e => setForm({ ...form, default_video_model: e.target.value })}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
+                >
+                  <option value="kling-2.6-pro">Kling 2.6 Pro (fal.ai)</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.enable_video_generation}
+                    onChange={e => setForm({ ...form, enable_video_generation: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-purple-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                </label>
+                <span className="text-sm text-gray-300">Enable Video Generation (Kling i2v for reels)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.quality_gate_enabled}
+                    onChange={e => setForm({ ...form, quality_gate_enabled: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-purple-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                </label>
+                <span className="text-sm text-gray-300">Enable Quality Gate (AI vision check)</span>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Quality Gate Min Score (1-10)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={form.quality_gate_min_score}
+                  onChange={e => setForm({ ...form, quality_gate_min_score: parseInt(e.target.value) || 7 })}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3b: Photography Anchors */}
+          <div className="border-t border-gray-800 pt-5">
+            <h4 className="text-sm font-medium text-gray-300 uppercase tracking-wide mb-3">Photography Anchors</h4>
+            <p className="text-gray-600 text-xs mb-4">
+              Camera and lens settings that anchor the visual style. The Creative Director includes these in every image prompt.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Camera Body</label>
+                <input type="text" value={form.camera_body} onChange={e => setForm({ ...form, camera_body: e.target.value })} placeholder="Canon R5" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Default Lens</label>
+                <input type="text" value={form.default_lens} onChange={e => setForm({ ...form, default_lens: e.target.value })} placeholder="100mm f/2.8L Macro IS" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Default Lighting</label>
+                <input type="text" value={form.default_lighting} onChange={e => setForm({ ...form, default_lighting: e.target.value })} placeholder="soft north-facing window light" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Color Profile</label>
+                <input type="text" value={form.default_color_profile} onChange={e => setForm({ ...form, default_color_profile: e.target.value })} placeholder="Kodak Portra 400" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3c: Per-Segment Visual Styles */}
+          <div className="border-t border-gray-800 pt-5">
+            <h4 className="text-sm font-medium text-gray-300 uppercase tracking-wide mb-3">Segment Visual Styles</h4>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Video Motion Style (Kling)</label>
+                <input type="text" value={form.video_motion_style} onChange={e => setForm({ ...form, video_motion_style: e.target.value })} placeholder="gentle organic motion, leaves subtly swaying, cinematic 24fps" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Hook Visual Style</label>
+                <input type="text" value={form.hook_visual_style} onChange={e => setForm({ ...form, hook_visual_style: e.target.value })} placeholder="dramatic macro, extreme close-up, high contrast, scroll-stopping" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Body Visual Style</label>
+                <input type="text" value={form.body_visual_style} onChange={e => setForm({ ...form, body_visual_style: e.target.value })} placeholder="clear well-lit subject, moderate close-up, informative angle" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">CTA Visual Style</label>
+                <input type="text" value={form.cta_visual_style} onChange={e => setForm({ ...form, cta_visual_style: e.target.value })} placeholder="warm soft light, hopeful mood, thriving healthy plant" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Image Generation Style */}
           <div className="border-t border-gray-800 pt-5">
             <h4 className="text-sm font-medium text-gray-300 uppercase tracking-wide mb-3">Image Generation Style</h4>
             <p className="text-gray-600 text-xs mb-4">
-              These are injected into the prompt sent to Flux Schnell (Replicate). They wrap around Claude's visual description.
+              Style prefix/suffix injected into every image prompt. These wrap around the Creative Director's photographic prompt.
             </p>
 
             <div className="space-y-4">
