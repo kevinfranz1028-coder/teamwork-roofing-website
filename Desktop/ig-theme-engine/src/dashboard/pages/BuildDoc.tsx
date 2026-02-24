@@ -174,7 +174,7 @@ const moduleDescriptions: Record<string, { name: string; description: string; ex
   '00-originality': { name: 'Originality Architecture', description: "Ensures all content avoids Instagram's repost/aggregator penalties. Sets transformation rules, red lines, and runs 70%+ similarity detection on queued content.", exports: ['generateOriginalityStrategy()', 'auditQueue()'] },
   '01-niche-selector': { name: 'Niche Selector', description: 'Analyzes 20 niches on 6 scoring metrics: DM shareability, evergreen demand, monetization ceiling, originality viability, search SEO, subscription ceiling.', exports: ['analyzeNiches()', 'selectNiche()'] },
   '02-viral-blueprint': { name: 'Viral Content Blueprint', description: 'Generates 15 viral content ideas (8 carousel + 7 reel) with hooks, value propositions, emotional triggers, and send triggers.', exports: ['generateViralBlueprint()'] },
-  '03-content-builder': { name: 'Content Builder', description: 'Converts ideas into production-ready scripts. Carousel: 10-slide hook/value/CTA structure. Reel: timed segments with voiceover + visual. Story: 6-8 slides with interactive elements.', exports: ['buildCarousel()', 'buildReel()', 'buildStorySequence()'] },
+  '03-content-builder': { name: 'Content Builder', description: 'Converts ideas into production-ready scripts. Carousel: 10-slide hook/value/CTA structure. Reel: timed segments with per-segment voiceover scripts (field names: voiceover, voiceoverScript, audio), visual descriptions, and timestamp ranges. Story: 6-8 slides with interactive elements.', exports: ['buildCarousel()', 'buildReel()', 'buildStorySequence()'] },
   '04-daily-output': { name: 'Daily Output Engine', description: 'Assembles daily content package: trend scan, carousel idea, reel idea, story sequence. Options engine generates 5 variations for user selection.', exports: ['generateDailyPackage()', 'generateContentOptions()', 'getLatestBatch()', 'scanTrends()'] },
   '05-design-system': { name: 'Design System', description: 'AI-generated brand visual system: color palette, typography, layout rules, mood board, template variations. Feeds into rendering pipeline.', exports: ['generateDesignSystem()', 'getDesignDirection()'] },
   '06-growth-strategy': { name: 'Growth Strategy', description: '4-week content calendar with pillar rotation and optimal posting times. Engagement protocol: pre-post and post-post actions.', exports: ['generateContentCalendar()', 'getUpcomingCalendar()', 'generateEngagementProtocol()'] },
@@ -239,8 +239,8 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     p('**CLI:** Commander.js providing 25+ terminal commands for headless operation.');
     p('**AI Content Generation:** Anthropic Claude API (Sonnet 4.5 by default) for all text generation. Includes JSON repair logic for truncated responses.');
     p('**AI Image Generation:** Replicate API running Black Forest Labs Flux Schnell for background images in 9:16 (reels) and 1:1 (carousels) aspect ratios.');
-    p('**Voiceover:** OpenAI Text-to-Speech API (tts-1 model) with 6 voice options for reel narration.');
-    p('**Visual Rendering:** Puppeteer (headless Chrome) renders HTML/CSS templates to PNG screenshots. ffmpeg composes reel MP4 videos from image sequences + audio tracks.');
+    p('**Voiceover:** OpenAI Text-to-Speech API (tts-1 model) with 6 voice options for reel narration. Per-segment TTS generation ensures voiceover is perfectly synced with visuals — audio duration drives each segment\'s visual length.');
+    p('**Visual Rendering:** Puppeteer (headless Chrome) renders HTML/CSS templates to PNG screenshots. ffmpeg composes reel MP4 videos with Ken Burns zoom effect, crossfade transitions, and per-segment audio-synced timing.');
     p('**CDN:** Cloudinary for hosting rendered assets with public HTTPS URLs (required by Instagram Graph API for publishing).');
     p('**Publishing:** Instagram Graph API v22.0 for carousel, reel, and image post publishing. Buffer API v1 as optional scheduling alternative.');
 
@@ -314,9 +314,9 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
       '**Step 3 — Viral Blueprint:** Module 02 generates 15 content ideas (8 carousels + 7 reels) with hooks, value propositions, emotional triggers, send triggers, and format notes. Each idea is scored on "send probability" — the likelihood someone would DM it to a friend.',
       '**Step 4 — Trend Check:** Module 04 scans for trending topics in the active niche. Each trend is urgency-ranked (trending/viral/emerging) and paired with an original angle that avoids being derivative.',
       '**Step 5 — Content Options:** Module 04 generates 5 variations of a content idea (different angles, hooks, formats) so the operator can choose the strongest direction before committing to full script generation.',
-      '**Step 6 — Script Building:** Module 03 takes the selected idea and produces a production-ready script. For carousels: 10-slide structure with hook/value/CTA slides, headlines, body text, AI image prompts (designNotes), and text hierarchy. For reels: timed segments with on-screen text, voiceover scripts, visual descriptions, and pacing notes.',
+      '**Step 6 — Script Building:** Module 03 takes the selected idea and produces a production-ready script. For carousels: 10-slide structure with hook/value/CTA slides, headlines, body text, AI image prompts (designNotes), and text hierarchy. For reels: timed segments with timestamp ranges (e.g. "4-7s"), on-screen text, per-segment voiceover scripts, visual descriptions, and pacing notes. The renderer parses multiple Claude field name variants (voiceover, voiceoverScript, audio) and timestamp formats ("4-7s", "0:02-0:05").',
       '**Step 7 — Approval Gate:** The operator reviews the script in the dashboard Content page. They can approve (moves to rendering), reject (archives), or edit the script. Nothing proceeds without explicit human action.',
-      '**Step 8 — Visual Rendering:** Approved scripts are rendered into publishable assets. Carousel slides: Puppeteer screenshots of HTML templates at 1080x1080 with AI-generated backgrounds from Replicate. Reels: AI background images + text overlay PNGs + OpenAI voiceover audio, composed into MP4 video by ffmpeg.',
+      '**Step 8 — Visual Rendering:** Approved scripts are rendered into publishable assets. Carousel slides: Puppeteer screenshots of HTML templates at 1080x1080 with AI-generated backgrounds from Replicate. Reels: per-segment TTS voiceover generated first (audio drives timing), then AI background images + text overlay PNGs, composed into MP4 video by ffmpeg with Ken Burns zoom, crossfade transitions, and audio-synced segment durations.',
       '**Step 9 — CDN Upload:** Rendered assets (PNGs, MP4s) are uploaded to Cloudinary, which provides public HTTPS URLs. Instagram Graph API requires publicly accessible URLs to create media containers.',
       '**Step 10 — Publishing:** The operator triggers "Post to Instagram" from the dashboard. The system calls Instagram Graph API to create media containers and publish the post. Carousel posts use `createCarouselItemContainer()` for each slide, then `createCarouselContainer()` + `publishMedia()`. Reels use `publishReel()` with the video URL.',
       '**Step 11 — Analytics:** Instagram Graph API insights are pulled daily via `refreshAnalytics()`. Metrics tracked: impressions, reach, sends, saves, likes, comments, shares, video views, watch time. Computed metrics: sends/reach %, likes/reach %, engagement rate. Weekly scorecards grade performance with traffic-light indicators.',
@@ -396,7 +396,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
       { name: 'Instagram Graph API', file: 'integrations/instagram-api.ts', desc: 'Full Instagram publishing client using Graph API v22.0. Supports three post types: single image (`publishImagePost`), multi-image carousel (`publishCarouselPost` — creates individual item containers, then a carousel container, waits for processing, and publishes), and video reel (`publishReel`). Also fetches account info, media insights (impressions, reach, saves, shares, video_views, ig_reels_avg_watch_time), and recent posts. Includes long-lived token exchange (short-lived → 60-day token) and token refresh. Container status polling with configurable timeout.' },
       { name: 'Replicate (Flux Schnell)', file: 'integrations/replicate-api.ts', desc: 'AI background image generation using Black Forest Labs Flux Schnell model. `generateBackground()` takes a text prompt, output directory, filename, and aspect ratio (default 9:16). Before calling Replicate, it reads the active AI Settings profile and injects `image_style_prefix` (prepended), `image_style_suffix` (appended), and `image_negative_prompt` (appended as "Do not include: ..."). Handles both URL string and ReadableStream output formats from Replicate. Saves PNG to local filesystem.' },
       { name: 'Cloudinary', file: 'integrations/cloudinary-api.ts', desc: 'Media CDN hosting for rendered assets. `uploadImage()` uploads a single image file and returns a public HTTPS URL. `uploadVideo()` does the same for MP4 files. `uploadImages()` batch-uploads an array of image paths. All uploads are organized into folders: `ig-engine/carousel-{id}`, `ig-engine/reel-{id}`. Public URLs are required by Instagram Graph API for media container creation.' },
-      { name: 'OpenAI Text-to-Speech', file: 'integrations/tts-api.ts', desc: 'Reel voiceover generation using OpenAI TTS API (model: tts-1). `generateSpeech()` takes text and a voice option (alloy, echo, fable, onyx, nova, shimmer) and returns an MP3 audio file. The audio is used by the reel renderer as the voiceover track, synchronized with visual segments via ffmpeg.' },
+      { name: 'OpenAI Text-to-Speech', file: 'integrations/tts-api.ts', desc: 'Reel voiceover generation using OpenAI TTS API (model: tts-1). `generateSpeech()` takes text and a voice option (alloy, echo, fable, onyx, nova, shimmer) and returns an MP3 audio file. Called once per reel segment (hook, each body segment, CTA) to produce individually-timed audio clips. Each clip\'s actual duration is probed via ffprobe and used to set the corresponding visual segment length, ensuring perfect audio-visual sync. Clips are concatenated into a single voiceover track via ffmpeg.' },
       { name: 'Buffer', file: 'integrations/buffer-api.ts', desc: 'Optional social media scheduling integration. Provides queue management (`addToQueue`, `getQueuedPosts`), direct scheduling (`schedulePost` with specific datetime), posting schedule configuration (`getPostingSchedule`, `updatePostingSchedule`), and post lifecycle management (`deletePost`, `moveToTop`). Alternative to direct Instagram Graph API publishing when scheduled posting is preferred.' },
       { name: 'Canva Connect', file: 'integrations/canva-api.ts', desc: 'Optional design creation API. `createDesign()` and `exportDesign()` use Canva Connect API for programmatic design generation. `generateDesignSpec()` provides a local fallback that generates design specifications without requiring Canva API approval. Primarily used for complex design workflows that exceed Puppeteer template capabilities.' },
     ];
@@ -501,13 +501,14 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     bullet('Upload all slide PNGs to Cloudinary');
 
     h3('9.2 Reel Rendering');
-    p('Reels are rendered as MP4 videos with AI backgrounds, text overlays, and optional voiceover.');
-    bullet('Parse the script JSON into segments: hook (0-1.7s), body segments (1.7-25s), CTA (last 3-5s)');
-    bullet('Generate AI background images via Replicate for each segment (9:16 aspect)');
-    bullet('If voiceover lines exist, generate speech audio via OpenAI TTS');
-    bullet('Render text overlay PNGs via Puppeteer using `reelOverlayHtml()` templates');
-    bullet('Compose the final MP4 with ffmpeg: image sequence + text overlays + audio track');
-    bullet('Fallback: if Replicate or TTS fails, use gradient backgrounds and silent audio');
+    p('Reels are rendered as MP4 videos with AI backgrounds, text overlays, and per-segment voiceover. Audio drives timing — each segment\'s visual duration is set by its voiceover audio length, ensuring perfect sync between voice, text, and visuals.');
+    bullet('**Step 1 — Parse script JSON:** Extract segments (hook, body[], CTA) with on-screen text, voiceover scripts, visual descriptions, and timestamps. Supports multiple Claude timestamp formats: `"4-7s"`, `"0:02-0:05"`. Voiceover text is extracted from varying field names (`voiceover`, `voiceoverScript`, `audio`) with stage direction stripping.');
+    bullet('**Step 2 — Per-segment TTS:** Generate OpenAI TTS audio for each segment individually (hook, each body segment, CTA). Probe each audio clip\'s actual duration via ffprobe, then set the visual segment duration = audio duration + 0.3s buffer. This ensures the voice narrates the entire reel without abrupt cutoffs.');
+    bullet('**Step 3 — AI backgrounds:** Generate per-segment background images via Replicate Flux Schnell (9:16 aspect). Falls back to branded gradient backgrounds if Replicate fails.');
+    bullet('**Step 4 — Text overlays:** Render transparent PNG overlays via Puppeteer using `reelOverlayHtml()` templates with step indicators for body segments.');
+    bullet('**Step 5 — Audio stitching:** Concatenate all per-segment audio clips into one continuous voiceover track via ffmpeg concat filter.');
+    bullet('**Step 6 — Video composition:** ffmpeg composes the final MP4: each background image is expanded into a video segment using `zoompan` (subtle 3% Ken Burns zoom effect), text overlays are composited, segments are joined with 0.3s crossfade dissolve transitions, and the stitched voiceover is laid as the audio track.');
+    bullet('**Fallback handling:** If Replicate fails → gradient backgrounds. If TTS fails for a segment → silent audio for that segment\'s duration. Errors propagate with actual messages instead of generic "Nothing to render".');
 
     h3('9.3 Story Rendering');
     p('Stories are rendered as 1080x1920 PNG frames (9:16 vertical) with interactive overlay mockups for polls, questions, sliders, and DM triggers.');
@@ -532,7 +533,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     bullet('`INSTAGRAM_BUSINESS_ACCOUNT_ID` **(required for publishing)** — Instagram Business Account ID. Found via Graph API: `GET /me/accounts` → page ID → `GET /{page-id}?fields=instagram_business_account`.');
     bullet('`REPLICATE_API_TOKEN` **(required for rendering)** — Replicate API token for Flux Schnell image generation. Get from replicate.com/account/api-tokens.');
     bullet('`CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` **(required for publishing)** — Cloudinary credentials for asset CDN hosting.');
-    bullet('`OPENAI_API_KEY` — OpenAI API key for TTS voiceover generation. Optional: reels will use silent audio if not set.');
+    bullet('`OPENAI_API_KEY` **(required for reel voiceover)** — OpenAI API key for per-segment TTS voiceover generation. Each reel segment gets its own TTS call and the audio duration drives visual timing. Reels will use silent audio per segment if not set.');
     bullet('`BUFFER_ACCESS_TOKEN` — Buffer API token for scheduled publishing. Optional: direct Instagram publishing is the default.');
     bullet('`APP_NICHE` — The active niche name (e.g., "indoor plants", "houseplant care"). Drives content topics.');
     bullet('`DASHBOARD_PORT` — Express server port. Default: 3847.');
@@ -863,7 +864,7 @@ function IntegrationsSection({ live }: { live: LiveData | null }) {
     { name: 'Instagram Graph API (Meta)', file: 'integrations/instagram-api.ts', model: 'API v22.0', usage: 'Publishing content (images, carousels, reels) and fetching performance analytics', features: ['publishImagePost()', 'publishCarouselPost()', 'publishReel()', 'getMediaInsights()', 'getRecentMedia()', 'Long-lived token management'] },
     { name: 'Replicate (Flux Schnell)', file: 'integrations/replicate-api.ts', model: 'black-forest-labs/flux-schnell', usage: 'AI background image generation for carousel slides and reel frames', features: ['generateBackground()', 'Aspect ratio: 9:16 / 1:1', 'AI Settings style injection', 'URL and ReadableStream output handling'] },
     { name: 'Cloudinary', file: 'integrations/cloudinary-api.ts', model: 'Upload API', usage: 'CDN hosting for rendered images and videos', features: ['uploadImage()', 'uploadVideo()', 'uploadImages()', 'Folder organization'] },
-    { name: 'OpenAI TTS', file: 'integrations/tts-api.ts', model: 'tts-1', usage: 'Reel voiceover audio generation', features: ['generateSpeech()', '6 voice options', 'MP3 output'] },
+    { name: 'OpenAI TTS', file: 'integrations/tts-api.ts', model: 'tts-1', usage: 'Per-segment reel voiceover generation (audio drives visual timing)', features: ['generateSpeech()', '6 voice options', 'MP3 output', 'Per-segment TTS calls', 'ffprobe duration probing', 'Audio-driven segment timing'] },
     { name: 'Buffer', file: 'integrations/buffer-api.ts', model: 'API v1', usage: 'Optional social media scheduling', features: ['getProfiles()', 'createPost() / schedulePost()', 'addToQueue()', 'getPostingSchedule()'] },
     { name: 'Canva Connect', file: 'integrations/canva-api.ts', model: 'Connect API', usage: 'Optional design creation and spec generation', features: ['createDesign()', 'generateDesignSpec()', 'Requires API approval'] },
   ];
@@ -1028,15 +1029,17 @@ function RenderingSection() {
           <p>5. Upload all PNGs to Cloudinary</p>
         </div>
       </SectionCard>
-      <SectionCard title="Reel Rendering">
-        <FileEntry path="src/rendering/reel-renderer.ts" description="Generates MP4 video via Replicate + OpenAI TTS + ffmpeg" />
+      <SectionCard title="Reel Rendering (Audio-Driven Sync)">
+        <FileEntry path="src/rendering/reel-renderer.ts" description="Generates MP4 video with per-segment TTS, AI backgrounds, and ffmpeg composition" />
         <div className="text-sm text-gray-400 space-y-1 mt-2">
-          <p>1. Parse script JSON into segments (hook, body[], CTA)</p>
-          <p>2. Generate AI background images via Replicate (9:16 aspect)</p>
-          <p>3. Generate voiceover audio via OpenAI TTS (if script has voiceover lines)</p>
-          <p>4. Render text overlay PNGs via Puppeteer</p>
-          <p>5. Compose final MP4 with ffmpeg: backgrounds + text overlays + audio</p>
-          <p>6. Fallback: gradient backgrounds + silent audio if APIs fail</p>
+          <p>1. Parse script JSON into segments (hook, body[], CTA) with voiceover text per segment</p>
+          <p>2. Generate TTS audio per segment via OpenAI — probe each clip&apos;s duration with ffprobe</p>
+          <p>3. Set each visual segment duration = audio duration + 0.3s buffer (audio drives timing)</p>
+          <p>4. Generate AI background images via Replicate Flux Schnell (9:16 aspect)</p>
+          <p>5. Render text overlay PNGs via Puppeteer with step indicators</p>
+          <p>6. Concatenate per-segment audio clips into one voiceover track</p>
+          <p>7. Compose MP4 with ffmpeg: zoompan Ken Burns effect + crossfade transitions + synced audio</p>
+          <p>8. Fallback: gradient backgrounds if Replicate fails, silent audio if TTS fails per segment</p>
         </div>
       </SectionCard>
       <SectionCard title="Story Rendering">
@@ -1053,7 +1056,7 @@ function RenderingSection() {
         <div className="flex flex-wrap gap-2 mt-2">
           <Tag color="blue">hookSlideHtml()</Tag><Tag color="blue">valueSlideHtml()</Tag><Tag color="blue">ctaSlideHtml()</Tag><Tag color="pink">storyOverlayHtml()</Tag><Tag color="purple">reelOverlayHtml()</Tag>
         </div>
-        <FileEntry path="src/rendering/asset-pipeline.ts" description="Orchestrates rendering + Cloudinary upload + database storage" />
+        <FileEntry path="src/rendering/asset-pipeline.ts" description="Orchestrates rendering + Cloudinary upload + database storage. Propagates actual render errors to the dashboard." />
         <FileEntry path="src/rendering/browser-pool.ts" description="Puppeteer instance pooling for efficient concurrent rendering" />
       </SectionCard>
     </div>
