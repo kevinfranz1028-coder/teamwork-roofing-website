@@ -131,7 +131,13 @@ export async function autoPublishScript(scriptId: number): Promise<{ success: bo
     }
     return { success: false, error: `Unsupported content type for auto-publish: ${script.content_type}` };
   } catch (err: any) {
-    return { success: false, error: err.message };
+    // Extract actual Instagram API error details from axios response
+    const igError = err.response?.data?.error;
+    const detail = igError
+      ? `${igError.error_user_msg || igError.message} (code ${igError.code}${igError.error_subcode ? '/' + igError.error_subcode : ''})`
+      : err.message;
+    console.error(`autoPublishScript failed for script ${scriptId}:`, detail);
+    return { success: false, error: detail };
   }
 }
 

@@ -1,5 +1,5 @@
 import { askClaudeJSON } from '../../integrations/claude-client.js';
-import { CONTENT_BUILDER_SYSTEM, reelBuilderPrompt } from './prompts.js';
+import { getContentBuilderSystem, reelBuilderPrompt } from './prompts.js';
 import { insertRow } from '../../database/db.js';
 
 interface ReelScript {
@@ -31,7 +31,7 @@ export async function buildReel(
   brandSystem: any
 ): Promise<ReelScript> {
   const result = await askClaudeJSON<ReelScript>({
-    systemPrompt: CONTENT_BUILDER_SYSTEM,
+    systemPrompt: getContentBuilderSystem(),
     userPrompt: reelBuilderPrompt(idea, brandSystem),
     maxTokens: 4096,
   });

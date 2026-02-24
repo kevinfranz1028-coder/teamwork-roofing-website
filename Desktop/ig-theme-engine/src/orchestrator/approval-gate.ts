@@ -1,7 +1,8 @@
 import { getDb, insertRow } from '../database/db.js';
 import { publishCarouselPost, publishReel, publishImagePost } from '../integrations/instagram-api.js';
 import { addToQueue as bufferQueue } from '../integrations/buffer-api.js';
-import { getRenderedAssets } from '../rendering/asset-pipeline.js';
+import { getRenderedAssets, renderScript } from '../rendering/asset-pipeline.js';
+import { closeBrowser } from '../rendering/browser-pool.js';
 import { scheduleNextSlot } from '../modules/06-growth-strategy/scheduler.js';
 import { CONFIG } from '../config/env.js';
 
@@ -36,6 +37,75 @@ export function rejectContent(scriptId: number): void {
 }
 
 /**
+ * Approve content for rendering: sets status to 'approved', renders visuals,
+ * then sets status to 'designed' once rendering is complete.
+ */
+export async function approveContentForRendering(scriptId: number): Promise<{
+  success: boolean;
+  localPaths: string[];
+  publicUrls: string[];
+  error?: string;
+}> {
+  const db = getDb();
+  const script = db.prepare('SELECT * FROM content_scripts WHERE id = ?').get(scriptId) as any;
+  if (!script) throw new Error(`Script ${scriptId} not found`);
+
+  // Mark as approved (rendering in progress)
+  db.prepare('UPDATE content_ideas SET status = ? WHERE id = ?').run('approved', script.idea_id);
+
+  try {
+    const rendered = await renderScript(scriptId);
+    await closeBrowser();
+
+    if (rendered) {
+      // Mark as designed (visuals ready)
+      db.prepare('UPDATE content_ideas SET status = ? WHERE id = ?').run('designed', script.idea_id);
+      return { success: true, localPaths: rendered.localPaths, publicUrls: rendered.publicUrls };
+    } else {
+      // Rendering returned nothing — revert to scripted
+      db.prepare('UPDATE content_ideas SET status = ? WHERE id = ?').run('scripted', script.idea_id);
+      return { success: false, localPaths: [], publicUrls: [], error: 'Nothing to render for this script' };
+    }
+  } catch (err: any) {
+    // On error, revert to scripted so user can retry
+    db.prepare('UPDATE content_ideas SET status = ? WHERE id = ?').run('scripted', script.idea_id);
+    return { success: false, localPaths: [], publicUrls: [], error: err.message };
+  }
+}
+
+/**
+ * Regenerate visuals for an already-rendered script.
+ * Deletes existing rendered_assets, re-renders, and returns new paths/URLs.
+ * Status stays 'designed' throughout — no status change needed.
+ */
+export async function regenerateVisuals(scriptId: number): Promise<{
+  success: boolean;
+  localPaths: string[];
+  publicUrls: string[];
+  error?: string;
+}> {
+  const db = getDb();
+  const script = db.prepare('SELECT * FROM content_scripts WHERE id = ?').get(scriptId) as any;
+  if (!script) throw new Error(`Script ${scriptId} not found`);
+
+  try {
+    // Delete existing rendered assets so renderScript generates fresh ones
+    db.prepare('DELETE FROM rendered_assets WHERE script_id = ?').run(scriptId);
+
+    const rendered = await renderScript(scriptId);
+    await closeBrowser();
+
+    if (rendered) {
+      return { success: true, localPaths: rendered.localPaths, publicUrls: rendered.publicUrls };
+    } else {
+      return { success: false, localPaths: [], publicUrls: [], error: 'Nothing to render for this script' };
+    }
+  } catch (err: any) {
+    return { success: false, localPaths: [], publicUrls: [], error: err.message };
+  }
+}
+
+/**
  * Publish approved content to Instagram
  * Requires image/video URLs to be set (user uploads assets first)
  */
@@ -56,8 +126,8 @@ export async function publishContent(
   `).get(scriptId) as any;
 
   if (!script) return { success: false, platform: 'instagram', error: 'Script not found' };
-  if (script.idea_status !== 'approved') {
-    return { success: false, platform: 'instagram', error: 'Content must be approved before publishing' };
+  if (script.idea_status !== 'designed') {
+    return { success: false, platform: 'instagram', error: 'Content must be rendered (designed) before publishing' };
   }
 
   const caption = script.caption || '';
@@ -124,15 +194,13 @@ export async function publishContent(
 export function approveAndSchedule(scriptId: number): { calendarId: number; scheduledDate: string; scheduledTime: string; contentType: string } {
   const db = getDb();
   const script = db.prepare(`
-    SELECT cs.*, ci.content_type
+    SELECT cs.*, ci.content_type, ci.status as idea_status
     FROM content_scripts cs
     JOIN content_ideas ci ON cs.idea_id = ci.id
     WHERE cs.id = ?
   `).get(scriptId) as any;
   if (!script) throw new Error(`Script ${scriptId} not found`);
-
-  // Mark idea as approved
-  db.prepare('UPDATE content_ideas SET status = ? WHERE id = ?').run('approved', script.idea_id);
+  if (script.idea_status !== 'designed') throw new Error('Content must be rendered (designed) before scheduling');
 
   // Schedule to next available slot
   const slot = scheduleNextSlot(scriptId, script.content_type);
@@ -154,7 +222,7 @@ export function getPendingApproval(): any[] {
 }
 
 /**
- * Get all approved content ready to publish
+ * Get all rendered content ready to publish
  */
 export function getReadyToPublish(): any[] {
   const db = getDb();
@@ -162,7 +230,7 @@ export function getReadyToPublish(): any[] {
     SELECT cs.*, ci.title, ci.content_type, ci.hook, ci.send_trigger
     FROM content_scripts cs
     JOIN content_ideas ci ON cs.idea_id = ci.id
-    WHERE ci.status = 'approved'
+    WHERE ci.status = 'designed'
     ORDER BY cs.created_at DESC
   `).all();
 }

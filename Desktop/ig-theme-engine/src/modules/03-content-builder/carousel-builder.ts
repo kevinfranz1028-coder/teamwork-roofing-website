@@ -1,5 +1,5 @@
 import { askClaudeJSON } from '../../integrations/claude-client.js';
-import { CONTENT_BUILDER_SYSTEM, carouselBuilderPrompt } from './prompts.js';
+import { getContentBuilderSystem, carouselBuilderPrompt } from './prompts.js';
 import { insertRow } from '../../database/db.js';
 import { CONFIG } from '../../config/env.js';
 
@@ -30,7 +30,7 @@ export async function buildCarousel(
   const slideCount = CONFIG.content.carouselSlideCount;
 
   const result = await askClaudeJSON<CarouselScript>({
-    systemPrompt: CONTENT_BUILDER_SYSTEM,
+    systemPrompt: getContentBuilderSystem(),
     userPrompt: carouselBuilderPrompt(idea, brandSystem, slideCount),
     maxTokens: 4096,
   });

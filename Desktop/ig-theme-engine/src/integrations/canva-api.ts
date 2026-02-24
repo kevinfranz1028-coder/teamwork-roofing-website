@@ -2,16 +2,17 @@ import axios from 'axios';
 import { CONFIG } from '../config/env.js';
 
 /**
- * Canva Connect API integration (optional)
+ * PLACEHOLDER — Not yet integrated. Requires Canva Connect API app approval.
  *
- * NOTE: Canva's Connect API requires an approved app integration.
+ * Canva's Connect API requires an approved app integration.
  * For most users, the workflow is:
  * 1. Engine generates design specs (colors, text, layout)
  * 2. User creates designs in Canva using the specs
  * 3. User exports images and feeds URLs back to the engine
  *
  * This module provides the API integration for automated flows
- * where a Canva app integration is available.
+ * where a Canva app integration is available. Currently unused —
+ * the rendering pipeline uses Puppeteer + Replicate instead.
  */
 
 const CANVA_BASE_URL = 'https://api.canva.com/rest/v1';

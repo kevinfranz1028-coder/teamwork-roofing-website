@@ -18,6 +18,7 @@ import { refreshAnalytics, generateWeeklyScorecard } from './orchestrator/analyt
 import { renderScript, renderDailyPackage } from './rendering/asset-pipeline.js';
 import { autoPublish } from './orchestrator/auto-publisher.js';
 import { scanTrends } from './modules/04-daily-output/trend-scanner.js';
+import { generateContentOptions } from './modules/04-daily-output/options-engine.js';
 import { runMigrations } from './database/migrations.js';
 import { getDb, getRows } from './database/db.js';
 import { CONFIG } from './config/env.js';
@@ -147,6 +148,30 @@ program
       });
     } else {
       console.log(chalk.gray('No actionable trends detected today.'));
+    }
+  });
+
+program
+  .command('generate-options')
+  .description('Generate 5 content options with visual previews to choose from')
+  .action(async () => {
+    runMigrations();
+    const spinner = ora('Generating 5 content options...').start();
+    try {
+      const batch = await generateContentOptions();
+      spinner.succeed(`Generated ${batch.options.length} content options (batch: ${batch.batchId.slice(0, 8)})`);
+      console.log(chalk.cyan('\n═══ CONTENT OPTIONS ═══\n'));
+      batch.options.forEach((opt, i) => {
+        const badge = opt.contentType === 'carousel' ? chalk.blue('[CAROUSEL]') : chalk.magenta('[REEL]');
+        console.log(chalk.white(`${i + 1}. ${badge} ${opt.title}`));
+        console.log(chalk.gray(`   Hook: ${opt.hook}`));
+        console.log(chalk.gray(`   Send trigger: ${opt.sendTrigger}`));
+        console.log(chalk.gray(`   Assets: ${opt.localPaths.length} files rendered`));
+        console.log();
+      });
+      console.log(chalk.yellow('Open the dashboard to preview visuals and select one to publish.'));
+    } catch (err: any) {
+      spinner.fail(err.message);
     }
   });
 

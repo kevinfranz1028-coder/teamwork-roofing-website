@@ -4,8 +4,6 @@ import { askClaudeJSON } from '../../integrations/claude-client.js';
 import { DAILY_ENGINE_SYSTEM, OPTIONS_ENGINE_USER, formatBriefContext, type CreativeBrief } from './prompts.js';
 import { buildCarousel } from '../03-content-builder/carousel-builder.js';
 import { buildReel } from '../03-content-builder/reel-builder.js';
-import { renderScript } from '../../rendering/asset-pipeline.js';
-import { closeBrowser } from '../../rendering/browser-pool.js';
 import { getDb, insertRow } from '../../database/db.js';
 import { CONFIG } from '../../config/env.js';
 
@@ -41,8 +39,8 @@ export interface GeneratedBatch {
 }
 
 /**
- * Generate 5 content options, script them, render visual assets,
- * and return a batch ready for dashboard preview.
+ * Generate 5 content options and script them (text-only, no rendering).
+ * Rendering happens later when the user approves individual content.
  */
 export async function generateContentOptions(): Promise<GeneratedBatch> {
   const niche = CONFIG.app.niche;
@@ -71,7 +69,7 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
   }
 
   // Step 1: Generate 5 ideas via Claude
-  console.log(chalk.gray('  Step 1/3: Generating ideas via Claude...'));
+  console.log(chalk.gray('  Step 1/2: Generating ideas via Claude...'));
   const userPrompt = briefContext
     ? OPTIONS_ENGINE_USER(niche, CONFIG.content.carouselSlideCount) + briefContext
     : OPTIONS_ENGINE_USER(niche, CONFIG.content.carouselSlideCount);
@@ -87,7 +85,7 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
   }
 
   // Step 2: Insert ideas + script each one
-  console.log(chalk.gray(`  Step 2/3: Scripting ${result.options.length} ideas...`));
+  console.log(chalk.gray(`  Step 2/2: Scripting ${result.options.length} ideas...`));
 
   // Load brand system for builders
   const brand = db.prepare(
@@ -154,24 +152,7 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
     }
   }
 
-  // Step 3: Render each script via Puppeteer
-  console.log(chalk.gray('  Step 3/3: Rendering visual assets...'));
-  for (const option of batchOptions) {
-    try {
-      console.log(chalk.gray(`    Rendering ${option.contentType} (script #${option.scriptId})...`));
-      const rendered = await renderScript(option.scriptId);
-      if (rendered) {
-        option.localPaths = rendered.localPaths;
-        option.publicUrls = rendered.publicUrls;
-      }
-    } catch (err: any) {
-      console.log(chalk.yellow(`    Render failed for script ${option.scriptId}: ${err.message}`));
-    }
-  }
-
-  await closeBrowser();
-
-  // Mark batch as ready
+  // Mark batch as ready (text-only — rendering happens on approval)
   db.prepare('UPDATE content_option_batches SET status = ? WHERE id = ?')
     .run('ready', batchId);
 
@@ -233,6 +214,7 @@ export function getLatestBatch(): any | null {
       scriptJson: idea.script_json,
       localPaths,
       publicUrls,
+      ideaStatus: idea.status,
     };
   });
 

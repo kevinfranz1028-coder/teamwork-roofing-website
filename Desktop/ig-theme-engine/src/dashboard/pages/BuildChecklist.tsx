@@ -203,7 +203,7 @@ const checklist: ChecklistSection[] = [
       { label: 'src/integrations/claude-client.ts — Claude API', status: 'done' },
       { label: 'src/integrations/instagram-api.ts — Instagram Graph API posting', status: 'done', notes: 'Full IG posting: images, carousels, reels + insights' },
       { label: 'src/integrations/buffer-api.ts — Buffer scheduling/publishing', status: 'done', notes: 'Queue management, scheduled posting, analytics' },
-      { label: 'src/integrations/canva-api.ts — Canva design generation', status: 'done', notes: 'Optional Canva Connect API + local design spec fallback' },
+      { label: 'src/integrations/canva-api.ts — Canva design generation', status: 'done', notes: 'PLACEHOLDER — Not yet integrated. Requires Canva Connect API app approval.' },
     ],
   },
   {

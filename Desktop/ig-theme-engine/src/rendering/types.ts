@@ -40,8 +40,10 @@ export interface ReelSegment {
 
 export interface ReelScript {
   hook: string;
+  hookVisual?: string;
   segments: ReelSegment[];
   cta: string;
+  ctaVisual?: string;
   totalLength: number;
   voiceoverText: string;
 }

@@ -23,6 +23,7 @@ export const CONFIG = {
     timezone: process.env.TIMEZONE || 'America/Chicago',
     dailyTriggerTime: process.env.DAILY_TRIGGER_TIME || '06:00',
     dashboardPort: parseInt(process.env.DASHBOARD_PORT || '3847'),
+    dashboardApiKey: process.env.DASHBOARD_API_KEY || '',
   },
   content: {
     carouselSlideCount: parseInt(process.env.CAROUSEL_SLIDE_COUNT || '10'),
@@ -36,6 +37,9 @@ export const CONFIG = {
   },
   replicate: {
     apiToken: process.env.REPLICATE_API_TOKEN || '',
+  },
+  manychat: {
+    apiKey: process.env.MANYCHAT_API_KEY || '',
   },
   openaiTts: {
     apiKey: process.env.OPENAI_API_KEY || '',

@@ -89,6 +89,26 @@ const MIGRATIONS: Migration[] = [
       );
     `,
   },
+  {
+    version: 8,
+    name: 'add_ai_settings',
+    up: `
+      CREATE TABLE IF NOT EXISTS ai_settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        content_builder_system TEXT,
+        carousel_design_instruction TEXT,
+        reel_visual_instruction TEXT,
+        image_style_prefix TEXT,
+        image_style_suffix TEXT,
+        image_negative_prompt TEXT,
+        temperature REAL DEFAULT 0.7,
+        is_active BOOLEAN DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `,
+  },
 ];
 
 export function runMigrations(): void {

@@ -2,6 +2,7 @@ import path from 'path';
 import { mkdirSync, existsSync } from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+import sharp from 'sharp';
 import { getBrowser } from './browser-pool.js';
 import { reelOverlayHtml } from './templates.js';
 import { generateBackground } from '../integrations/replicate-api.js';
@@ -28,23 +29,37 @@ export async function renderReel(
 
   const allSegments = buildSegmentList(script);
 
-  // Step 1: Generate AI backgrounds (parallel)
+  // Step 1: Generate AI backgrounds (parallel), fallback to gradient if Replicate fails
   console.log('  Generating AI backgrounds...');
-  const bgPaths = await Promise.all(
-    allSegments.map((seg, i) =>
-      generateBackground(
-        seg.visualDescription || `cinematic ${CONFIG.app.niche} visual, moody lighting, vertical 9:16`,
-        outputDir,
-        `bg-${i}.png`
+  let bgPaths: string[];
+  try {
+    bgPaths = await Promise.all(
+      allSegments.map((seg, i) =>
+        generateBackground(
+          seg.visualDescription || `cinematic ${CONFIG.app.niche} visual, moody lighting, vertical 9:16`,
+          outputDir,
+          `bg-${i}.png`
+        )
       )
-    )
-  );
+    );
+  } catch (err: any) {
+    console.log(`  Replicate failed (${err.message}), using gradient backgrounds...`);
+    bgPaths = await Promise.all(
+      allSegments.map((_, i) => generateGradientBackground(outputDir, `bg-${i}.png`, renderConfig, i))
+    );
+  }
 
-  // Step 2: Generate voiceover
+  // Step 2: Generate voiceover, fallback to silent audio if TTS fails
   console.log('  Generating voiceover...');
-  const voiceoverText = script.voiceoverText
-    || [script.hook, ...allSegments.map(s => s.text), script.cta].join('. ');
-  const voiceoverPath = await generateSpeech(voiceoverText, outputDir, 'voiceover.mp3');
+  let voiceoverPath: string;
+  try {
+    const voiceoverText = script.voiceoverText
+      || [script.hook, ...allSegments.map(s => s.text), script.cta].join('. ');
+    voiceoverPath = await generateSpeech(voiceoverText, outputDir, 'voiceover.mp3');
+  } catch (err: any) {
+    console.log(`  TTS failed (${err.message}), generating silent audio...`);
+    voiceoverPath = await generateSilentAudio(outputDir, allSegments);
+  }
 
   // Step 3: Render text overlays as transparent PNGs
   console.log('  Rendering text overlays...');
@@ -58,14 +73,51 @@ export async function renderReel(
   return outputPath;
 }
 
+function generateSilentAudio(outputDir: string, segments: ReelSegment[]): Promise<string> {
+  const totalDuration = segments.reduce((sum, s) => sum + s.durationSeconds, 0);
+  const outputPath = path.join(outputDir, 'voiceover.mp3');
+  return new Promise((resolve, reject) => {
+    ffmpeg()
+      .input('anullsrc=r=44100:cl=mono')
+      .inputFormat('lavfi')
+      .duration(totalDuration)
+      .audioCodec('libmp3lame')
+      .output(outputPath)
+      .on('end', () => resolve(outputPath))
+      .on('error', (err) => reject(new Error(`Silent audio generation failed: ${err.message}`)))
+      .run();
+  });
+}
+
+async function generateGradientBackground(
+  outputDir: string,
+  filename: string,
+  config: RenderConfig,
+  index: number
+): Promise<string> {
+  const outputPath = path.join(outputDir, filename);
+  // Rotate hue slightly per segment for visual variety
+  const colors = [config.brandColors.primary, config.brandColors.accent, config.brandColors.secondary];
+  const hex = colors[index % colors.length].replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  await sharp({
+    create: { width: 1080, height: 1920, channels: 3, background: { r, g, b } },
+  }).png().toFile(outputPath);
+
+  return outputPath;
+}
+
 function buildSegmentList(script: ReelScript): ReelSegment[] {
   const segments: ReelSegment[] = [];
 
-  // Hook segment
+  // Hook segment — use Claude's visual description if available
   segments.push({
     text: script.hook,
     durationSeconds: 3,
-    visualDescription: 'attention-grabbing dramatic visual',
+    visualDescription: script.hookVisual || 'attention-grabbing dramatic visual',
   });
 
   // Body segments
@@ -73,11 +125,11 @@ function buildSegmentList(script: ReelScript): ReelSegment[] {
     segments.push(seg);
   }
 
-  // CTA segment
+  // CTA segment — use Claude's visual description if available
   segments.push({
     text: script.cta,
     durationSeconds: 4,
-    visualDescription: 'call to action motivational visual',
+    visualDescription: script.ctaVisual || 'call to action motivational visual',
   });
 
   return segments;
@@ -202,15 +254,56 @@ export function parseReelScript(scriptJson: string): ReelScript {
 
   const reel = parsed.reel || parsed;
 
-  return {
-    hook: reel.hook || reel.hookLine || '',
-    segments: (reel.segments || reel.body || []).map((s: any) => ({
-      text: s.text || s.line || '',
-      durationSeconds: s.durationSeconds || s.duration || 4,
+  // Hook can be a string or object with onScreenText
+  const hookRaw = reel.hook;
+  const hook = typeof hookRaw === 'string' ? hookRaw : hookRaw?.onScreenText || hookRaw?.text || '';
+
+  // CTA can be a string or object with onScreenText
+  const ctaRaw = reel.cta;
+  const cta = typeof ctaRaw === 'string' ? ctaRaw : ctaRaw?.onScreenText || ctaRaw?.text || '';
+
+  // Segments can use body[], segments[], or other shapes
+  const rawSegments = reel.segments || reel.body || [];
+
+  const segments = rawSegments.map((s: any) => {
+    const text = s.text || s.onScreenText || s.line || '';
+    // Parse duration from timestamp like "0:02-0:05" or use explicit value
+    let durationSeconds = s.durationSeconds || s.duration || 4;
+    if (typeof durationSeconds !== 'number' && s.timestamp) {
+      const match = s.timestamp.match(/(\d+):(\d+)-(\d+):(\d+)/);
+      if (match) {
+        const start = parseInt(match[1]) * 60 + parseInt(match[2]);
+        const end = parseInt(match[3]) * 60 + parseInt(match[4]);
+        durationSeconds = end - start;
+      }
+    }
+    return {
+      text,
+      durationSeconds: typeof durationSeconds === 'number' ? durationSeconds : 4,
       visualDescription: s.visualDescription || s.visual || '',
-    })),
-    cta: reel.cta || reel.ctaLine || '',
+    };
+  });
+
+  // Build voiceover from all segment voiceover fields
+  const voiceoverParts: string[] = [];
+  if (hookRaw?.voiceover) voiceoverParts.push(hookRaw.voiceover);
+  for (const s of rawSegments) {
+    if (s.voiceover) voiceoverParts.push(s.voiceover);
+  }
+  if (ctaRaw?.voiceover) voiceoverParts.push(ctaRaw.voiceover);
+  const voiceoverText = reel.voiceoverText || voiceoverParts.join('. ') || '';
+
+  // Extract visual descriptions for hook and CTA
+  const hookVisual = typeof hookRaw === 'object' ? (hookRaw?.visual || hookRaw?.visualDescription || '') : '';
+  const ctaVisual = typeof ctaRaw === 'object' ? (ctaRaw?.visual || ctaRaw?.visualDescription || '') : '';
+
+  return {
+    hook,
+    hookVisual,
+    segments,
+    cta,
+    ctaVisual,
     totalLength: reel.totalLength || 30,
-    voiceoverText: reel.voiceoverText || '',
+    voiceoverText,
   };
 }

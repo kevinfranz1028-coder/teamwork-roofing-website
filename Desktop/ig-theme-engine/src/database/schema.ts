@@ -34,8 +34,18 @@ export const SCHEMA = `
     originality_score INTEGER,
     status TEXT DEFAULT 'idea' CHECK(status IN ('idea', 'scripted', 'designed', 'queued', 'approved', 'published', 'archived')),
     performance_json TEXT,
+    batch_id TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     published_at DATETIME
+  );
+
+  -- Content option batches (for generating 5 options to choose from)
+  CREATE TABLE IF NOT EXISTS content_option_batches (
+    id TEXT PRIMARY KEY,
+    status TEXT DEFAULT 'generating' CHECK(status IN ('generating', 'ready', 'selected', 'expired')),
+    option_count INTEGER DEFAULT 5,
+    selected_idea_id INTEGER REFERENCES content_ideas(id),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
   -- Fully scripted content (from Module 3)

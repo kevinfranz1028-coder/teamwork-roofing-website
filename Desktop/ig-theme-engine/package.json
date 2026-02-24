@@ -14,7 +14,8 @@
     "build": "tsc",
     "dashboard": "tsx src/server.ts",
     "dashboard:dev": "vite",
-    "dashboard:build": "vite build"
+    "dashboard:build": "vite build",
+    "test:smoke": "tsx src/test-smoke.ts"
   },
   "keywords": [],
   "author": "",

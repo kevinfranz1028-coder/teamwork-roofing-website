@@ -1,5 +1,5 @@
 import { askClaudeJSON } from '../../integrations/claude-client.js';
-import { CONTENT_BUILDER_SYSTEM } from './prompts.js';
+import { getContentBuilderSystem } from './prompts.js';
 
 interface StorySequence {
   slides: Array<{
@@ -23,7 +23,7 @@ export async function buildStorySequence(
   dmValue: string
 ): Promise<StorySequence> {
   return askClaudeJSON<StorySequence>({
-    systemPrompt: CONTENT_BUILDER_SYSTEM,
+    systemPrompt: getContentBuilderSystem(),
     userPrompt: `Create a 6-8 slide Instagram Story sequence for the "${niche}" niche.
 
 Topic: ${topic}

@@ -1,10 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
 import { CONFIG } from './config/env.js';
 import { getDb, getRows } from './database/db.js';
 import { getState, runDailyPipeline } from './orchestrator/master.js';
-import { approveContent, rejectContent, publishContent, getPendingApproval, getReadyToPublish, approveAndSchedule } from './orchestrator/approval-gate.js';
+import { approveContent, rejectContent, publishContent, getPendingApproval, getReadyToPublish, approveAndSchedule, approveContentForRendering, regenerateVisuals } from './orchestrator/approval-gate.js';
 import { generateWeeklyScorecard, refreshAnalytics } from './orchestrator/analytics-loop.js';
 import { scanTrends } from './modules/04-daily-output/trend-scanner.js';
 import { generateDesignSystem, getDesignDirection } from './modules/05-design-system/design-manager.js';
@@ -19,12 +20,35 @@ import { renderScript, renderDailyPackage } from './rendering/asset-pipeline.js'
 import { autoPublish, autoPublishScript } from './orchestrator/auto-publisher.js';
 import { generateContentOptions, getLatestBatch } from './modules/04-daily-output/options-engine.js';
 import { runMigrations } from './database/migrations.js';
+import { checkAndRefreshToken, testMediaContainer } from './integrations/instagram-api.js';
+import { syncFlowsToManyChat } from './integrations/manychat-api.js';
+import {
+  DEFAULT_CONTENT_BUILDER_SYSTEM,
+  DEFAULT_CAROUSEL_DESIGN_INSTRUCTION,
+  DEFAULT_REEL_VISUAL_INSTRUCTION,
+} from './modules/03-content-builder/prompts.js';
 
 runMigrations();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ─── Authentication Middleware ──────────────────────
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // Only protect API routes
+  if (!req.path.startsWith('/api/')) return next();
+  // Allow webhook endpoints (they have their own auth)
+  if (req.path.startsWith('/api/webhooks/')) return next();
+  // No key configured = no auth required (backward compatible)
+  if (!CONFIG.app.dashboardApiKey) return next();
+
+  const apiKey = req.headers['x-api-key'] || req.query.apiKey;
+  if (apiKey !== CONFIG.app.dashboardApiKey) {
+    return res.status(401).json({ error: 'Unauthorized. Provide X-API-Key header.' });
+  }
+  next();
+});
 
 // ─── API Routes ─────────────────────────────────────
 
@@ -55,7 +79,7 @@ app.get('/api/queue', (req, res) => {
     FROM content_scripts cs
     JOIN content_ideas ci ON cs.idea_id = ci.id
     LEFT JOIN rendered_assets ra ON ra.script_id = cs.id
-    WHERE ci.status IN ('scripted', 'approved')
+    WHERE ci.status IN ('scripted', 'approved', 'designed')
     ORDER BY cs.created_at DESC
     LIMIT 50
   `).all().map((row: any) => ({
@@ -76,7 +100,26 @@ app.get('/api/queue/ready', (_req, res) => {
 
 app.post('/api/queue/:id/approve', (req, res) => {
   try {
-    approveContent(parseInt(req.params.id));
+    const scriptId = parseInt(req.params.id);
+    approveContent(scriptId);
+
+    // Auto-create DM flow if content has a DM trigger keyword
+    const db = getDb();
+    const script = db.prepare('SELECT dm_trigger_keyword, story_sequence_json FROM content_scripts WHERE id = ?').get(scriptId) as any;
+    if (script?.dm_trigger_keyword) {
+      const existing = db.prepare('SELECT id FROM dm_flows WHERE trigger_keyword = ?').get(script.dm_trigger_keyword);
+      if (!existing) {
+        const storySequence = JSON.parse(script.story_sequence_json || '{}');
+        db.prepare(
+          'INSERT INTO dm_flows (trigger_keyword, flow_name, flow_steps_json, is_active) VALUES (?, ?, ?, 1)'
+        ).run(
+          script.dm_trigger_keyword,
+          `Auto: ${script.dm_trigger_keyword}`,
+          JSON.stringify([{ type: 'text', text: storySequence.dmTriggerValue || "Thanks for your interest! Here's your resource." }])
+        );
+      }
+    }
+
     res.json({ success: true });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
@@ -92,6 +135,24 @@ app.post('/api/queue/:id/reject', (req, res) => {
   }
 });
 
+app.post('/api/queue/:id/approve-content', async (req, res) => {
+  try {
+    const result = await approveContentForRendering(parseInt(req.params.id));
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/queue/:id/regenerate', async (req, res) => {
+  try {
+    const result = await regenerateVisuals(parseInt(req.params.id));
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ─── Publishing ─────────────────────────────────────
 app.post('/api/queue/:id/publish', async (req, res) => {
   try {
@@ -104,6 +165,36 @@ app.post('/api/queue/:id/publish', async (req, res) => {
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Instagram Token Management ────────────────────
+app.get('/api/instagram/token-health', async (_req, res) => {
+  try {
+    const result = await checkAndRefreshToken();
+    res.json({ success: true, daysLeft: result.daysLeft, refreshed: result.refreshed });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/instagram/refresh-token', async (_req, res) => {
+  try {
+    const result = await checkAndRefreshToken();
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/instagram/test-container', async (req, res) => {
+  try {
+    const { imageUrl } = req.body;
+    if (!imageUrl) return res.status(400).json({ error: 'imageUrl required' });
+    const result = await testMediaContainer(imageUrl);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
@@ -270,8 +361,60 @@ app.post('/api/dm-flows/lead-magnets', async (_req, res) => {
   }
 });
 
+app.post('/api/dm-flows/sync', async (_req, res) => {
+  try {
+    const result = await syncFlowsToManyChat();
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/email-list', (_req, res) => {
   res.json(getEmailListStats());
+});
+
+app.get('/api/email-list/stats', (_req, res) => {
+  const db = getDb();
+  const total = db.prepare('SELECT COUNT(*) as count FROM email_list WHERE is_active = 1').get() as any;
+  const bySource = db.prepare('SELECT source, COUNT(*) as count FROM email_list GROUP BY source').all();
+  const byLeadMagnet = db.prepare('SELECT lead_magnet, COUNT(*) as count FROM email_list GROUP BY lead_magnet').all();
+  const recent = db.prepare('SELECT * FROM email_list ORDER BY subscribed_at DESC LIMIT 20').all();
+
+  res.json({
+    totalActive: total.count,
+    bySource,
+    byLeadMagnet,
+    recentSubscribers: recent,
+  });
+});
+
+// Webhook endpoint for DM automation tools to send captured emails
+app.post('/api/webhooks/email-capture', (req, res) => {
+  const { email, source, lead_magnet, trigger_keyword } = req.body;
+
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ error: 'Valid email required' });
+  }
+
+  const db = getDb();
+
+  try {
+    db.prepare(
+      'INSERT OR IGNORE INTO email_list (email, source, lead_magnet) VALUES (?, ?, ?)'
+    ).run(email, source || 'dm_trigger', lead_magnet || trigger_keyword || 'unknown');
+
+    // Update DM flow conversion count
+    if (trigger_keyword) {
+      db.prepare(
+        'UPDATE dm_flows SET conversions = conversions + 1 WHERE trigger_keyword = ?'
+      ).run(trigger_keyword);
+    }
+
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ─── Cross-Platform ─────────────────────────────────
@@ -301,9 +444,7 @@ app.get('/api/schedule', (_req, res) => {
 app.post('/api/queue/:id/approve-and-post', async (req, res) => {
   try {
     const scriptId = parseInt(req.params.id);
-    // Approve first
-    approveContent(scriptId);
-    // Publish directly to Instagram
+    // Content must be rendered (designed) before posting
     const result = await autoPublishScript(scriptId);
     if (result.success) {
       res.json({ success: true });
@@ -452,6 +593,98 @@ app.delete('/api/briefs/:id', (req, res) => {
   res.json({ success: true });
 });
 
+// ─── AI Settings ───────────────────────────────────
+app.get('/api/ai-settings', (_req, res) => {
+  const db = getDb();
+  const settings = db.prepare('SELECT * FROM ai_settings ORDER BY created_at DESC').all();
+  res.json(settings);
+});
+
+app.get('/api/ai-settings/active', (_req, res) => {
+  const db = getDb();
+  const setting = db.prepare(
+    'SELECT * FROM ai_settings WHERE is_active = 1 ORDER BY updated_at DESC LIMIT 1'
+  ).get();
+  res.json(setting || null);
+});
+
+app.get('/api/ai-settings/defaults', (_req, res) => {
+  res.json({
+    content_builder_system: DEFAULT_CONTENT_BUILDER_SYSTEM,
+    carousel_design_instruction: DEFAULT_CAROUSEL_DESIGN_INSTRUCTION,
+    reel_visual_instruction: DEFAULT_REEL_VISUAL_INSTRUCTION,
+    temperature: 0.7,
+  });
+});
+
+app.post('/api/ai-settings', (req, res) => {
+  const db = getDb();
+  const {
+    name, content_builder_system, carousel_design_instruction, reel_visual_instruction,
+    image_style_prefix, image_style_suffix, image_negative_prompt, temperature,
+  } = req.body;
+  // Deactivate all existing
+  db.prepare('UPDATE ai_settings SET is_active = 0').run();
+  const id = db.prepare(`
+    INSERT INTO ai_settings (name, content_builder_system, carousel_design_instruction, reel_visual_instruction,
+      image_style_prefix, image_style_suffix, image_negative_prompt, temperature, is_active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+  `).run(
+    name,
+    content_builder_system || null,
+    carousel_design_instruction || null,
+    reel_visual_instruction || null,
+    image_style_prefix || null,
+    image_style_suffix || null,
+    image_negative_prompt || null,
+    temperature ?? 0.7,
+  ).lastInsertRowid;
+  const setting = db.prepare('SELECT * FROM ai_settings WHERE id = ?').get(id);
+  res.json(setting);
+});
+
+app.put('/api/ai-settings/:id', (req, res) => {
+  const db = getDb();
+  const {
+    name, content_builder_system, carousel_design_instruction, reel_visual_instruction,
+    image_style_prefix, image_style_suffix, image_negative_prompt, temperature,
+  } = req.body;
+  db.prepare(`
+    UPDATE ai_settings
+    SET name = ?, content_builder_system = ?, carousel_design_instruction = ?, reel_visual_instruction = ?,
+        image_style_prefix = ?, image_style_suffix = ?, image_negative_prompt = ?, temperature = ?,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).run(
+    name,
+    content_builder_system || null,
+    carousel_design_instruction || null,
+    reel_visual_instruction || null,
+    image_style_prefix || null,
+    image_style_suffix || null,
+    image_negative_prompt || null,
+    temperature ?? 0.7,
+    parseInt(req.params.id),
+  );
+  const setting = db.prepare('SELECT * FROM ai_settings WHERE id = ?').get(parseInt(req.params.id));
+  res.json(setting);
+});
+
+app.post('/api/ai-settings/:id/activate', (req, res) => {
+  const db = getDb();
+  db.prepare('UPDATE ai_settings SET is_active = 0').run();
+  db.prepare('UPDATE ai_settings SET is_active = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+    .run(parseInt(req.params.id));
+  const setting = db.prepare('SELECT * FROM ai_settings WHERE id = ?').get(parseInt(req.params.id));
+  res.json(setting);
+});
+
+app.delete('/api/ai-settings/:id', (req, res) => {
+  const db = getDb();
+  db.prepare('DELETE FROM ai_settings WHERE id = ?').run(parseInt(req.params.id));
+  res.json({ success: true });
+});
+
 // ─── Content Options ────────────────────────────────
 app.post('/api/options/generate', async (_req, res) => {
   try {
@@ -465,6 +698,118 @@ app.post('/api/options/generate', async (_req, res) => {
 app.get('/api/options/latest', (_req, res) => {
   const batch = getLatestBatch();
   res.json(batch || {});
+});
+
+// ─── Build Doc Auto-Discovery ──────────────────────
+app.get('/api/build-doc', (_req, res) => {
+  const db = getDb();
+
+  // 1. Discover database tables + columns
+  const tableNames = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_%' AND name NOT LIKE 'sqlite_%' ORDER BY name"
+  ).all() as { name: string }[];
+  const tables = tableNames.map((t) => {
+    const columns = db.prepare(`PRAGMA table_info('${t.name}')`).all() as {
+      name: string; type: string; notnull: number; dflt_value: string | null; pk: number;
+    }[];
+    const rowCount = (db.prepare(`SELECT COUNT(*) as count FROM "${t.name}"`).get() as any).count;
+    return { name: t.name, columns, rowCount };
+  });
+
+  // 2. Discover API routes from Express
+  const routes: { method: string; path: string }[] = [];
+  (app as any)._router.stack.forEach((layer: any) => {
+    if (layer.route) {
+      Object.keys(layer.route.methods).forEach((method: string) => {
+        routes.push({ method: method.toUpperCase(), path: layer.route.path });
+      });
+    }
+  });
+
+  // 3. Discover migrations
+  const migrations = db.prepare('SELECT version, name, applied_at FROM _migrations ORDER BY version').all();
+
+  // 4. Scan source file tree
+  const srcRoot = path.resolve('src');
+  function scanDir(dir: string, prefix = ''): { path: string; type: 'file' | 'dir' }[] {
+    if (!existsSync(dir)) return [];
+    const results: { path: string; type: 'file' | 'dir' }[] = [];
+    try {
+      const entries = readdirSync(dir);
+      for (const entry of entries) {
+        if (entry.startsWith('.') || entry === 'node_modules') continue;
+        const fullPath = path.join(dir, entry);
+        const relativePath = prefix ? `${prefix}/${entry}` : entry;
+        const stat = statSync(fullPath);
+        if (stat.isDirectory()) {
+          results.push({ path: relativePath, type: 'dir' });
+          results.push(...scanDir(fullPath, relativePath));
+        } else {
+          results.push({ path: relativePath, type: 'file' });
+        }
+      }
+    } catch {}
+    return results;
+  }
+  const sourceFiles = scanDir(srcRoot);
+
+  // 5. Categorized source structure
+  const categorize = (prefix: string) =>
+    sourceFiles.filter(f => f.path.startsWith(prefix) && f.type === 'file').map(f => f.path);
+  const sourceTree = {
+    config: categorize('config/'),
+    database: categorize('database/'),
+    integrations: categorize('integrations/'),
+    orchestrator: categorize('orchestrator/'),
+    rendering: categorize('rendering/'),
+    utils: categorize('utils/'),
+    dashboard: categorize('dashboard/'),
+    modules: (() => {
+      const modDirs = sourceFiles
+        .filter(f => f.path.startsWith('modules/') && f.type === 'dir' && f.path.split('/').length === 2)
+        .map(f => f.path);
+      return modDirs.map(dir => ({
+        dir: dir.replace('modules/', ''),
+        files: sourceFiles
+          .filter(f => f.path.startsWith(dir + '/') && f.type === 'file')
+          .map(f => f.path.replace(dir + '/', '')),
+      }));
+    })(),
+    entryPoints: sourceFiles.filter(f => f.type === 'file' && !f.path.includes('/')).map(f => f.path),
+  };
+
+  // 6. Active config (redacted)
+  const configSummary = {
+    niche: CONFIG.app.niche,
+    dashboardPort: CONFIG.app.dashboardPort,
+    model: CONFIG.ai.model,
+    carouselSlideCount: CONFIG.content.carouselSlideCount,
+    hasInstagramToken: !!CONFIG.instagram.accessToken,
+    hasReplicateToken: !!CONFIG.replicate.apiToken,
+    hasCloudinary: !!CONFIG.cloudinary.cloudName,
+    hasOpenAI: !!(CONFIG as any).openai?.apiKey,
+    hasBuffer: !!(CONFIG as any).buffer?.accessToken,
+  };
+
+  // 7. Read actual source code of all files
+  const sourceContents: Record<string, string> = {};
+  for (const file of sourceFiles) {
+    if (file.type !== 'file') continue;
+    try {
+      const fullPath = path.join(srcRoot, file.path);
+      sourceContents[file.path] = readFileSync(fullPath, 'utf-8');
+    } catch {}
+  }
+
+  res.json({
+    generatedAt: new Date().toISOString(),
+    tables,
+    routes,
+    migrations,
+    sourceTree,
+    configSummary,
+    sourceContents,
+  });
 });
 
 // ─── Serve Rendered Assets ─────────────────────────
@@ -483,6 +828,23 @@ app.get('/{*splat}', (req, res) => {
 export function startDashboard() {
   app.listen(CONFIG.app.dashboardPort, () => {
     console.log(`Dashboard API running on http://localhost:${CONFIG.app.dashboardPort}`);
+
+    // Check Instagram token health on startup (non-blocking)
+    if (CONFIG.instagram.accessToken) {
+      checkAndRefreshToken()
+        .then(result => {
+          if (result.daysLeft >= 0) {
+            if (result.daysLeft < 7) {
+              console.warn(`WARNING: Instagram token expires in ${result.daysLeft} days!${result.refreshed ? ' (auto-refreshed)' : ' Run refresh-token to renew.'}`);
+            } else {
+              console.log(`Instagram token valid for ${result.daysLeft} more days.`);
+            }
+          }
+        })
+        .catch(() => {
+          console.warn('Could not verify Instagram token health.');
+        });
+    }
   });
 }
 

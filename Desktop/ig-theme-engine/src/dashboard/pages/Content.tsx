@@ -18,7 +18,10 @@ interface OptionData {
   scriptJson: string;
   localPaths: string[];
   publicUrls: string[];
+  ideaStatus: string;
 }
+
+type CardRenderState = 'idle' | 'rendering' | 'regenerating' | 'rendered' | 'posted' | 'scheduled' | 'error';
 
 interface BatchData {
   batchId: string;
@@ -98,6 +101,8 @@ const getThumbnail = (opt: { publicUrls: string[]; localPaths: string[] }): stri
   return slides.length > 0 ? slides[0] : null;
 };
 
+const isVideo = (url: string): boolean => /\.(mp4|mov|webm)(\?|$)/i.test(url);
+
 function formatScheduleDate(dateStr: string): string {
   const d = new Date(dateStr + 'T12:00:00');
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
@@ -165,11 +170,20 @@ function SlidePreview({
         </button>
 
         <div className="flex-1 flex items-center justify-center mx-4 max-h-[80vh]">
-          <img
-            src={slides[current]}
-            alt={`${title} — Slide ${current + 1}`}
-            className="max-h-[80vh] max-w-full object-contain rounded-lg shadow-2xl"
-          />
+          {isVideo(slides[current]) ? (
+            <video
+              src={slides[current]}
+              controls
+              autoPlay
+              className="max-h-[80vh] max-w-full object-contain rounded-lg shadow-2xl"
+            />
+          ) : (
+            <img
+              src={slides[current]}
+              alt={`${title} — Slide ${current + 1}`}
+              className="max-h-[80vh] max-w-full object-contain rounded-lg shadow-2xl"
+            />
+          )}
         </div>
 
         <button
@@ -239,7 +253,7 @@ function ContentOptionsSection({
   const [expanded, setExpanded] = useState<number | null>(null);
   const [posting, setPosting] = useState<number | null>(null);
   const [scheduling, setScheduling] = useState<number | null>(null);
-  const [cardStatus, setCardStatus] = useState<Record<number, { type: 'posted' | 'scheduled' | 'error'; message: string }>>({});
+  const [cardState, setCardState] = useState<Record<number, { renderState: CardRenderState; message?: string }>>({});
   const [preview, setPreview] = useState<{ opt: OptionData; startIndex: number } | null>(null);
 
   const fetchLatest = async () => {
@@ -249,6 +263,16 @@ function ContentOptionsSection({
       const data = await res.json();
       if (data && data.batchId) {
         setBatch(data);
+        // Initialize card states from existing idea statuses
+        const states: Record<number, { renderState: CardRenderState }> = {};
+        for (const opt of data.options) {
+          if (opt.ideaStatus === 'designed') {
+            states[opt.scriptId] = { renderState: 'rendered' };
+          } else if (opt.ideaStatus === 'published') {
+            states[opt.scriptId] = { renderState: 'posted' };
+          }
+        }
+        setCardState(prev => ({ ...prev, ...states }));
       } else {
         setBatch(null);
       }
@@ -262,7 +286,7 @@ function ContentOptionsSection({
 
   const handleGenerate = async () => {
     setGenerating(true);
-    setCardStatus({});
+    setCardState({});
     try {
       await fetch('/api/options/generate', { method: 'POST' });
       await fetchLatest();
@@ -272,19 +296,36 @@ function ContentOptionsSection({
     setGenerating(false);
   };
 
+  const handleApproveContent = async (scriptId: number) => {
+    setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'rendering' } }));
+    try {
+      const res = await fetch(`/api/queue/${scriptId}/approve-content`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'rendered' } }));
+        // Refresh batch to get updated URLs
+        await fetchLatest();
+      } else {
+        setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'error', message: data.error || `Render failed (${res.status})` } }));
+      }
+    } catch (err: any) {
+      setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'error', message: err?.message || 'Network error — check server logs' } }));
+    }
+  };
+
   const handlePostNow = async (scriptId: number) => {
     setPosting(scriptId);
     try {
       const res = await fetch(`/api/queue/${scriptId}/approve-and-post`, { method: 'POST' });
       const data = await res.json();
       if (data.success) {
-        setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'posted', message: 'Posted to Instagram!' } }));
+        setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'posted', message: 'Posted to Instagram!' } }));
         onPublished();
       } else {
-        setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'error', message: data.error || 'Post failed' } }));
+        setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'error', message: data.error || 'Post failed' } }));
       }
     } catch (err) {
-      setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'error', message: 'Network error' } }));
+      setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'error', message: 'Network error' } }));
     }
     setPosting(null);
   };
@@ -295,13 +336,38 @@ function ContentOptionsSection({
       const res = await fetch(`/api/queue/${scriptId}/approve-and-schedule`, { method: 'POST' });
       const data = await res.json();
       if (data.success) {
-        setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'scheduled', message: `Scheduled: ${data.scheduledDate} at ${data.scheduledTime}` } }));
+        setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'scheduled', message: `Scheduled: ${data.scheduledDate} at ${data.scheduledTime}` } }));
         onScheduled();
       }
     } catch (err) {
       console.error('Schedule failed:', err);
     }
     setScheduling(null);
+  };
+
+  const handleRegenerate = async (scriptId: number) => {
+    setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'regenerating' } }));
+    try {
+      const res = await fetch(`/api/queue/${scriptId}/regenerate`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'rendered' } }));
+        await fetchLatest();
+      } else {
+        setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'error', message: data.error || 'Regeneration failed' } }));
+      }
+    } catch (err: any) {
+      setCardState(prev => ({ ...prev, [scriptId]: { renderState: 'error', message: err?.message || 'Network error' } }));
+    }
+  };
+
+  const getCardRenderState = (opt: OptionData): CardRenderState => {
+    return cardState[opt.scriptId]?.renderState || 'idle';
+  };
+
+  const isRendered = (opt: OptionData): boolean => {
+    const state = getCardRenderState(opt);
+    return state === 'rendered' || state === 'posted' || state === 'scheduled';
   };
 
   return (
@@ -349,7 +415,7 @@ function ContentOptionsSection({
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
           <p className="text-gray-500">No content options generated yet</p>
           <p className="text-xs text-gray-600 mt-2">
-            Click "Generate New Options" to create 5 visual post options to choose from
+            Click "Generate New Options" to create 5 content options to review
           </p>
         </div>
       )}
@@ -371,7 +437,8 @@ function ContentOptionsSection({
               const thumb = getThumbnail(opt);
               const slides = getAllSlides(opt);
               const isExpanded = expanded === opt.ideaId;
-              const status = cardStatus[opt.scriptId];
+              const renderState = getCardRenderState(opt);
+              const rendered = isRendered(opt);
               let script: any = {};
               try { script = JSON.parse(opt.scriptJson || '{}'); } catch {}
 
@@ -379,48 +446,80 @@ function ContentOptionsSection({
                 <div
                   key={opt.ideaId}
                   className={`bg-gray-900 border rounded-xl overflow-hidden transition-all ${
-                    status?.type === 'posted'
+                    renderState === 'posted'
                       ? 'border-green-500 ring-1 ring-green-500'
-                      : status?.type === 'scheduled'
+                      : renderState === 'scheduled'
                         ? 'border-blue-500 ring-1 ring-blue-500'
-                        : status?.type === 'error'
+                        : renderState === 'error'
                           ? 'border-red-500/50'
-                          : 'border-gray-800 hover:border-gray-700'
+                          : renderState === 'rendered'
+                            ? 'border-emerald-500/50'
+                            : 'border-gray-800 hover:border-gray-700'
                   }`}
                 >
-                  {/* Thumbnail */}
-                  <div
-                    className="relative aspect-square bg-gray-800 cursor-pointer group"
-                    onClick={() => slides.length > 0 && setPreview({ opt, startIndex: 0 })}
-                  >
-                    {thumb ? (
-                      <>
+                  {/* Visual area: thumbnail if rendered, text summary if not */}
+                  {rendered && thumb ? (
+                    <div
+                      className="relative aspect-square bg-gray-800 cursor-pointer group"
+                      onClick={() => slides.length > 0 && setPreview({ opt, startIndex: 0 })}
+                    >
+                      {isVideo(thumb) ? (
+                        <video src={thumb} muted playsInline className="w-full h-full object-cover" onMouseOver={e => (e.target as HTMLVideoElement).play()} onMouseOut={e => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0; }} />
+                      ) : (
                         <img src={thumb} alt={opt.title} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                          <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-4 py-2 rounded-lg">
-                            Preview All {slides.length} Slides
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-600">
-                        <span className="text-4xl">
-                          {opt.contentType === 'carousel' ? '[ ]' : '|>'}
+                      )}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                        <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-4 py-2 rounded-lg">
+                          {isVideo(thumb) ? 'Preview Reel' : `Preview All ${slides.length} Slides`}
                         </span>
                       </div>
-                    )}
-                    <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[opt.contentType] || 'bg-gray-600'}`}>
-                      {opt.contentType}
-                    </span>
-                    {slides.length > 1 && (
-                      <span className="absolute bottom-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
-                        {slides.length} slides
+                      <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[opt.contentType] || 'bg-gray-600'}`}>
+                        {opt.contentType}
                       </span>
-                    )}
-                    <span className="absolute top-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
-                      #{idx + 1}
-                    </span>
-                  </div>
+                      {slides.length > 1 && (
+                        <span className="absolute bottom-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
+                          {slides.length} slides
+                        </span>
+                      )}
+                      <span className="absolute top-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
+                        #{idx + 1}
+                      </span>
+                    </div>
+                  ) : (renderState === 'rendering' || renderState === 'regenerating') ? (
+                    <div className="relative aspect-[4/3] bg-gray-800 flex flex-col items-center justify-center gap-3">
+                      <span className="inline-block w-8 h-8 border-3 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-sm text-purple-300">{renderState === 'regenerating' ? 'Re-rendering visuals...' : 'Rendering visuals...'}</span>
+                      <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[opt.contentType] || 'bg-gray-600'}`}>
+                        {opt.contentType}
+                      </span>
+                      <span className="absolute top-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
+                        #{idx + 1}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="relative bg-gray-800/50 p-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs text-white px-2 py-0.5 rounded-full ${typeColors[opt.contentType] || 'bg-gray-600'}`}>
+                          {opt.contentType}
+                        </span>
+                        <span className="text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
+                          #{idx + 1}
+                        </span>
+                      </div>
+                      {opt.valueProp && (
+                        <div>
+                          <span className="text-[10px] text-gray-500 uppercase tracking-wider">Value Prop</span>
+                          <p className="text-xs text-gray-300">{opt.valueProp}</p>
+                        </div>
+                      )}
+                      {opt.emotionalTrigger && (
+                        <div>
+                          <span className="text-[10px] text-gray-500 uppercase tracking-wider">Emotional Trigger</span>
+                          <p className="text-xs text-gray-300">{opt.emotionalTrigger}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Info */}
                   <div className="p-4 space-y-2">
@@ -438,44 +537,58 @@ function ContentOptionsSection({
                       <p className="text-xs text-purple-300 italic">"{opt.sendTrigger}"</p>
                     )}
 
-                    {/* Action buttons */}
-                    <div className="pt-2 flex gap-2">
-                      <button
-                        onClick={() => slides.length > 0 && setPreview({ opt, startIndex: 0 })}
-                        className="flex-1 px-3 py-1.5 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs rounded-lg transition-colors"
-                      >
-                        Preview Full Post
-                      </button>
-                      <button
-                        onClick={() => setExpanded(isExpanded ? null : opt.ideaId)}
-                        className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
-                      >
-                        {isExpanded ? 'Less' : 'Info'}
-                      </button>
-                    </div>
-
-                    {cardStatus[opt.scriptId]?.type === 'posted' ? (
-                      <div className="w-full px-3 py-2 text-xs rounded-lg bg-green-900/40 border border-green-700 text-green-300 text-center font-medium">
-                        {cardStatus[opt.scriptId].message}
+                    {/* Action buttons — vary by render state */}
+                    {renderState === 'posted' ? (
+                      <div className="pt-2">
+                        <div className="w-full px-3 py-2 text-xs rounded-lg bg-green-900/40 border border-green-700 text-green-300 text-center font-medium">
+                          {cardState[opt.scriptId]?.message || 'Posted to Instagram!'}
+                        </div>
                       </div>
-                    ) : cardStatus[opt.scriptId]?.type === 'scheduled' ? (
-                      <div className="w-full px-3 py-2 text-xs rounded-lg bg-blue-900/40 border border-blue-700 text-blue-300 text-center font-medium">
-                        {cardStatus[opt.scriptId].message}
+                    ) : renderState === 'scheduled' ? (
+                      <div className="pt-2">
+                        <div className="w-full px-3 py-2 text-xs rounded-lg bg-blue-900/40 border border-blue-700 text-blue-300 text-center font-medium">
+                          {cardState[opt.scriptId]?.message || 'Scheduled'}
+                        </div>
                       </div>
-                    ) : cardStatus[opt.scriptId]?.type === 'error' ? (
-                      <div className="space-y-2">
+                    ) : renderState === 'error' ? (
+                      <div className="pt-2 space-y-2">
                         <div className="w-full px-3 py-2 text-xs rounded-lg bg-red-900/40 border border-red-700 text-red-300 text-center">
-                          {cardStatus[opt.scriptId].message}
+                          {cardState[opt.scriptId]?.message || 'Error'}
                         </div>
                         <button
-                          onClick={() => handlePostNow(opt.scriptId)}
-                          className="w-full px-3 py-2 text-xs rounded-lg bg-green-700 hover:bg-green-600 text-white font-medium transition-colors"
+                          onClick={() => handleApproveContent(opt.scriptId)}
+                          className="w-full px-3 py-2 text-xs rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors"
                         >
-                          Retry Post to Instagram
+                          Retry Approve Content
                         </button>
                       </div>
-                    ) : (
-                      <div className="space-y-1.5">
+                    ) : (renderState === 'rendering' || renderState === 'regenerating') ? (
+                      <div className="pt-2">
+                        <button
+                          disabled
+                          className="w-full px-3 py-2 text-xs rounded-lg bg-gray-700 text-gray-400 cursor-not-allowed font-medium"
+                        >
+                          {renderState === 'regenerating' ? 'Re-rendering...' : 'Rendering...'}
+                        </button>
+                      </div>
+                    ) : rendered ? (
+                      <div className="pt-2 space-y-1.5">
+                        <div className="flex gap-2">
+                          {slides.length > 0 && (
+                            <button
+                              onClick={() => setPreview({ opt, startIndex: 0 })}
+                              className="flex-1 px-3 py-1.5 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs rounded-lg transition-colors"
+                            >
+                              Preview Full Post
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setExpanded(isExpanded ? null : opt.ideaId)}
+                            className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
+                          >
+                            {isExpanded ? 'Less' : 'Info'}
+                          </button>
+                        </div>
                         <button
                           onClick={() => handlePostNow(opt.scriptId)}
                           disabled={posting === opt.scriptId}
@@ -498,6 +611,27 @@ function ContentOptionsSection({
                         >
                           {scheduling === opt.scriptId ? 'Scheduling...' : 'Schedule for Later'}
                         </button>
+                        <button
+                          onClick={() => handleRegenerate(opt.scriptId)}
+                          className="w-full px-3 py-1.5 text-xs rounded-lg transition-colors border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-gray-200"
+                        >
+                          Regenerate Visuals
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="pt-2 space-y-1.5">
+                        <button
+                          onClick={() => setExpanded(isExpanded ? null : opt.ideaId)}
+                          className="w-full px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
+                        >
+                          {isExpanded ? 'Less' : 'More Info'}
+                        </button>
+                        <button
+                          onClick={() => handleApproveContent(opt.scriptId)}
+                          className="w-full px-3 py-2 text-xs rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors"
+                        >
+                          Approve Content
+                        </button>
                       </div>
                     )}
                   </div>
@@ -505,7 +639,7 @@ function ContentOptionsSection({
                   {/* Expanded details */}
                   {isExpanded && (
                     <div className="border-t border-gray-800 p-4 space-y-4">
-                      {slides.length > 1 && (
+                      {rendered && slides.length > 1 && (
                         <div>
                           <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
                             All Slides — click any to preview full-size
@@ -778,19 +912,44 @@ function ReadyContentSection({
   const [expanded, setExpanded] = useState<number | null>(null);
   const [posting, setPosting] = useState<number | null>(null);
   const [scheduling, setScheduling] = useState<number | null>(null);
-  const [cardStatus, setCardStatus] = useState<Record<number, { type: 'posted' | 'scheduled' | 'error'; message: string }>>({});
+  const [rendering, setRendering] = useState<number | null>(null);
+  const [cardStatus, setCardStatus] = useState<Record<number, { type: 'posted' | 'scheduled' | 'rendering' | 'regenerating' | 'error'; message: string }>>({});
   const [preview, setPreview] = useState<{ item: QueueItem; startIndex: number } | null>(null);
 
   const fetchQueue = async () => {
     try {
       const res = await fetch('/api/queue');
-      setItems(await res.json());
+      const all = await res.json();
+      // Show scripted (awaiting approval) and designed (ready to publish) items
+      setItems(all.filter((item: QueueItem) => item.idea_status === 'scripted' || item.idea_status === 'designed'));
     } catch {
       // Server not running
     }
   };
 
   useEffect(() => { fetchQueue(); }, []);
+
+  const handleApproveContent = async (scriptId: number) => {
+    setRendering(scriptId);
+    setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'rendering', message: 'Rendering visuals...' } }));
+    try {
+      const res = await fetch(`/api/queue/${scriptId}/approve-content`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setCardStatus(prev => {
+          const next = { ...prev };
+          delete next[scriptId];
+          return next;
+        });
+        fetchQueue();
+      } else {
+        setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'error', message: data.error || `Render failed (${res.status})` } }));
+      }
+    } catch (err: any) {
+      setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'error', message: err?.message || 'Network error — check server logs' } }));
+    }
+    setRendering(null);
+  };
 
   const handlePostNow = async (scriptId: number) => {
     setPosting(scriptId);
@@ -831,6 +990,26 @@ function ReadyContentSection({
     fetchQueue();
   };
 
+  const handleRegenerate = async (scriptId: number) => {
+    setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'regenerating', message: 'Re-rendering visuals...' } }));
+    try {
+      const res = await fetch(`/api/queue/${scriptId}/regenerate`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setCardStatus(prev => {
+          const next = { ...prev };
+          delete next[scriptId];
+          return next;
+        });
+        fetchQueue();
+      } else {
+        setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'error', message: data.error || 'Regeneration failed' } }));
+      }
+    } catch (err: any) {
+      setCardStatus(prev => ({ ...prev, [scriptId]: { type: 'error', message: err?.message || 'Network error' } }));
+    }
+  };
+
   const getItemSlides = (item: QueueItem): string[] => {
     const paths = item.public_urls && item.public_urls.length > 0 ? item.public_urls : item.local_paths;
     if (!paths || paths.length === 0) return [];
@@ -838,6 +1017,9 @@ function ReadyContentSection({
   };
 
   if (items.length === 0) return null;
+
+  const scriptedItems = items.filter(i => i.idea_status === 'scripted');
+  const designedItems = items.filter(i => i.idea_status === 'designed');
 
   return (
     <div className="space-y-4">
@@ -853,8 +1035,12 @@ function ReadyContentSection({
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Ready Content</h2>
-        <span className="text-sm text-gray-500">{items.length} items</span>
+        <h2 className="text-xl font-bold">Content Queue</h2>
+        <span className="text-sm text-gray-500">
+          {scriptedItems.length > 0 && <span className="text-yellow-400">{scriptedItems.length} awaiting approval</span>}
+          {scriptedItems.length > 0 && designedItems.length > 0 && <span className="mx-2">|</span>}
+          {designedItems.length > 0 && <span className="text-emerald-400">{designedItems.length} ready to publish</span>}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -863,7 +1049,9 @@ function ReadyContentSection({
           const thumb = slides.length > 0 ? slides[0] : null;
           const isExpanded = expanded === item.id;
           const status = cardStatus[item.id];
-          const isApproved = item.idea_status === 'approved';
+          const isDesigned = item.idea_status === 'designed';
+          const isScripted = item.idea_status === 'scripted';
+          const isRendering = status?.type === 'rendering' || status?.type === 'regenerating';
           let script: any = {};
           try { script = JSON.parse(item.script_json || '{}'); } catch {}
           let hashtags: string[] = [];
@@ -879,46 +1067,65 @@ function ReadyContentSection({
                     ? 'border-blue-500 ring-1 ring-blue-500'
                     : status?.type === 'error'
                       ? 'border-red-500/50'
-                      : isApproved
-                        ? 'border-blue-500/50'
+                      : isDesigned
+                        ? 'border-emerald-500/50'
                         : 'border-gray-800 hover:border-gray-700'
               }`}
             >
-              {/* Thumbnail */}
-              <div
-                className="relative aspect-square bg-gray-800 cursor-pointer group"
-                onClick={() => slides.length > 0 && setPreview({ item, startIndex: 0 })}
-              >
-                {thumb ? (
-                  <>
+              {/* Visual area */}
+              {isDesigned && thumb ? (
+                <div
+                  className="relative aspect-square bg-gray-800 cursor-pointer group"
+                  onClick={() => slides.length > 0 && setPreview({ item, startIndex: 0 })}
+                >
+                  {isVideo(thumb) ? (
+                    <video src={thumb} muted playsInline className="w-full h-full object-cover" onMouseOver={e => (e.target as HTMLVideoElement).play()} onMouseOut={e => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0; }} />
+                  ) : (
                     <img src={thumb} alt={item.title} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                      <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-4 py-2 rounded-lg">
-                        Preview {slides.length > 1 ? `All ${slides.length} Slides` : 'Post'}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-600">
-                    <span className="text-4xl">
-                      {item.content_type === 'carousel' ? '[ ]' : item.content_type === 'reel' ? '|>' : '#'}
+                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                    <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-4 py-2 rounded-lg">
+                      {isVideo(thumb) ? 'Preview Reel' : (slides.length > 1 ? `Preview All ${slides.length} Slides` : 'Preview Post')}
                     </span>
                   </div>
-                )}
-                <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
-                  {item.content_type}
-                </span>
-                {slides.length > 1 && (
-                  <span className="absolute bottom-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
-                    {slides.length} slides
+                  <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
+                    {item.content_type}
                   </span>
-                )}
-                {isApproved && (
-                  <span className="absolute top-2 right-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
-                    approved
+                  {slides.length > 1 && (
+                    <span className="absolute bottom-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
+                      {slides.length} slides
+                    </span>
+                  )}
+                  <span className="absolute top-2 right-2 text-xs bg-emerald-600 text-white px-2 py-0.5 rounded-full">
+                    rendered
                   </span>
-                )}
-              </div>
+                </div>
+              ) : isRendering ? (
+                <div className="relative aspect-[4/3] bg-gray-800 flex flex-col items-center justify-center gap-3">
+                  <span className="inline-block w-8 h-8 border-3 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm text-purple-300">{status?.type === 'regenerating' ? 'Re-rendering visuals...' : 'Rendering visuals...'}</span>
+                  <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
+                    {item.content_type}
+                  </span>
+                </div>
+              ) : (
+                <div className="relative bg-gray-800/50 p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
+                      {item.content_type}
+                    </span>
+                    <span className="text-xs bg-yellow-700/60 text-yellow-200 px-2 py-0.5 rounded-full">
+                      awaiting approval
+                    </span>
+                  </div>
+                  {item.send_trigger && (
+                    <div>
+                      <span className="text-[10px] text-gray-500 uppercase tracking-wider">Send Trigger</span>
+                      <p className="text-xs text-gray-300">{item.send_trigger}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Info */}
               <div className="p-4 space-y-2">
@@ -934,50 +1141,88 @@ function ReadyContentSection({
                   </div>
                 )}
 
-                {item.send_trigger && (
-                  <p className="text-xs text-purple-300 italic">"{item.send_trigger}"</p>
-                )}
-
-                {/* Action buttons */}
-                <div className="pt-2 flex gap-2">
-                  {slides.length > 0 && (
-                    <button
-                      onClick={() => setPreview({ item, startIndex: 0 })}
-                      className="flex-1 px-3 py-1.5 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs rounded-lg transition-colors"
-                    >
-                      Preview Full Post
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setExpanded(isExpanded ? null : item.id)}
-                    className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
-                  >
-                    {isExpanded ? 'Less' : 'Info'}
-                  </button>
-                </div>
-
-                {cardStatus[item.id]?.type === 'posted' ? (
-                  <div className="w-full px-3 py-2 text-xs rounded-lg bg-green-900/40 border border-green-700 text-green-300 text-center font-medium">
-                    {cardStatus[item.id].message}
-                  </div>
-                ) : cardStatus[item.id]?.type === 'scheduled' ? (
-                  <div className="w-full px-3 py-2 text-xs rounded-lg bg-blue-900/40 border border-blue-700 text-blue-300 text-center font-medium">
-                    {cardStatus[item.id].message}
-                  </div>
-                ) : cardStatus[item.id]?.type === 'error' ? (
-                  <div className="space-y-2">
-                    <div className="w-full px-3 py-2 text-xs rounded-lg bg-red-900/40 border border-red-700 text-red-300 text-center">
-                      {cardStatus[item.id].message}
+                {/* Action buttons — vary by status */}
+                {status?.type === 'posted' ? (
+                  <div className="pt-2">
+                    <div className="w-full px-3 py-2 text-xs rounded-lg bg-green-900/40 border border-green-700 text-green-300 text-center font-medium">
+                      {status.message}
                     </div>
+                  </div>
+                ) : status?.type === 'scheduled' ? (
+                  <div className="pt-2">
+                    <div className="w-full px-3 py-2 text-xs rounded-lg bg-blue-900/40 border border-blue-700 text-blue-300 text-center font-medium">
+                      {status.message}
+                    </div>
+                  </div>
+                ) : status?.type === 'error' ? (
+                  <div className="pt-2 space-y-2">
+                    <div className="w-full px-3 py-2 text-xs rounded-lg bg-red-900/40 border border-red-700 text-red-300 text-center">
+                      {status.message}
+                    </div>
+                    {isScripted ? (
+                      <button
+                        onClick={() => handleApproveContent(item.id)}
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors"
+                      >
+                        Retry Approve Content
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handlePostNow(item.id)}
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-green-700 hover:bg-green-600 text-white font-medium transition-colors"
+                      >
+                        Retry Post to Instagram
+                      </button>
+                    )}
+                  </div>
+                ) : isRendering ? (
+                  <div className="pt-2">
                     <button
-                      onClick={() => handlePostNow(item.id)}
-                      className="w-full px-3 py-2 text-xs rounded-lg bg-green-700 hover:bg-green-600 text-white font-medium transition-colors"
+                      disabled
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-gray-700 text-gray-400 cursor-not-allowed font-medium"
                     >
-                      Retry Post to Instagram
+                      {status?.type === 'regenerating' ? 'Re-rendering...' : 'Rendering...'}
+                    </button>
+                  </div>
+                ) : isScripted ? (
+                  <div className="pt-2 space-y-1.5">
+                    <button
+                      onClick={() => setExpanded(isExpanded ? null : item.id)}
+                      className="w-full px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
+                    >
+                      {isExpanded ? 'Less' : 'More Info'}
+                    </button>
+                    <button
+                      onClick={() => handleApproveContent(item.id)}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors"
+                    >
+                      Approve Content
+                    </button>
+                    <button
+                      onClick={() => handleReject(item.id)}
+                      className="w-full px-3 py-1.5 bg-red-900/60 hover:bg-red-800 text-red-300 text-xs rounded-lg transition-colors"
+                    >
+                      Reject
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-1.5">
+                  <div className="pt-2 space-y-1.5">
+                    <div className="flex gap-2">
+                      {slides.length > 0 && (
+                        <button
+                          onClick={() => setPreview({ item, startIndex: 0 })}
+                          className="flex-1 px-3 py-1.5 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs rounded-lg transition-colors"
+                        >
+                          Preview Full Post
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setExpanded(isExpanded ? null : item.id)}
+                        className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
+                      >
+                        {isExpanded ? 'Less' : 'Info'}
+                      </button>
+                    </div>
                     <button
                       onClick={() => handlePostNow(item.id)}
                       disabled={posting === item.id}
@@ -1008,6 +1253,12 @@ function ReadyContentSection({
                         Reject
                       </button>
                     </div>
+                    <button
+                      onClick={() => handleRegenerate(item.id)}
+                      className="w-full px-3 py-1.5 text-xs rounded-lg transition-colors border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-gray-200"
+                    >
+                      Regenerate Visuals
+                    </button>
                   </div>
                 )}
               </div>
