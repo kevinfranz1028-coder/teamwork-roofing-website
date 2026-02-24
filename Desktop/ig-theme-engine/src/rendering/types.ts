@@ -36,6 +36,7 @@ export interface ReelSegment {
   text: string;
   durationSeconds: number;
   visualDescription: string;
+  segmentType?: 'hook' | 'body' | 'cta';
 }
 
 export interface ReelScript {
@@ -59,6 +60,7 @@ export interface RenderConfig {
   fonts: {
     headline: string;
     body: string;
+    accent?: string;
   };
   handle: string;
 }

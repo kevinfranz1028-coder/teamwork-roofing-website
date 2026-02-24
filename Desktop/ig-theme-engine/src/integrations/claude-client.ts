@@ -1,5 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { CONFIG } from '../config/env.js';
+import { getSetting } from '../config/ai-settings.js';
+import { withRetry } from '../utils/retry.js';
 
 const client = new Anthropic({ apiKey: CONFIG.ai.apiKey });
 
@@ -18,29 +20,38 @@ interface ClaudeResponse {
 }
 
 export async function askClaude(request: ClaudeRequest): Promise<ClaudeResponse> {
-  const response = await client.messages.create({
-    model: CONFIG.ai.model,
-    max_tokens: request.maxTokens || 4096,
-    temperature: request.temperature ?? 0.7,
-    system: request.systemPrompt,
-    messages: [{ role: 'user', content: request.userPrompt }],
+  return withRetry(async () => {
+    const response = await client.messages.create({
+      model: CONFIG.ai.model,
+      max_tokens: request.maxTokens || 4096,
+      temperature: request.temperature ?? getSetting('temperature', 0.7),
+      system: request.systemPrompt,
+      messages: [{ role: 'user', content: request.userPrompt }],
+    });
+
+    const text = response.content
+      .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+      .map(block => block.text)
+      .join('\n');
+
+    // Approximate cost (Sonnet 4.5 pricing — verify current rates)
+    const inputCost = (response.usage.input_tokens / 1_000_000) * 3;
+    const outputCost = (response.usage.output_tokens / 1_000_000) * 15;
+
+    return {
+      text,
+      inputTokens: response.usage.input_tokens,
+      outputTokens: response.usage.output_tokens,
+      cost: inputCost + outputCost,
+    };
+  }, {
+    maxAttempts: 3,
+    delayMs: 2000,
+    backoffMultiplier: 2,
+    onRetry: (attempt, err) => {
+      console.warn(`Claude API retry ${attempt}: ${err.message}`);
+    }
   });
-
-  const text = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
-    .map(block => block.text)
-    .join('\n');
-
-  // Approximate cost (Sonnet 4.5 pricing — verify current rates)
-  const inputCost = (response.usage.input_tokens / 1_000_000) * 3;
-  const outputCost = (response.usage.output_tokens / 1_000_000) * 15;
-
-  return {
-    text,
-    inputTokens: response.usage.input_tokens,
-    outputTokens: response.usage.output_tokens,
-    cost: inputCost + outputCost,
-  };
 }
 
 // Attempt to repair truncated JSON by closing open brackets/braces

@@ -215,6 +215,23 @@ const checklist: ChecklistSection[] = [
       { label: 'src/utils/text-utils.ts — Text helpers', status: 'done', notes: 'Captions, hashtags, slugify, health check' },
     ],
   },
+  {
+    title: 'Strategy Configuration — ThePlantICU',
+    completion: 100,
+    items: [
+      { label: 'AI Settings profile (PlantICU v1 — Diagnostic Authority)', status: 'done', notes: 'System prompt, carousel/reel instructions, image style prefix/suffix/negative, temperature 0.75' },
+      { label: 'Brand System (colors, fonts, voice, visual style)', status: 'done', notes: '#1B4332 primary, #2D6A4F secondary, #D4A574 accent, Space Grotesk + Inter + JetBrains Mono' },
+      { label: 'Creative Brief (5 content pillars + target audience)', status: 'done', notes: 'Diagnosis, Treatment, Prevention, Debunk, Trending Rescues — 3 carousels + 2 reels/week' },
+      { label: 'Reel overlay template upgrade (segment-type-aware)', status: 'done', notes: 'Hook/body/cta get different visual treatments: accent border, glassmorphism card, CTA button + progress bar' },
+      { label: 'Reel builder prompt upgrade (Plant ER narrative)', status: 'done', notes: 'ALARM → DIAGNOSIS → TREATMENT → HOPE arc, segmentType field, voiceover improvements' },
+      { label: 'DM flows (RESCUE, DIAGNOSE, PESTS)', status: 'done', notes: '3 multi-step flows with email capture, follow-up sequences, affiliate integration' },
+      { label: 'Content calendar — Week 1 (Yellow Leaves Week)', status: 'done', notes: '5 posts: 3 carousels + 2 reels, Feb 24-28' },
+      { label: 'Reel renderer upgrades (Ken Burns + crossfade)', status: 'done', notes: '3% zoompan effect on backgrounds, 0.3s fade transitions between segments' },
+      { label: 'Affiliate program setup', status: 'partial', notes: 'Strategy defined — requires Amazon Associates account + product links' },
+      { label: 'PDF lead magnets (Root Rot Checklist, Symptom Chart, Pest Guide)', status: 'partial', notes: 'DM flows reference these — PDFs need to be created and hosted' },
+      { label: 'OpenAI TTS voice configuration', status: 'partial', notes: 'Recommended: nova (warm) or onyx (authoritative). Set OPENAI_API_KEY in .env' },
+    ],
+  },
 ];
 
 const statusIcon = (status: string) => {

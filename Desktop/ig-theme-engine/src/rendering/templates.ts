@@ -286,25 +286,115 @@ function getInteractiveElementHtml(slide: StorySlideContent, config: RenderConfi
 
 // ─── Reel Text Overlay Template ───────────────────────
 
-export function reelOverlayHtml(text: string, config: RenderConfig): string {
+export function reelOverlayHtml(
+  text: string,
+  config: RenderConfig,
+  segmentType: 'hook' | 'body' | 'cta' = 'body',
+  segmentIndex?: number,
+  totalSegments?: number
+): string {
+  const accentFont = config.fonts.accent || 'JetBrains Mono';
+
+  const hookStyles = `
+    .overlay-text {
+      font-size: 72px; font-weight: 900; line-height: 1.1;
+      text-transform: uppercase; letter-spacing: -2px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6);
+      max-width: 900px;
+      padding: 50px 60px;
+      border-left: 6px solid ${config.brandColors.accent};
+    }
+  `;
+
+  const bodyStyles = `
+    .overlay-text {
+      font-size: 48px; font-weight: 700; line-height: 1.3;
+      text-shadow: 0 3px 15px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5);
+      max-width: 860px;
+      padding: 40px 60px;
+      background: linear-gradient(135deg, rgba(27,67,50,0.85), rgba(10,15,13,0.75));
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+    }
+    .step-indicator {
+      font-family: '${accentFont}', monospace;
+      font-size: 20px; font-weight: 600;
+      color: ${config.brandColors.accent};
+      letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 16px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+  `;
+
+  const ctaStyles = `
+    .overlay-text {
+      font-size: 52px; font-weight: 900; line-height: 1.2;
+      text-align: center;
+      text-shadow: 0 3px 15px rgba(0,0,0,0.7);
+      max-width: 800px;
+      margin-bottom: 30px;
+    }
+    .cta-button {
+      display: inline-block;
+      background: ${config.brandColors.accent};
+      color: #FFFFFF;
+      padding: 20px 50px;
+      border-radius: 40px;
+      font-size: 28px; font-weight: 700;
+      font-family: '${config.fonts.headline}', sans-serif;
+      box-shadow: 0 6px 25px rgba(212,165,116,0.4);
+    }
+    .handle {
+      margin-top: 20px;
+      font-size: 22px; opacity: 0.8;
+      font-family: '${config.fonts.body}', sans-serif;
+    }
+  `;
+
+  const styleMap = { hook: hookStyles, body: bodyStyles, cta: ctaStyles };
+
+  const stepLabel = segmentType === 'body' && segmentIndex !== undefined && totalSegments
+    ? `<div class="step-indicator">Step ${segmentIndex} of ${totalSegments}</div>`
+    : '';
+
+  const ctaButton = segmentType === 'cta'
+    ? `<div class="cta-button">Follow @ThePlantICU</div><div class="handle">Your plant's second chance starts here</div>`
+    : '';
+
+  const justification = segmentType === 'cta' ? 'center' : 'flex-end';
+  const alignment = segmentType === 'cta' ? 'center' : 'left';
+
   return `<!DOCTYPE html>
 <html><head><style>
-  ${baseStyles(config)}
+  @import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(config.fonts.headline)}:wght@700;900&family=${encodeURIComponent(config.fonts.body)}:wght@400;600&family=JetBrains+Mono:wght@500;600&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     width: 1080px; height: 1920px;
     background: transparent;
-    display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 0 60px 200px; font-family: '${config.fonts.headline}', sans-serif;
-    color: #FFFFFF; text-align: left;
+    display: flex; flex-direction: column; justify-content: ${justification};
+    align-items: ${segmentType === 'cta' ? 'center' : 'flex-start'};
+    padding: 0 50px ${segmentType === 'cta' ? '300px' : '180px'};
+    font-family: '${config.fonts.headline}', sans-serif;
+    color: #FFFFFF; text-align: ${alignment};
   }
-  .overlay-text {
-    font-size: 56px; font-weight: 900; line-height: 1.25;
-    text-shadow: 0 3px 15px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4);
-    max-width: 900px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.4));
-    padding: 40px; border-radius: 20px;
+  ${styleMap[segmentType]}
+  .watermark {
+    position: absolute; bottom: 30px; right: 40px;
+    font-size: 18px; opacity: 0.4;
+    font-family: '${config.fonts.body}', sans-serif;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .progress-bar {
+    position: absolute; bottom: 0; left: 0;
+    height: 4px;
+    background: ${config.brandColors.accent};
+    opacity: 0.8;
   }
 </style></head><body>
+  ${stepLabel}
   <div class="overlay-text">${escapeHtml(text)}</div>
+  ${ctaButton}
+  <div class="watermark">@ThePlantICU</div>
+  ${segmentIndex !== undefined && totalSegments ? `<div class="progress-bar" style="width: ${((segmentIndex + 1) / (totalSegments + 2)) * 100}%"></div>` : ''}
 </body></html>`;
 }

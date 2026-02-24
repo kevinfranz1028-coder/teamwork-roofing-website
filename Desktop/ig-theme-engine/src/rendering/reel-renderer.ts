@@ -118,11 +118,12 @@ function buildSegmentList(script: ReelScript): ReelSegment[] {
     text: script.hook,
     durationSeconds: 3,
     visualDescription: script.hookVisual || 'attention-grabbing dramatic visual',
+    segmentType: 'hook',
   });
 
   // Body segments
   for (const seg of script.segments) {
-    segments.push(seg);
+    segments.push({ ...seg, segmentType: seg.segmentType || 'body' });
   }
 
   // CTA segment — use Claude's visual description if available
@@ -130,6 +131,7 @@ function buildSegmentList(script: ReelScript): ReelSegment[] {
     text: script.cta,
     durationSeconds: 4,
     visualDescription: script.ctaVisual || 'call to action motivational visual',
+    segmentType: 'cta',
   });
 
   return segments;
@@ -145,10 +147,21 @@ async function renderTextOverlays(
   await page.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
 
   const paths: string[] = [];
+  // Count body segments for step indicators
+  const bodySegments = segments.filter(s => s.segmentType === 'body');
+  const totalBodySteps = bodySegments.length;
+  let bodyIndex = 0;
 
   try {
     for (let i = 0; i < segments.length; i++) {
-      const html = reelOverlayHtml(segments[i].text, config);
+      const seg = segments[i];
+      const segType = seg.segmentType || 'body';
+      let stepIdx: number | undefined;
+      if (segType === 'body') {
+        bodyIndex++;
+        stepIdx = bodyIndex;
+      }
+      const html = reelOverlayHtml(seg.text, config, segType, stepIdx, totalBodySteps);
       await page.setContent(html, { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => Promise.race([
         document.fonts.ready,
@@ -196,10 +209,11 @@ function composeVideo(
     inputs.push(voiceoverPath);
 
     // Build filter graph
-    // Scale backgrounds to 1080x1920, set duration, create video from still
+    // Scale backgrounds to 1080x1920, set duration, add Ken Burns (subtle 3% zoom)
     for (let i = 0; i < segmentCount; i++) {
       const dur = segments[i].durationSeconds;
-      filterComplex += `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,loop=loop=${dur * 25}:size=1:start=0,fps=25,trim=duration=${dur},setpts=PTS-STARTPTS[bg${i}];`;
+      const frames = dur * 25;
+      filterComplex += `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,loop=loop=${frames}:size=1:start=0,fps=25,trim=duration=${dur},setpts=PTS-STARTPTS,zoompan=z='min(zoom+0.0005,1.03)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1080x1920:fps=25[bg${i}];`;
     }
 
     // Scale overlays
@@ -213,9 +227,21 @@ function composeVideo(
       filterComplex += `[bg${i}][ov${i}]overlay=0:0:format=auto[seg${i}];`;
     }
 
-    // Concatenate all segments
-    const concatInputs = Array.from({ length: segmentCount }, (_, i) => `[seg${i}]`).join('');
-    filterComplex += `${concatInputs}concat=n=${segmentCount}:v=1:a=0[outv]`;
+    // Apply crossfade transitions (0.3s dissolve) between segments
+    if (segmentCount > 1) {
+      let cumulativeDuration = segments[0].durationSeconds;
+      let prevLabel = 'seg0';
+      for (let i = 1; i < segmentCount; i++) {
+        const fadeOffset = cumulativeDuration - 0.3;
+        const outLabel = i === segmentCount - 1 ? 'outv' : `xf${i}`;
+        filterComplex += `[${prevLabel}][seg${i}]xfade=transition=fade:duration=0.3:offset=${fadeOffset.toFixed(2)}[${outLabel}];`;
+        cumulativeDuration += segments[i].durationSeconds - 0.3;
+        prevLabel = outLabel;
+      }
+    } else {
+      // Single segment, just rename
+      filterComplex += `[seg0]copy[outv];`;
+    }
 
     const audioIdx = inputs.length - 1;
 
@@ -281,6 +307,7 @@ export function parseReelScript(scriptJson: string): ReelScript {
       text,
       durationSeconds: typeof durationSeconds === 'number' ? durationSeconds : 4,
       visualDescription: s.visualDescription || s.visual || '',
+      segmentType: s.segmentType || 'body',
     };
   });
 

@@ -77,36 +77,52 @@ export function reelBuilderPrompt(
 ): string {
   const visualInstruction = getSetting('reel_visual_instruction', DEFAULT_REEL_VISUAL_INSTRUCTION);
 
-  return `Turn this idea into a complete production-ready Instagram Reel script:
+  return `Turn this idea into a production-ready Instagram Reel for @ThePlantICU.
 
 IDEA: "${idea.title}"
 HOOK: "${idea.hook}"
 FORMAT NOTES: ${idea.formatNotes}
 
-Create the full Reel script with:
+THE PLANTICU REEL FORMULA:
+This reel follows the "Plant ER" narrative arc: ALARM → DIAGNOSIS → TREATMENT → HOPE
 
-hook (0-1.7 seconds): THE MOST IMPORTANT PART
-- onScreenText: Exact text overlay — must create open loop
-- visual: ${visualInstruction}
-- audio: Voiceover line OR sound effect — must be original audio, NOT a trending sound
+Create the full Reel script:
 
-body (1.7-25 seconds):
-- Array of segments, each with:
+hook (0-2 seconds): THE SCROLL-STOPPER
+- onScreenText: Bold, alarming statement — open loop or shock. Max 8 words. Examples: "Your monstera is DROWNING" / "This is NOT underwatering" / "Your $200 plant has 48 hours"
+- visual: ${visualInstruction} — HOOK FRAME style (maximum drama, macro of the problem)
+- voiceoverScript: Match the text energy — short, punchy, concerned tone
+- segmentType: "hook"
+
+body (2-20 seconds): THE DIAGNOSIS & TREATMENT
+- Array of 3-5 segments, each with:
   - timestamp: Start time in seconds
-  - onScreenText: Text overlay for this segment
-  - voiceoverScript: Exact words if using voiceover (OR "text-only" if no VO)
-  - visual: ${visualInstruction}
-  - pacing: "fast" | "medium" | "slow"
+  - onScreenText: One clear instruction or insight per segment. Max 12 words.
+  - voiceoverScript: Expand on the text — conversational, like explaining to a worried friend. 1-2 sentences per segment.
+  - visual: ${visualInstruction} — BODY FRAME style (educational, step-by-step)
+  - pacing: "fast" for alarm, "medium" for explanation, "slow" for important steps
+  - segmentType: "body"
+  - durationSeconds: 3-5 seconds per segment
 
-cta (last 3-5 seconds):
-- onScreenText: Specific call to action
-- voiceover: Closing line
-- visual: ${visualInstruction}
+cta (last 3-5 seconds): THE HOPE
+- onScreenText: "Follow @ThePlantICU" or "Save this for next time" or specific DM trigger
+- voiceoverScript: Warm, reassuring close — "Your plant's not dead yet. Follow for more rescues."
+- visual: ${visualInstruction} — CTA FRAME style (recovered plant, hopeful, warm light)
+- segmentType: "cta"
 
-totalLength: Target length in seconds (under 30 for max discovery)
-audioMood: Overall audio direction — MUST be original (not trending)
-captionKeywords: Woven naturally into caption
-hashtags: Max 5
+totalLength: Target 18-25 seconds (sweet spot for discovery reach)
+audioMood: "Calm urgency — concerned but competent, like a nurse giving instructions. NOT dramatic/anxious. Reassuring expertise."
+
+voiceoverText: Complete voiceover script as one continuous paragraph, natural speech patterns. This will be sent to OpenAI TTS.
+
+caption:
+- hookLine: First line creates curiosity gap (gets cut off in feed → drives tap-through)
+- body: 60-100 words. Lead with the diagnosis, then treatment summary. Include 1 personal touch.
+- cta: "Save this for your next plant emergency" or "Send to someone whose [plant] needs help" or DM trigger
+- seoKeywords: ${idea.captionKeywords.join(', ')} woven naturally into caption text — never keyword-stuffed
+- hashtags: Max 5, specific: #PlantICU #HouseplantRescue #PlantDiagnosis #[SpecificPlant] #[SpecificProblem]
+
+dmTrigger: Keyword + value offer for the story companion. E.g., "DM me RESCUE for the free recovery checklist"
 
 Return as JSON.`;
 }
