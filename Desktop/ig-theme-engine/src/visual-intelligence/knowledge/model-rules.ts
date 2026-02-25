@@ -1,52 +1,40 @@
-// Per-model DO and DON'T rules for prompt engineering
+export const UNIVERSAL_NEVER = [
+  'NEVER include text, words, letters, or numbers in the image',
+  'NEVER include clocks, watches, timers, or time indicators',
+  'NEVER include product labels, brand names, or logos',
+  'NEVER create collages, split screens, or multiple panels',
+  'NEVER include UI elements, buttons, or interface components',
+  'NEVER include black bars, padding, or empty space',
+  'NEVER include cartoon or illustration styles — photorealism only',
+];
 
-export const MODEL_RULES = {
-  universal: {
-    never: [
-      'NEVER include text, words, numbers, or letters in image prompts',
-      'NEVER ask for clocks, timers, watches, or time displays',
-      'NEVER ask for product packaging with brand names or labels',
-      'NEVER ask for collages, split screens, or multi-panel layouts',
-      'NEVER ask for UI elements, buttons, or digital interfaces',
-      'NEVER ask for multiple distinct scenes in one image',
-      'NEVER use abstract concepts as visual descriptions',
-      'ALL text content goes exclusively in the HTML overlay layer',
-    ],
-    always: [
-      'ALWAYS describe ONE scene from ONE camera angle',
-      'ALWAYS include lens focal length in the prompt',
-      'ALWAYS include lighting direction and quality',
-      'ALWAYS include depth of field specification',
-      'ALWAYS include color palette description',
-      'ALWAYS include a specific texture or material detail',
-      'ALWAYS start with the image style prefix from AI Settings',
-    ],
-  },
+export const UNIVERSAL_ALWAYS = [
+  'ALWAYS describe ONE single scene from ONE camera angle',
+  'ALWAYS specify a lens focal length and aperture',
+  'ALWAYS specify lighting direction and quality',
+  'ALWAYS specify depth of field',
+  'ALWAYS specify a color palette or film stock',
+  'ALWAYS include at least one texture detail (leaf veins, soil grains, water droplets)',
+];
 
-  'flux-2-pro': {
-    additional: [
-      'Add "editorial quality, magazine photography" for polish boost',
-      'Specify a film stock for consistent color grading',
-      'Use "shot on Canon R5" or similar for camera realism cue',
-      'For macro shots, add "1:1 reproduction, ring flash fill"',
-      'Avoid overly complex scene descriptions (keep to 2-3 elements max)',
-    ],
-  },
-
-  'gpt-image-1.5': {
-    additional: [
-      'Can handle longer, more detailed prompts (up to 4000 chars)',
-      'Specify exact text to render in double quotes within prompt',
-      'Describe spatial layout explicitly when multiple elements present',
-      'Add "professional product photography, e-commerce quality" for products',
-    ],
-  },
-
-  'ideogram-3': {
-    additional: [
-      "Put text to render in single quotes: 'Your Text Here'",
-      'Describe the font style: "bold sans-serif", "elegant script", etc.',
-      'Add "graphic design layout" or "poster design" for typography-first images',
-    ],
-  },
-} as const;
+export const MODEL_TIPS: Record<string, string[]> = {
+  'flux-2-pro': [
+    'Add "editorial quality, magazine photography" to boost realism',
+    'Specify a film stock for color science (e.g., "Kodak Portra 400")',
+    'Mention a camera model (e.g., "shot on Canon R5")',
+    'Use prompt_upsampling for enhanced detail',
+    'Excellent at nature, plants, macro detail, atmospheric lighting',
+  ],
+  'gpt-image-1.5': [
+    'Can handle prompts up to 4000 characters — be detailed',
+    'If text MUST appear, put it in exact quotes: \'the text "PLANT CARE"\' ',
+    'Describe spatial layout precisely for complex scenes',
+    'Best for: photorealism, text-in-image, multi-element compositions',
+  ],
+  'ideogram-3': [
+    'Put desired text in single quotes in the prompt',
+    'Describe font style explicitly (bold sans-serif, hand-lettered, etc.)',
+    'Add "graphic design layout" for poster/card aesthetics',
+    'Best for: typography, posters, social cards with text as the hero',
+  ],
+};

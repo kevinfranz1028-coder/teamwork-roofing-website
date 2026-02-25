@@ -11,6 +11,19 @@ interface AISettings {
   image_negative_prompt: string | null;
   temperature: number;
   is_active: number;
+  default_image_model: string | null;
+  default_video_model: string | null;
+  enable_video_generation: number | null;
+  video_motion_style: string | null;
+  quality_gate_enabled: number | null;
+  quality_gate_min_score: number | null;
+  hook_visual_style: string | null;
+  body_visual_style: string | null;
+  cta_visual_style: string | null;
+  camera_body: string | null;
+  default_lens: string | null;
+  default_lighting: string | null;
+  default_color_profile: string | null;
   created_at: string;
   updated_at: string;
 }

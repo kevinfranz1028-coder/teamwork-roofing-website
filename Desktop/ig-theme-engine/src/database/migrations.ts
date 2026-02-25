@@ -148,6 +148,26 @@ const MIGRATIONS: Migration[] = [
       ALTER TABLE ai_settings ADD COLUMN default_color_profile TEXT DEFAULT 'Kodak Portra 400';
     `,
   },
+  {
+    version: 11,
+    name: 'expand_api_costs',
+    up: `
+      ALTER TABLE api_costs ADD COLUMN provider TEXT;
+      ALTER TABLE api_costs ADD COLUMN category TEXT;
+      ALTER TABLE api_costs ADD COLUMN model TEXT;
+      ALTER TABLE api_costs ADD COLUMN description TEXT;
+      ALTER TABLE api_costs ADD COLUMN idea_id INTEGER;
+      ALTER TABLE api_costs ADD COLUMN duration_ms INTEGER;
+    `,
+  },
+  {
+    version: 12,
+    name: 'add_project_label_to_api_costs',
+    up: `
+      ALTER TABLE api_costs ADD COLUMN project_label TEXT;
+      CREATE INDEX IF NOT EXISTS idx_api_costs_project ON api_costs(project_label);
+    `,
+  },
 ];
 
 export function runMigrations(): void {

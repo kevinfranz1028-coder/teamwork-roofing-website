@@ -1,22 +1,14 @@
-// Visual Intelligence Layer — Core Types
+// ─── Visual Intelligence Layer — Type Definitions ───
 
 export type ImageModel = 'flux-2-pro' | 'gpt-image-1.5' | 'ideogram-3';
 export type VideoModel = 'kling-2.6-pro';
-
-export interface VisualPlan {
-  model: ImageModel;
-  prompt: string;
-  negativePrompt: string;
-  aspectRatio: '9:16' | '1:1' | '16:9' | '4:5';
-  generateVideo: boolean;
-  videoPrompt?: string;
-  videoDuration?: 5 | 10;
-  rationale: string;
-}
+export type SegmentType = 'hook' | 'body' | 'cta';
+export type ContentType = 'carousel' | 'reel' | 'story';
+export type AspectRatio = '9:16' | '1:1' | '16:9';
 
 export interface VisualBrief {
-  contentType: 'carousel' | 'reel' | 'story';
-  segmentType: 'hook' | 'body' | 'cta';
+  contentType: ContentType;
+  segmentType: SegmentType;
   segmentIndex: number;
   totalSegments: number;
   onScreenText: string;
@@ -30,70 +22,58 @@ export interface VisualBrief {
   };
 }
 
+export interface VisualPlan {
+  model: ImageModel;
+  prompt: string;
+  negativePrompt: string;
+  aspectRatio: AspectRatio;
+  generateVideo: boolean;
+  motionPrompt?: string;
+  motionStyle?: string;
+  lens?: string;
+  lighting?: string;
+  depthOfField?: string;
+  colorPalette?: string;
+}
+
+export interface GeneratedImage {
+  path: string;
+  model: string;
+  prompt: string;
+  qualityScore?: number;
+  retryCount: number;
+}
+
+export interface GeneratedVideo {
+  path: string;
+  model: string;
+  durationSeconds: number;
+  fromImage: boolean;
+}
+
 export interface QualityReport {
   score: number;
   pass: boolean;
   issues: string[];
   feedback: string;
   checks: {
-    dimensions: boolean;
-    fileSize: boolean;
     noGarbledText: boolean;
     noCollage: boolean;
     noBlackBars: boolean;
-    noSeams: boolean;
     subjectClarity: boolean;
     brandAlignment: boolean;
   };
 }
 
-export interface GeneratedImage {
-  path: string;
-  model: ImageModel;
-  prompt: string;
-  qualityReport?: QualityReport;
-  retryCount: number;
-}
-
-export interface GeneratedVideo {
-  path: string;
-  model: VideoModel;
-  sourceImagePath: string;
-  motionPrompt: string;
-  durationSeconds: number;
-  qualityReport?: QualityReport;
-}
-
 export interface StyleAnchor {
   imageStylePrefix: string;
-  imageStyleSuffix: string;
   imageNegativePrompt: string;
   videoMotionStyle: string;
   hookVisualStyle: string;
   bodyVisualStyle: string;
   ctaVisualStyle: string;
-}
-
-export interface QualityLogEntry {
-  model: string;
-  contentType: string;
-  segmentType?: string;
-  prompt: string;
-  qualityScore: number;
-  issues: string[];
-  retryCount: number;
-  finalPrompt?: string;
-}
-
-export interface ModelCapabilities {
-  name: string;
-  provider: string;
-  costPerImage?: number;
-  costPerSecond?: number;
-  speedSeconds: number;
-  strengths: string[];
-  weaknesses: string[];
-  absoluteNever: string[];
-  promptTips: string[];
-  aspectRatios: string[];
+  cameraBody: string;
+  defaultLens: string;
+  defaultLighting: string;
+  defaultColorProfile: string;
 }

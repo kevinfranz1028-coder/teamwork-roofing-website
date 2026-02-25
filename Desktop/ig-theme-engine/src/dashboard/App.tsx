@@ -8,6 +8,7 @@ import BuildChecklist from './pages/BuildChecklist.js';
 import CreativeBrief from './pages/CreativeBrief.js';
 import AISettings from './pages/AISettings.js';
 import BuildDoc from './pages/BuildDoc.js';
+import APICosts from './pages/APICosts.js';
 import { getApiKey, setApiKey, clearApiKey, apiFetch } from './utils/api.js';
 
 const tabs = [
@@ -19,6 +20,7 @@ const tabs = [
   { id: 'scorecard', label: 'Scorecard' },
   { id: 'revenue', label: 'Revenue' },
   { id: 'checklist', label: 'Build Checklist' },
+  { id: 'api-costs', label: 'API Costs' },
   { id: 'build-doc', label: 'Build Doc' },
 ] as const;
 
@@ -156,6 +158,7 @@ export default function App() {
         {activeTab === 'scorecard' && <Scorecard />}
         {activeTab === 'revenue' && <Revenue />}
         {activeTab === 'checklist' && <BuildChecklist />}
+        {activeTab === 'api-costs' && <APICosts />}
         {activeTab === 'build-doc' && <BuildDoc />}
       </main>
     </div>

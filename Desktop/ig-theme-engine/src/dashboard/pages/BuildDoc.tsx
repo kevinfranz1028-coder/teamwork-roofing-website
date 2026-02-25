@@ -113,7 +113,7 @@ const routeDescriptions: Record<string, string> = {
   'GET /api/status': 'Get current pipeline state (phase, lastRun, errors, todaysPackage)',
   'POST /api/pipeline/run': 'Trigger full daily pipeline manually',
   'POST /api/pipeline/auto-run': 'Render daily package + auto-publish to Instagram',
-  'GET /api/queue': 'List all content scripts with ideas, assets (limit 50)',
+  'GET /api/queue': 'List all content scripts with ideas, assets — returns scripted, approved, designed, and published items (limit 100)',
   'GET /api/queue/pending': 'Scripts awaiting approval',
   'GET /api/queue/ready': 'Approved scripts ready to publish',
   'POST /api/queue/:id/approve': 'Approve content script',
@@ -359,7 +359,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
 
     const dashPages = [
       { file: 'dashboard/pages/PipelineStatus.tsx', name: 'Pipeline Status', desc: 'Displays current pipeline phase (idle/generating/rendering/publishing) with color-coded status, last run timestamp, error log, and today\'s content package preview (carousel, reel, stories with DM triggers). Includes a "Run Daily Pipeline" button that triggers the full generate→render→approve workflow. Auto-refreshes every 5 seconds.' },
-      { file: 'dashboard/pages/Content.tsx', name: 'Content', desc: 'The main content management hub. Shows all queued content scripts with visual thumbnail previews of rendered carousel slides. Actions per item: "Approve & Render" (triggers Puppeteer/Replicate rendering), "Regenerate" (re-renders with new AI backgrounds), "Post to Instagram" (publishes via Graph API), "Schedule for Later" (adds to content calendar). Displays caption text, hashtags, DM trigger keywords, and content type badges.' },
+      { file: 'dashboard/pages/Content.tsx', name: 'Content', desc: 'The main content management hub with filter tabs (All, Not Rendered, Rendered, Approved, Posted) and date-grouped cards sorted newest first. Each card shows visual thumbnail, status badge (Not Rendered/Rendered/Approved/Posted), content type, and context-sensitive actions. Not-rendered items: "Approve Content" (triggers Visual Intelligence rendering). Rendered items: "Post to Instagram", "Schedule for Later", "Regenerate Visuals", "Preview Full Post", "Download". Posted items: read-only with preview/download only. Includes full-screen slide preview modal, DM trigger keywords, hashtags, reel script details, and send probability scoring.' },
       { file: 'dashboard/pages/CreativeBrief.tsx', name: 'Creative Brief', desc: 'CRUD interface for creative direction profiles. Each brief contains: title, notes/inspiration, competitor Instagram links (parsed from URLs), content angles (tag-style chips), mood & themes, visual style, and target emotions. The active brief (green border) guides AI content generation. Past briefs are listed with Activate/Edit/Delete buttons. Creating a new brief auto-deactivates the previous one.' },
       { file: 'dashboard/pages/AISettings.tsx', name: 'AI Settings', desc: 'CRUD interface for AI behavior profiles. Seven sections: (1) Claude Personality — system prompt textarea with Reset to Default, (2) Image Prompt Instructions — carousel design instruction and reel visual instruction textareas, (3) Image Generation Style — style prefix, suffix, and negative prompt, (4) Model Parameters — temperature slider, (5) Visual Intelligence Layer — default image model (FLUX 2 Pro/GPT Image/Ideogram), default video model (Kling 2.6 Pro), video generation toggle, quality gate toggle and min score, (6) Photography Anchors — camera body, default lens, default lighting, default color profile, (7) Segment Visual Styles — video motion style, hook/body/CTA visual styles. Profiles can be versioned, activated, and compared.' },
       { file: 'dashboard/pages/Analytics.tsx', name: 'Analytics', desc: '30-day performance overview. Summary cards: total reach, total sends, total saves, average engagement rate, average sends/reach %. Per-post table sorted by sends/reach showing every published post with individual metrics. "Refresh Analytics" button pulls latest data from Instagram Graph API.' },
@@ -504,7 +504,67 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     h2('9. Rendering Pipeline');
     p('The rendering pipeline converts JSON content scripts into publishable visual assets using the **Visual Intelligence Layer** — a multi-model AI pipeline with Claude-powered creative direction, automated quality validation, and self-learning prompt optimization. It uses Puppeteer (headless Chrome) for HTML→PNG rendering, FLUX 2 Pro / GPT Image / Ideogram for AI images, Kling 2.6 Pro for video generation, OpenAI TTS for voiceover audio, and ffmpeg for final video composition.');
 
-    h3('9.1 Carousel Rendering (Visual Intelligence)');
+    h3('9.1 Visual Intelligence Layer — Architecture');
+    p('The Visual Intelligence Layer is a 6-component AI pipeline that manages the entire visual creation workflow. Every image and video generated by the system flows through this pipeline. Source files live in `src/visual-intelligence/`.');
+
+    h4('Component 1: Creative Director (`creative-director.ts`)');
+    p('The brain of visual planning. A Claude AI agent that receives all content briefs in a batch and returns a VisualPlan for each segment. Uses raw `fetch()` to the Anthropic Messages API (not the SDK wrapper) with a specialized system prompt that instructs Claude to "brief a professional photographer."');
+    bullet('**Input:** Array of `VisualBrief` objects — each describes a segment\'s content type, on-screen text, original visual description, and brand context (niche, style prefix, color palette, mood)');
+    bullet('**Output:** Array of `VisualPlan` objects — each contains: `model` (flux-2-pro|gpt-image-1.5|ideogram-3), `prompt` (detailed photographic prompt), `negativePrompt`, `aspectRatio`, `generateVideo` (boolean), `motionPrompt` (for Kling), `lens`, `lighting`, `depthOfField`, `colorPalette`');
+    bullet('**Model selection logic:** FLUX 2 Pro is the default for photorealistic plant photography. GPT Image 1.5 is selected when text must appear in the image. Ideogram 3 is selected when typography IS the visual. The Creative Director decides per-segment.');
+    bullet('**Photography language:** Prompts use specific technical terms — "100mm f/2.8 macro lens" not "close-up", "warm side-lit golden hour light raking across leaves" not "nice lighting", "shallow depth of field, f/2.8, subject tack sharp against creamy bokeh" not "blurry background"');
+    bullet('**Safety rewriting:** If the content description mentions products, brands, clocks, timers, text, or before/after comparisons, the Creative Director rewrites the visual to be purely photographic. Example: "Mosquito Bits bag next to plant" → "Fine golden granules scattered across dark moist soil surface, macro close-up showing granule texture"');
+    bullet('**Fallback:** If Claude API fails or returns unparseable JSON, falls back to `buildFallbackPlan()` which uses the style anchor defaults and original visual description');
+    bullet('**`planVisualsBatch(briefs)`** — Plans all segments at once (batch efficiency). Returns `VisualPlan[]`');
+    bullet('**`retryPlan(brief, feedback)`** — Called by Quality Gate when an image fails validation. Sends the failure feedback to Claude and gets a revised plan with a better prompt');
+
+    h4('Component 2: Image Router (`image-router.ts`)');
+    p('Routes image generation to the correct model based on the Creative Director\'s plan. Runs the Quality Gate after generation and auto-retries with revised prompts on failure.');
+    bullet('**Input:** `VisualPlan`, `VisualBrief`, output directory, filename');
+    bullet('**Output:** `GeneratedImage` with path, model used, prompt, quality score, retry count');
+    bullet('**Model routing:** `switch(plan.model)` → `generateFlux2Pro()` | `generateGPTImage()` | `generateIdeogram()`');
+    bullet('**Quality Gate loop:** After each generation, if quality gate is enabled and not final attempt: validate → if failed, call `retryPlan()` for a refined prompt → regenerate. Max retries configurable via `QUALITY_GATE_MAX_RETRIES` (default: 2)');
+    bullet('**Fallback chain:** Primary model fails → fallback to FLUX 2 Pro → all attempts fail → legacy `generateBackground()` (replicate-api.ts) → gradient fallback via Puppeteer');
+
+    h4('Component 3: Video Router (`video-router.ts`)');
+    p('Generates video clips from still images using Kling 2.6 Pro via fal.ai. Called after Image Router for reel segments when video generation is enabled.');
+    bullet('**Input:** Image path, `VisualPlan`, output directory, filename');
+    bullet('**Output:** `GeneratedVideo` with path, model, duration, fromImage flag');
+    bullet('**Kling integration:** Uses `@fal-ai/client` package with dynamic import (`const { fal } = await import(\'@fal-ai/client\')`). Model endpoint: `fal-ai/kling-video/v2/master/image-to-video`. Supports 5s and 10s durations, 9:16 aspect ratio.');
+    bullet('**Motion prompt:** Uses `plan.motionPrompt` if Creative Director provided one, otherwise generates via `buildMotionPrompt()` from the Prompt Engineer');
+    bullet('**Graceful fallback:** If `FAL_API_KEY` not set or Kling fails, returns the still image path with `model: \'still-fallback\'`. The reel renderer then applies Ken Burns zoompan effect via ffmpeg.');
+    bullet('**Video-forced for reels:** The reel renderer overrides `plan.generateVideo = true` for all segments when video generation is enabled, even if the Creative Director returned false. This ensures reels always get Kling video when the feature is on.');
+
+    h4('Component 4: Quality Gate (`quality-gate.ts`)');
+    p('Uses Claude Vision (Anthropic Messages API with image content) to validate every AI-generated image. Scores 1-10 and provides specific feedback for retry improvement.');
+    bullet('**Validation checks:** No garbled/unreadable text, no collages or split-screen, no black bars or padding, subject clarity and focus, no unrealistic artifacts, brand alignment (mood for plant care)');
+    bullet('**Scoring:** 1-10 scale. Default pass threshold: 7 (configurable via `QUALITY_GATE_MIN_SCORE`)');
+    bullet('**Feedback:** On failure, returns specific issues (e.g., "garbled text in top-left", "image appears to be a collage") that feed back to Creative Director\'s `retryPlan()` for prompt refinement');
+    bullet('**Self-learning:** All results (model, prompt hash, score, pass/fail, feedback, retry count) logged to `visual_quality_log` SQLite table. `getTopPromptPatterns()` queries this table to identify which prompt patterns consistently score high, feeding back into future prompt generation');
+    bullet('**Bypass:** When `QUALITY_GATE_ENABLED=false` or on final attempt, images are accepted as-is without validation');
+
+    h4('Component 5: Prompt Engineer (`prompt-engineer.ts`)');
+    p('Builds model-optimized final prompts by combining the Creative Director\'s plan with style anchors, photography vocabulary, and brand context.');
+    bullet('**`buildFinalPrompt(plan, brief)`** — Combines plan.prompt with style anchor prefix/suffix, brand context, and model-specific optimizations');
+    bullet('**`buildNegativePrompt(plan)`** — Combines plan.negativePrompt with universal negative prompt rules');
+    bullet('**`buildMotionPrompt(plan, brief)`** — Generates motion descriptions for Kling video generation based on segment type (hook = dramatic motion, body = subtle, CTA = warm zoom)');
+
+    h4('Component 6: Knowledge Base (`knowledge/`)');
+    p('Static and dynamic knowledge that informs the Creative Director and Prompt Engineer:');
+    bullet('**`style-anchors.ts`** — Loads photography defaults from AI Settings DB: camera body (Canon R5), default lens (100mm f/2.8L Macro IS), default lighting, default color profile, image style prefix/suffix/negative prompt. Falls back to `DEFAULT_ANCHOR` constants.');
+    bullet('**`photography-vocabulary.ts`** — Reference data: `LENS_TYPES` (8 lens profiles with use cases), `LIGHTING_STYLES` (12 styles), `DEPTH_OF_FIELD` (5 options), `COLOR_PALETTES` (8 palettes), `FILM_STOCKS` (6 film emulation profiles). Each entry has `name` and `use` fields.');
+    bullet('**`model-rules.ts`** — `UNIVERSAL_NEVER` (array of things AI models must never generate: garbled text, collages, black bars, watermarks, deformed anatomy), `UNIVERSAL_ALWAYS` (always: single subject, consistent lighting, brand mood), `MODEL_TIPS` (per-model optimization tips for FLUX, GPT Image, Ideogram)');
+    bullet('**`prompt-templates.ts`** — `SEGMENT_STYLE_HINTS` (hook/body/CTA style guidance), `CONTENT_TYPE_HINTS` (carousel/reel/story visual approach)');
+
+    h4('Component 7: Model Implementations (`models/`)');
+    p('Individual model wrappers that handle the specific API calls:');
+    bullet('**`flux-2-pro.ts`** — Replicate SDK integration. Calls `black-forest-labs/flux-2-pro`. Uses `aspect_ratio` string parameter (not width/height). Handles Replicate SDK `FileOutput` return type (which extends ReadableStream) — extracts the download URL via `String(output)`. Settings: `prompt_upsampling: true`, `guidance: 3.5`, `safety_tolerance: 5`.');
+    bullet('**`gpt-image.ts`** — Raw `fetch()` to OpenAI API (`https://api.openai.com/v1/images/generations`). Model: `gpt-image-1`. Response format: `b64_json`. Size mapping: 1:1→1024x1024, 9:16→1024x1536, 16:9→1536x1024. Quality: high.');
+    bullet('**`ideogram.ts`** — Raw `fetch()` to Ideogram API (`https://api.ideogram.ai/api/v1/ideogram-v3/generate`). Aspect ratio mapping: 1:1→ASPECT_1_1, 9:16→ASPECT_9_16, 16:9→ASPECT_16_9. Supports negative prompts natively.');
+    bullet('**`kling-video.ts`** — fal.ai client integration. Dynamic import: `const { fal } = await import(\'@fal-ai/client\')`. Model: `fal-ai/kling-video/v2/master/image-to-video`. Uploads image to fal storage first, then runs inference. Supports 5s and 10s duration. Returns MP4.');
+    bullet('**`model-registry.ts`** — `MODEL_REGISTRY` Record keyed by `ImageModel`. Each entry has: `id`, `name`, `strengths`, `weaknesses`, `bestFor`, `costPerImage`, `avgGenerationSeconds`, `maxPromptLength`, `supportsNegativePrompt`. Used by Creative Director for informed model selection.');
+
+    h3('9.2 Carousel Rendering (Visual Intelligence)');
     p('Carousels are rendered as a set of 1080x1080 PNG images (one per slide). The Visual Intelligence pipeline plans, generates, and validates every image.');
     bullet('Parse the script JSON into slide objects with type (hook/value/CTA), headline, bodyText, designNotes, and textHierarchy');
     bullet('Build VisualBriefs for all slides, then send to Creative Director (Claude AI) via `planVisualsBatch()` — returns a VisualPlan per slide with model selection, photographic prompt, lens, lighting, DoF, color palette');
@@ -514,22 +574,32 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     bullet('Render HTML template with generated background image, brand colors, fonts, and text content');
     bullet('Screenshot with Puppeteer at 1080x1080, upload all PNGs to Cloudinary');
 
-    h3('9.2 Reel Rendering (Visual Intelligence + Video)');
+    h3('9.3 Reel Rendering (Visual Intelligence + Video)');
     p('Reels are rendered as MP4 videos with AI-generated images and video, text overlays, and per-segment voiceover. Audio drives timing — each segment\'s visual duration is set by its voiceover audio length.');
-    bullet('**Step 1 — Parse script JSON:** Extract segments (hook, body[], CTA) with on-screen text, voiceover scripts, visual descriptions, and timestamps. Supports multiple timestamp formats including number types and strings like `"4-7s"`, `"0:02-0:05"`.');
-    bullet('**Step 2 — Creative Director planning:** Build VisualBriefs for all segments, send to Creative Director via `planVisualsBatch()`. Returns per-segment VisualPlans with model, photographic prompt, motion prompt for video, lens/lighting/DoF/color specifications.');
-    bullet('**Step 3 — Per-segment TTS:** Generate OpenAI TTS audio for each segment individually. Probe each clip\'s duration via ffprobe, set visual segment duration = audio duration + 0.3s buffer.');
-    bullet('**Step 4 — AI image generation:** Image Router generates per-segment background images via planned model (default FLUX 2 Pro, 9:16 aspect). Quality Gate validates each image with auto-retry on failure.');
-    bullet('**Step 5 — AI video generation:** Video Router sends each still image + motion prompt to Kling 2.6 Pro (fal.ai) for image-to-video generation. Gracefully falls back to still image when video gen is disabled, FAL_API_KEY not set, or Kling fails.');
-    bullet('**Step 6 — Text overlays:** Render transparent PNG overlays via Puppeteer using `reelOverlayHtml()` templates.');
-    bullet('**Step 7 — Audio stitching:** Concatenate all per-segment audio clips into one voiceover track via ffmpeg.');
-    bullet('**Step 8 — Video composition:** ffmpeg composes the final MP4. For segments with Kling video: uses the .mp4 clip directly. For segments with still images: applies Ken Burns zoompan effect. All segments joined with crossfade transitions, voiceover audio track overlaid.');
-    bullet('**Fallback chain:** Kling fails → Ken Burns on still. Image gen fails → gradient background. TTS fails → silent audio. Quality Gate logs all results for learning.');
+    bullet('**Step 1 — Parse script JSON:** Extract segments (hook, body[], CTA) with on-screen text, voiceover scripts, visual descriptions, and timestamps. Supports multiple timestamp formats including number types and strings like `"4-7s"`, `"0:02-0:05"`. Voiceover is extracted from multiple field name variants: `voiceover`, `voiceoverScript`, `audio`.');
+    bullet('**Step 2 — Creative Director planning:** Build VisualBriefs for all segments, send to Creative Director via `planVisualsBatch()`. Returns per-segment VisualPlans with model, photographic prompt, motion prompt for video, lens/lighting/DoF/color specifications. The reel renderer forces `generateVideo=true` for all segments when video generation is enabled.');
+    bullet('**Step 3 — Per-segment TTS:** Generate OpenAI TTS audio for each segment individually (hook, each body segment, CTA). Probe each clip\'s actual duration via ffprobe, set visual segment duration = audio duration + 0.3s buffer. This ensures perfect audio-visual sync. Falls back to generated silent audio on TTS failure.');
+    bullet('**Step 4 — AI image generation:** Image Router generates per-segment background images via planned model (default FLUX 2 Pro, 9:16 aspect). Quality Gate validates each image with auto-retry on failure. Detailed logging shows model used, prompt, and quality score for each segment.');
+    bullet('**Step 5 — AI video generation:** Video Router sends each still image + motion prompt to Kling 2.6 Pro (fal.ai) for image-to-video generation. Generates 5-second clips per segment. The reel renderer reads `isVideoEnabled` from both the AI Settings database AND the `ENABLE_VIDEO_GENERATION` env var, and requires `FAL_API_KEY` to be set. Falls back to still image (Ken Burns applied later) when disabled or failed.');
+    bullet('**Step 6 — Text overlays:** Render transparent PNG overlays via Puppeteer using `reelOverlayHtml()` templates at 1080x1920.');
+    bullet('**Step 7 — Audio stitching:** Concatenate all per-segment audio clips into one continuous voiceover track via ffmpeg.');
+    bullet('**Step 8 — Video composition:** ffmpeg composes the final MP4 using a complex filter graph. For segments with Kling video clips (.mp4): scales to 1080x1920 and trims to segment duration. For segments with still images: applies Ken Burns zoompan effect (slow zoom to 1.03x) to generate video frames. All segments joined with 0.3s crossfade transitions. Transparent text overlay composited on each segment. Voiceover audio track mixed in. Output: H.264 video, AAC audio, 25fps, yuv420p pixel format, faststart flag for web streaming.');
+    bullet('**Fallback chain:** Kling fails → Ken Burns on still. FLUX 2 Pro fails → legacy generateBackground() → gradient fallback via Puppeteer. TTS fails → silent audio. Quality Gate logs all results to visual_quality_log for self-learning.');
 
-    h3('9.3 Story Rendering');
-    p('Stories are rendered as 1080x1920 PNG frames (9:16 vertical) with interactive overlay mockups for polls, questions, sliders, and DM triggers.');
+    h3('9.4 Story Rendering');
+    p('Stories are rendered as 1080x1920 PNG frames (9:16 vertical) with interactive overlay mockups for polls, questions, sliders, and DM triggers. Uses the same Visual Intelligence pipeline as carousels but with 9:16 aspect ratio.');
 
-    h3('9.4 Source Code');
+    h3('9.5 Asset Pipeline Orchestration (`asset-pipeline.ts`)');
+    p('The central orchestrator that routes scripts to the correct renderer, handles Cloudinary upload, and stores results in the database.');
+    bullet('**`renderScript(scriptId)`** — Loads script from DB, detects content_type (carousel/reel/story), calls the appropriate renderer, uploads results to Cloudinary, stores paths in `rendered_assets` table');
+    bullet('**`renderDailyPackage()`** — Batch renders all scripted/approved content for today. Each content type renders independently — failures are isolated.');
+    bullet('**`getRenderConfig()`** — Loads brand system (colors, fonts, handle) from the active `brand_system` DB entry');
+    bullet('**Cloudinary upload:** Carousel PNGs are batch-uploaded via `uploadImages()`. Reel MP4s are uploaded via `uploadVideo()`. Organized into folders: `ig-engine/carousel-{id}`, `ig-engine/reel-{id}`.');
+
+    h3('9.6 Replicate SDK Compatibility Note');
+    p('**Critical implementation detail:** The Replicate Node.js SDK (v1.x) changed its return type. `replicate.run()` now returns a `FileOutput` object (which extends `ReadableStream`) instead of an array of URL strings. `JSON.stringify(output)` returns `{}` (empty object) because FileOutput has no enumerable properties. The correct way to extract the image URL is `String(output)`, which returns the download URL. Both `src/visual-intelligence/models/flux-2-pro.ts` and `src/integrations/replicate-api.ts` use this pattern. The model also expects `aspect_ratio` as a string parameter (e.g., "9:16") rather than explicit `width`/`height` pixel values.');
+
+    h3('9.7 Source Code');
     const renderFiles = live?.sourceTree.rendering || [];
     renderFiles.forEach(f => {
       h4(`\`src/${f}\``);
@@ -825,7 +895,7 @@ Content Calendar:
 function PagesSection() {
   const pages = [
     { name: 'Pipeline', desc: 'Real-time pipeline status showing current phase, errors, and content package preview with manual trigger.', features: ['Phase status cards', 'Error display', 'Package preview', 'Manual trigger', 'Auto-refresh'] },
-    { name: 'Content', desc: 'Unified content hub with thumbnails, approve/render/publish/schedule actions, caption & hashtag preview.', features: ['Thumbnail grid', 'Approve/Render/Publish', 'Post to Instagram', 'Schedule', 'Regenerate'] },
+    { name: 'Content', desc: 'Unified content hub with 5 filter tabs (All/Not Rendered/Rendered/Approved/Posted), date-grouped cards sorted newest first, status badges, and context-sensitive actions per status.', features: ['Filter tabs with counts', 'Date grouping', 'Status badges', 'Approve/Render', 'Post to Instagram', 'Schedule', 'Regenerate', 'Preview/Download', 'Slide preview modal'] },
     { name: 'Brief', desc: 'Creative direction: angles, mood, visual style, competitor links, target emotions. CRUD with active toggle.', features: ['Profile CRUD', 'Active highlighting', 'Competitor links', 'Content angles', 'Past briefs'] },
     { name: 'AI Settings', desc: 'Claude system prompt, image style, Visual Intelligence config (model selection, quality gate, photography anchors, segment styles). Multiple profiles.', features: ['System prompt editor', 'Image style', 'Model selection', 'Quality Gate config', 'Photography anchors', 'Segment styles', 'Temperature', 'Reset to Default'] },
     { name: 'Analytics', desc: '30-day overview: reach, sends, saves, engagement. Per-post metrics table.', features: ['Summary cards', 'Per-post table', 'Sends/reach', 'Refresh trigger'] },
@@ -1043,20 +1113,122 @@ function RenderingSection() {
       <SectionCard title="Rendering Pipeline Overview">
         <p className="text-sm text-gray-300">The rendering pipeline converts JSON scripts into publishable visual assets using the <strong className="text-purple-400">Visual Intelligence Layer</strong> — a multi-model AI pipeline with Claude-powered creative direction, automated quality validation, and self-learning prompt optimization. Carousels become PNG slides, reels become MP4 videos (with Kling AI video or Ken Burns stills), and stories become PNG frames. All assets are uploaded to Cloudinary.</p>
       </SectionCard>
-      <SectionCard title="Visual Intelligence Pipeline">
-        <div className="text-sm text-gray-400 space-y-1 mt-2">
-          <p><strong className="text-purple-400">Creative Director</strong> — Claude AI plans every visual with photographic language: model selection, lens type, lighting, depth of field, color palette, motion prompt</p>
-          <p><strong className="text-blue-400">Prompt Engineer</strong> — Builds model-optimized prompts using photography vocabulary, model rules, style anchors, and self-learning patterns from quality log</p>
-          <p><strong className="text-green-400">Image Router</strong> — Routes to FLUX 2 Pro (default), GPT Image 1.5 (photorealistic), or Ideogram 3.0 (typography) based on Creative Director plan</p>
-          <p><strong className="text-yellow-400">Quality Gate</strong> — Claude Vision validates every image (technical checks + AI scoring 1-10), auto-retries with Creative Director-revised prompts</p>
-          <p><strong className="text-pink-400">Video Router</strong> — Routes to Kling 2.6 Pro via fal.ai for image-to-video. Graceful fallback to Ken Burns zoom stills</p>
-          <p><strong className="text-orange-400">Knowledge Base</strong> — Photography vocabulary, model-specific rules, style anchors, prompt templates</p>
+
+      <SectionCard title="Visual Intelligence Layer — Architecture">
+        <p className="text-sm text-gray-400 mb-4">6-component AI pipeline in <code className="text-purple-400">src/visual-intelligence/</code>. Every image and video flows through this system.</p>
+        <div className="space-y-4">
+          <div className="bg-gray-800 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-purple-400 mb-2">1. Creative Director <code className="text-gray-500 text-xs ml-2">creative-director.ts</code></h4>
+            <p className="text-xs text-gray-400 mb-2">The brain. Claude AI receives all content briefs in batch and returns a VisualPlan per segment. Uses raw fetch() to Anthropic Messages API with a "brief a professional photographer" system prompt.</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>- <strong className="text-gray-300">planVisualsBatch(briefs)</strong> — Batch plans all segments. Returns VisualPlan[] with model, photographic prompt, motion prompt, lens/lighting/DoF/color</p>
+              <p>- <strong className="text-gray-300">retryPlan(brief, feedback)</strong> — Called by Quality Gate on failure. Gets a revised plan with better prompt</p>
+              <p>- Model selection: FLUX 2 Pro (photorealistic default) | GPT Image 1.5 (text-in-image) | Ideogram 3 (typography-first)</p>
+              <p>- Safety rewriting: "Mosquito Bits bag" → "Fine golden granules on dark soil surface, macro close-up"</p>
+              <p>- Fallback: If Claude API fails → buildFallbackPlan() with style anchor defaults</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-green-400 mb-2">2. Image Router <code className="text-gray-500 text-xs ml-2">image-router.ts</code></h4>
+            <p className="text-xs text-gray-400 mb-2">Routes to correct model, runs Quality Gate, auto-retries with Creative Director-revised prompts on failure.</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>- <strong className="text-gray-300">generateImage(plan, brief, dir, file)</strong> → GeneratedImage (path, model, prompt, qualityScore, retryCount)</p>
+              <p>- Quality Gate loop: generate → validate (1-10) → if failed, retryPlan() → regenerate (max retries: configurable)</p>
+              <p>- Fallback chain: Primary fails → FLUX 2 Pro → legacy generateBackground() → gradient via Puppeteer</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-pink-400 mb-2">3. Video Router <code className="text-gray-500 text-xs ml-2">video-router.ts</code></h4>
+            <p className="text-xs text-gray-400 mb-2">Kling 2.6 Pro via fal.ai for image-to-video. Forced on for reels when enabled.</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>- <strong className="text-gray-300">generateVideo(imagePath, plan, dir, file)</strong> → GeneratedVideo (path, model, duration)</p>
+              <p>- Uses @fal-ai/client with dynamic import. Endpoint: fal-ai/kling-video/v2/master/image-to-video</p>
+              <p>- Reel renderer forces generateVideo=true even if Creative Director returned false</p>
+              <p>- Fallback: FAL_API_KEY missing or Kling fails → returns still image (Ken Burns applied by ffmpeg)</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-yellow-400 mb-2">4. Quality Gate <code className="text-gray-500 text-xs ml-2">quality-gate.ts</code></h4>
+            <p className="text-xs text-gray-400 mb-2">Claude Vision validates every image. Scores 1-10 with specific feedback for retry improvement.</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>- Checks: no garbled text, no collages, no black bars, subject clarity, no artifacts, brand alignment</p>
+              <p>- Pass threshold: 7 (configurable). Failed images get feedback → retryPlan() → regenerate</p>
+              <p>- Self-learning: All results logged to visual_quality_log table (model, score, pass/fail, retry count)</p>
+              <p>- <strong className="text-gray-300">getTopPromptPatterns()</strong> — Queries log for high-scoring patterns to improve future prompts</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-blue-400 mb-2">5. Prompt Engineer <code className="text-gray-500 text-xs ml-2">prompt-engineer.ts</code></h4>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>- <strong className="text-gray-300">buildFinalPrompt(plan, brief)</strong> — Combines plan.prompt + style anchors + brand context</p>
+              <p>- <strong className="text-gray-300">buildNegativePrompt(plan)</strong> — Combines plan + universal negative rules</p>
+              <p>- <strong className="text-gray-300">buildMotionPrompt(plan, brief)</strong> — Motion descriptions for Kling (hook=dramatic, body=subtle, CTA=warm zoom)</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-orange-400 mb-2">6. Knowledge Base <code className="text-gray-500 text-xs ml-2">knowledge/</code></h4>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>- <strong className="text-gray-300">style-anchors.ts</strong> — Camera: Canon R5, Lens: 100mm f/2.8L Macro, loaded from AI Settings DB</p>
+              <p>- <strong className="text-gray-300">photography-vocabulary.ts</strong> — 8 lens types, 12 lighting styles, 5 DoF options, 8 color palettes, 6 film stocks</p>
+              <p>- <strong className="text-gray-300">model-rules.ts</strong> — UNIVERSAL_NEVER/ALWAYS rules, per-model tips for FLUX/GPT/Ideogram</p>
+              <p>- <strong className="text-gray-300">prompt-templates.ts</strong> — Segment style hints (hook/body/CTA), content type hints (carousel/reel/story)</p>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2 mt-3">
+
+        <div className="flex flex-wrap gap-2 mt-4">
           <Tag color="purple">Creative Director</Tag><Tag color="blue">Prompt Engineer</Tag><Tag color="green">Image Router</Tag><Tag color="yellow">Quality Gate</Tag><Tag color="pink">Video Router</Tag><Tag color="orange">Knowledge Base</Tag>
         </div>
       </SectionCard>
-      <SectionCard title="Carousel Rendering (Visual Intelligence)">
+
+      <SectionCard title="Model Implementations">
+        <p className="text-xs text-gray-500 mb-3">Source: <code className="text-purple-400">src/visual-intelligence/models/</code></p>
+        <div className="space-y-3">
+          <div className="bg-gray-800 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <strong className="text-green-400 text-sm">FLUX 2 Pro</strong>
+              <code className="text-gray-600 text-xs">flux-2-pro.ts</code>
+              <Tag color="green">Default</Tag>
+            </div>
+            <p className="text-xs text-gray-500">Replicate SDK → black-forest-labs/flux-2-pro. Uses aspect_ratio string (not width/height). SDK returns FileOutput (extends ReadableStream) — extract URL via String(output). Settings: prompt_upsampling, guidance: 3.5, safety_tolerance: 5.</p>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <strong className="text-blue-400 text-sm">GPT Image 1.5</strong>
+              <code className="text-gray-600 text-xs">gpt-image.ts</code>
+            </div>
+            <p className="text-xs text-gray-500">Raw fetch to OpenAI API. Model: gpt-image-1. Sizes: 1:1→1024x1024, 9:16→1024x1536, 16:9→1536x1024. Response: b64_json. Best for photorealism and text-in-image.</p>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <strong className="text-yellow-400 text-sm">Ideogram 3.0</strong>
+              <code className="text-gray-600 text-xs">ideogram.ts</code>
+            </div>
+            <p className="text-xs text-gray-500">Raw fetch to api.ideogram.ai. Aspect: ASPECT_1_1/ASPECT_9_16/ASPECT_16_9. Supports negative prompts. Best for typography, logos, social cards.</p>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <strong className="text-pink-400 text-sm">Kling 2.6 Pro</strong>
+              <code className="text-gray-600 text-xs">kling-video.ts</code>
+            </div>
+            <p className="text-xs text-gray-500">fal.ai client (dynamic import). Endpoint: fal-ai/kling-video/v2/master/image-to-video. Uploads image to fal storage → inference. 5s/10s duration, 9:16 aspect. Returns MP4.</p>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <strong className="text-gray-300 text-sm">Model Registry</strong>
+              <code className="text-gray-600 text-xs">model-registry.ts</code>
+            </div>
+            <p className="text-xs text-gray-500">MODEL_REGISTRY Record: id, name, strengths, weaknesses, bestFor, costPerImage, avgGenerationSeconds, maxPromptLength, supportsNegativePrompt. Used by Creative Director for informed decisions.</p>
+          </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Carousel Rendering">
         <FileEntry path="src/rendering/carousel-renderer.ts" description="Generates 1080x1080 PNG slides via Visual Intelligence + Puppeteer" />
         <div className="text-sm text-gray-400 space-y-1 mt-2">
           <p>1. Parse script JSON into slide objects (hook, value, CTA types)</p>
@@ -1067,35 +1239,69 @@ function RenderingSection() {
           <p>6. Screenshot with Puppeteer at 1080x1080, upload to Cloudinary</p>
         </div>
       </SectionCard>
-      <SectionCard title="Reel Rendering (Visual Intelligence + Video)">
-        <FileEntry path="src/rendering/reel-renderer.ts" description="Generates MP4 with AI images, Kling video, TTS voiceover, and ffmpeg composition" />
-        <div className="text-sm text-gray-400 space-y-1 mt-2">
-          <p>1. Parse script JSON into segments (hook, body[], CTA) with voiceover text</p>
-          <p>2. Creative Director plans all segments via planVisualsBatch() — model, prompt, motion, lens/lighting</p>
-          <p>3. Generate TTS audio per segment via OpenAI — audio duration drives visual timing</p>
-          <p>4. Image Router generates per-segment background images with Quality Gate validation</p>
-          <p>5. Video Router sends stills to Kling 2.6 Pro for image-to-video (falls back to Ken Burns zoom)</p>
-          <p>6. Render text overlay PNGs via Puppeteer</p>
-          <p>7. Concatenate audio clips into one voiceover track</p>
-          <p>8. Compose MP4 with ffmpeg: video clips or zoompan stills + crossfade + synced audio</p>
+
+      <SectionCard title="Reel Rendering (Visual Intelligence + Kling Video)">
+        <FileEntry path="src/rendering/reel-renderer.ts" description="Generates MP4 with AI stills → Kling video clips, TTS voiceover, and ffmpeg composition" />
+        <div className="text-sm text-gray-400 space-y-2 mt-2">
+          <div className="bg-gray-800/50 rounded p-2">
+            <p className="text-xs text-purple-400 font-semibold mb-1">Step 1: Parse Script</p>
+            <p className="text-xs">Extract segments (hook, body[], CTA) with on-screen text, voiceover scripts (fields: voiceover, voiceoverScript, audio), visual descriptions. Supports timestamp formats: "4-7s", "0:02-0:05", plain numbers.</p>
+          </div>
+          <div className="bg-gray-800/50 rounded p-2">
+            <p className="text-xs text-purple-400 font-semibold mb-1">Step 2: Creative Director Planning</p>
+            <p className="text-xs">planVisualsBatch() sends all briefs to Claude. Returns per-segment plans with model, prompt, motion prompt, lens/lighting/DoF. Reel renderer forces generateVideo=true when video is enabled.</p>
+          </div>
+          <div className="bg-gray-800/50 rounded p-2">
+            <p className="text-xs text-blue-400 font-semibold mb-1">Step 3: Per-Segment TTS</p>
+            <p className="text-xs">OpenAI TTS generates audio per segment. ffprobe measures actual duration. Visual segment = audio + 0.3s buffer. Perfect audio-visual sync. Silent fallback on TTS failure.</p>
+          </div>
+          <div className="bg-gray-800/50 rounded p-2">
+            <p className="text-xs text-green-400 font-semibold mb-1">Step 4: AI Image Generation</p>
+            <p className="text-xs">Image Router generates 9:16 stills per segment. Quality Gate (Claude Vision) validates 1-10. Below threshold → Creative Director revises prompt → retry. Detailed logging per segment.</p>
+          </div>
+          <div className="bg-gray-800/50 rounded p-2">
+            <p className="text-xs text-pink-400 font-semibold mb-1">Step 5: Kling Video Generation</p>
+            <p className="text-xs">Video Router sends each still + motion prompt to Kling 2.6 Pro (fal.ai). 5s clips per segment. Requires FAL_API_KEY + ENABLE_VIDEO_GENERATION. Reads both env var and AI Settings DB. Falls back to still image (Ken Burns applied in Step 8).</p>
+          </div>
+          <div className="bg-gray-800/50 rounded p-2">
+            <p className="text-xs text-yellow-400 font-semibold mb-1">Step 6: Text Overlays</p>
+            <p className="text-xs">Puppeteer renders transparent PNG overlays via reelOverlayHtml() at 1080x1920. Brand colors, fonts, and text hierarchy applied.</p>
+          </div>
+          <div className="bg-gray-800/50 rounded p-2">
+            <p className="text-xs text-orange-400 font-semibold mb-1">Step 7-8: Audio Stitch + Video Composition</p>
+            <p className="text-xs">ffmpeg concatenates audio → builds complex filter graph. Kling clips: scale/trim to duration. Stills: zoompan Ken Burns (zoom to 1.03x). 0.3s crossfade transitions. Text overlay composited. H.264, AAC, 25fps, yuv420p, faststart.</p>
+          </div>
+        </div>
+        <div className="mt-3 bg-red-900/10 border border-red-800/30 rounded-lg p-3">
+          <p className="text-xs text-red-400 font-semibold mb-1">Fallback Chain</p>
+          <p className="text-xs text-gray-500">Kling fails → Ken Burns on still | Image gen fails → gradient background via Puppeteer | TTS fails → silent audio | Quality Gate logs all for self-learning</p>
         </div>
       </SectionCard>
+
       <SectionCard title="Story Rendering">
         <FileEntry path="src/rendering/story-renderer.ts" description="Generates 1080x1920 PNG frames with interactive overlays" />
         <div className="text-sm text-gray-400 space-y-1 mt-2">
           <p>1. Parse story sequence into slides</p>
-          <p>2. Render each slide as 1080x1920 PNG (9:16 vertical)</p>
-          <p>3. Add interactive overlays: polls, questions, sliders, DM triggers</p>
-          <p>4. Semi-transparent text overlays with brand styling</p>
+          <p>2. Visual Intelligence pipeline generates 9:16 backgrounds (same flow as carousel)</p>
+          <p>3. Render each slide as 1080x1920 PNG with brand styling</p>
+          <p>4. Add interactive overlays: polls, questions, sliders, DM triggers</p>
         </div>
       </SectionCard>
-      <SectionCard title="Supporting Files">
+
+      <SectionCard title="Asset Pipeline + Supporting Files">
+        <FileEntry path="src/rendering/asset-pipeline.ts" description="Orchestrates: renderScript() detects content type → calls renderer → Cloudinary upload → DB storage" />
         <FileEntry path="src/rendering/templates.ts" description="HTML/CSS templates for all slide types" />
+        <FileEntry path="src/rendering/browser-pool.ts" description="Puppeteer instance pooling for concurrent rendering" />
         <div className="flex flex-wrap gap-2 mt-2">
           <Tag color="blue">hookSlideHtml()</Tag><Tag color="blue">valueSlideHtml()</Tag><Tag color="blue">ctaSlideHtml()</Tag><Tag color="pink">storyOverlayHtml()</Tag><Tag color="purple">reelOverlayHtml()</Tag>
         </div>
-        <FileEntry path="src/rendering/asset-pipeline.ts" description="Orchestrates rendering + Cloudinary upload + database storage. Propagates actual render errors to the dashboard." />
-        <FileEntry path="src/rendering/browser-pool.ts" description="Puppeteer instance pooling for efficient concurrent rendering" />
+      </SectionCard>
+
+      <SectionCard title="Replicate SDK Compatibility">
+        <div className="bg-yellow-900/10 border border-yellow-800/30 rounded-lg p-3">
+          <p className="text-xs text-yellow-400 font-semibold mb-1">Critical Implementation Detail</p>
+          <p className="text-xs text-gray-400">Replicate SDK v1.x changed return type. <code className="text-purple-400">replicate.run()</code> returns <code className="text-purple-400">FileOutput</code> (extends ReadableStream), NOT an array of URLs. <code className="text-purple-400">JSON.stringify(output)</code> returns <code className="text-gray-500">{'{}'}</code> (empty). Extract URL via <code className="text-purple-400">String(output)</code>. Model uses <code className="text-purple-400">aspect_ratio</code> string param, not width/height pixels. Both flux-2-pro.ts and replicate-api.ts use this pattern.</p>
+        </div>
       </SectionCard>
     </div>
   );

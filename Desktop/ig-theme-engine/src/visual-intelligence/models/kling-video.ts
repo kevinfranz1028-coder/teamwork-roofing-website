@@ -1,99 +1,77 @@
-// Kling 2.6 Pro via fal.ai — Image-to-Video generation
-import * as fal from '@fal-ai/serverless-client';
-import { writeFile, readFile } from 'fs/promises';
+import { writeFile } from 'fs/promises';
+import { readFileSync, mkdirSync, existsSync } from 'fs';
 import path from 'path';
-import { mkdirSync, existsSync } from 'fs';
-
-let configured = false;
-
-function ensureConfig() {
-  if (!configured) {
-    const apiKey = process.env.FAL_API_KEY;
-    if (!apiKey) throw new Error('FAL_API_KEY not set');
-    fal.config({ credentials: apiKey });
-    configured = true;
-  }
-}
+import type { GeneratedVideo } from '../types.js';
+import { logApiCost } from '../../utils/cost-tracker.js';
 
 export async function generateVideoFromImage(
   imagePath: string,
   motionPrompt: string,
-  duration: 5 | 10,
-  outputPath: string
-): Promise<string> {
-  ensureConfig();
+  outputDir: string,
+  filename: string,
+  durationSeconds: number = 5
+): Promise<GeneratedVideo> {
+  if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
 
-  const dir = path.dirname(outputPath);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  const apiKey = process.env.FAL_API_KEY;
+  if (!apiKey) throw new Error('FAL_API_KEY not set — cannot use Kling video');
 
-  // Upload source image to fal storage
-  const imageBuffer = await readFile(imagePath);
-  const imageBlob = new Blob([imageBuffer], { type: 'image/png' });
-  const imageUrl = await fal.storage.upload(imageBlob);
+  // Dynamic import for fal client
+  const { fal } = await import('@fal-ai/client');
+  fal.config({ credentials: apiKey });
 
-  console.log(`    Kling: generating ${duration}s video from still...`);
+  console.log(`    [Kling 2.6 Pro] Generating ${durationSeconds}s video from still...`);
 
-  const result = await fal.subscribe('fal-ai/kling-video/v2.6/pro/image-to-video', {
+  // Read image as data URI
+  const imageBuffer = readFileSync(imagePath);
+  const base64 = imageBuffer.toString('base64');
+  const ext = path.extname(imagePath).replace('.', '') || 'png';
+  const dataUri = `data:image/${ext};base64,${base64}`;
+
+  // Upload image to fal storage
+  const imageUrl = await fal.storage.upload(new Blob([imageBuffer], { type: `image/${ext}` }));
+
+  const result = await fal.subscribe('fal-ai/kling-video/v2.5-turbo/pro/image-to-video', {
     input: {
       prompt: motionPrompt,
       image_url: imageUrl,
-      duration: String(duration),
+      duration: durationSeconds <= 5 ? '5' : '10',
       aspect_ratio: '9:16',
-    },
+    } as any,
     logs: true,
     onQueueUpdate: (update: any) => {
       if (update.status === 'IN_PROGRESS') {
-        const msg = update.logs?.[update.logs.length - 1]?.message || 'processing...';
-        console.log(`    Kling: ${msg}`);
-      }
-    },
-  }) as any;
-
-  // Download the generated video
-  const videoUrl = result.data?.video?.url || result.video?.url;
-  if (!videoUrl) throw new Error('No video URL in Kling response');
-
-  const videoRes = await fetch(videoUrl);
-  const videoBuffer = Buffer.from(await videoRes.arrayBuffer());
-  await writeFile(outputPath, videoBuffer);
-
-  console.log(`    Kling: video saved (${(videoBuffer.length / 1024 / 1024).toFixed(1)}MB)`);
-  return outputPath;
-}
-
-export async function generateVideoFromText(
-  textPrompt: string,
-  duration: 5 | 10,
-  outputPath: string
-): Promise<string> {
-  ensureConfig();
-
-  const dir = path.dirname(outputPath);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-
-  console.log(`    Kling: generating ${duration}s video from text prompt...`);
-
-  const result = await fal.subscribe('fal-ai/kling-video/v2.6/pro/text-to-video', {
-    input: {
-      prompt: textPrompt,
-      duration: String(duration),
-      aspect_ratio: '9:16',
-    },
-    logs: true,
-    onQueueUpdate: (update: any) => {
-      if (update.status === 'IN_PROGRESS') {
-        const msg = update.logs?.[update.logs.length - 1]?.message || 'processing...';
-        console.log(`    Kling: ${msg}`);
+        const msgs = update.logs?.map((l: any) => l.message).filter(Boolean) || [];
+        if (msgs.length > 0) console.log(`      Kling: ${msgs[msgs.length - 1]}`);
       }
     },
   }) as any;
 
   const videoUrl = result.data?.video?.url || result.video?.url;
-  if (!videoUrl) throw new Error('No video URL in Kling t2v response');
+  if (!videoUrl) throw new Error('Kling returned no video URL');
 
-  const videoRes = await fetch(videoUrl);
-  const videoBuffer = Buffer.from(await videoRes.arrayBuffer());
+  const videoResponse = await fetch(videoUrl);
+  const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+
+  const outputPath = path.join(outputDir, filename);
   await writeFile(outputPath, videoBuffer);
 
-  return outputPath;
+  console.log(`    [Kling 2.6 Pro] Saved: ${filename} (${durationSeconds}s)`);
+
+  logApiCost({
+    provider: 'fal',
+    category: 'video',
+    endpoint: 'fal-ai/kling-video/v2.5-turbo/pro/image-to-video',
+    model: 'kling-2.5-turbo-pro',
+    description: `Video: ${motionPrompt.slice(0, 60)}`,
+    estimatedCost: durationSeconds <= 5 ? 0.35 : 0.70,
+    durationMs: durationSeconds * 1000,
+  });
+
+  return {
+    path: outputPath,
+    model: 'kling-2.6-pro',
+    durationSeconds,
+    fromImage: true,
+  };
 }

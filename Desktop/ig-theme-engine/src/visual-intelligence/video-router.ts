@@ -1,66 +1,48 @@
-// Video Router — Routes video generation to Kling via fal.ai
 import type { VisualPlan, GeneratedVideo } from './types.js';
-import { generateVideoFromImage, generateVideoFromText } from './models/kling-video.js';
-import { buildVideoPrompt } from './prompt-engineer.js';
-import chalk from 'chalk';
+import { generateVideoFromImage } from './models/kling-video.js';
+import { buildMotionPrompt } from './prompt-engineer.js';
 
 /**
- * Generate a video clip from a still image using Kling 2.6 Pro.
- * Falls back to a still-image hold if video generation is disabled or fails.
+ * Generate a video clip from a still image.
+ * Falls back gracefully to returning the still image path if video gen fails.
  */
 export async function generateVideo(
-  sourceImagePath: string,
+  imagePath: string,
   plan: VisualPlan,
   outputDir: string,
   filename: string
 ): Promise<GeneratedVideo> {
-  const outputPath = `${outputDir}/${filename}`;
-  const motionPrompt = buildVideoPrompt(plan);
-  const duration = plan.videoDuration || 5;
+  const falKey = process.env.FAL_API_KEY;
 
-  // Check if video generation is enabled
-  if (!plan.generateVideo || process.env.ENABLE_VIDEO_GENERATION === 'false') {
-    console.log(chalk.dim('    Video generation disabled — using still image'));
-    return {
-      path: sourceImagePath,
-      model: 'kling-2.6-pro',
-      sourceImagePath,
-      motionPrompt: '',
-      durationSeconds: duration,
-    };
+  if (!falKey) {
+    console.log('    [Video Router] FAL_API_KEY not set — using still image (Ken Burns will be applied)');
+    return { path: imagePath, model: 'still-fallback', durationSeconds: 0, fromImage: false };
   }
 
-  // Check for FAL API key
-  if (!process.env.FAL_API_KEY) {
-    console.warn(chalk.yellow('    FAL_API_KEY not set — skipping video generation, using still'));
-    return {
-      path: sourceImagePath,
-      model: 'kling-2.6-pro',
-      sourceImagePath,
-      motionPrompt: '',
-      durationSeconds: duration,
-    };
-  }
+  console.log(`    [Video Router] FAL_API_KEY is set, calling Kling 2.6 Pro...`);
 
   try {
-    console.log(chalk.cyan(`    Video Router → Kling 2.6 Pro (${duration}s, i2v)`));
-    const videoPath = await generateVideoFromImage(sourceImagePath, motionPrompt, duration as 5 | 10, outputPath);
+    const motionPrompt = plan.motionPrompt || buildMotionPrompt(plan, {
+      contentType: 'reel',
+      segmentType: 'body',
+      segmentIndex: 0,
+      totalSegments: 1,
+      onScreenText: '',
+      originalVisualDescription: plan.prompt,
+      brandContext: { niche: '', stylePrefix: '', colorPalette: [], mood: '' },
+    });
 
-    return {
-      path: videoPath,
-      model: 'kling-2.6-pro',
-      sourceImagePath,
+    const video = await generateVideoFromImage(
+      imagePath,
       motionPrompt,
-      durationSeconds: duration,
-    };
+      outputDir,
+      filename,
+      5
+    );
+
+    return video;
   } catch (err: any) {
-    console.warn(chalk.yellow(`    Kling video failed: ${err.message} — falling back to still image`));
-    return {
-      path: sourceImagePath,
-      model: 'kling-2.6-pro',
-      sourceImagePath,
-      motionPrompt,
-      durationSeconds: duration,
-    };
+    console.log(`    [Video Router] Kling failed (${err.message?.slice(0, 80)}), using still image fallback`);
+    return { path: imagePath, model: 'still-fallback', durationSeconds: 0, fromImage: false };
   }
 }

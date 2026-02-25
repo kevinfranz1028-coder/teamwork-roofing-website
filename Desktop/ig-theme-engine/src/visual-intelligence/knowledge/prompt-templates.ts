@@ -1,26 +1,11 @@
-// Tested prompt structures per content type
-// These are enhanced over time by the self-learning quality loop
+export const SEGMENT_STYLE_HINTS: Record<string, string> = {
+  hook: 'Extreme macro, dramatic angle, high contrast, scroll-stopping composition. Fill the entire frame with the subject — no negative space.',
+  body: 'Clean well-lit subject at moderate close-up. Informative angle showing relevant detail clearly. Leave bottom 20% visually simple for text overlay.',
+  cta: 'Warm golden light, hopeful uplifting mood, thriving healthy plant. Soft bokeh background. Center composition with space for centered text.',
+};
 
-export const PROMPT_TEMPLATES = {
-  carousel: {
-    hook: '{stylePrefix}, {visualDescription}, {hookStyle}, {lens}, {lighting}, {dof}, {colorPalette}, {filmStock}, {suffix}',
-    body: '{stylePrefix}, {visualDescription}, {bodyStyle}, {lens}, {lighting}, {dof}, {colorPalette}, {filmStock}, {suffix}',
-    cta: '{stylePrefix}, {visualDescription}, {ctaStyle}, {lens}, {lighting}, {dof}, {colorPalette}, {filmStock}, {suffix}',
-  },
-  reel: {
-    hook: '{stylePrefix}, {visualDescription}, {hookStyle}, dramatic angle, {lens}, {lighting}, {dof}, {colorPalette}, {filmStock}, {suffix}',
-    body: '{stylePrefix}, {visualDescription}, {bodyStyle}, {lens}, {lighting}, {dof}, {colorPalette}, {filmStock}, {suffix}',
-    cta: '{stylePrefix}, {visualDescription}, {ctaStyle}, uplifting, {lens}, {lighting}, {dof}, {colorPalette}, {filmStock}, {suffix}',
-  },
-  story: {
-    hook: '{stylePrefix}, {visualDescription}, vertical 9:16 composition, {hookStyle}, {lens}, {lighting}, {dof}, {colorPalette}, {suffix}',
-    body: '{stylePrefix}, {visualDescription}, vertical 9:16 composition, {bodyStyle}, {lens}, {lighting}, {dof}, {colorPalette}, {suffix}',
-    cta: '{stylePrefix}, {visualDescription}, vertical 9:16 composition, {ctaStyle}, {lens}, {lighting}, {dof}, {colorPalette}, {suffix}',
-  },
-} as const;
-
-export const VIDEO_MOTION_TEMPLATES = {
-  hook: 'dramatic slow reveal, camera slowly pushes in, shallow depth of field, {motionStyle}',
-  body: 'gentle organic motion, {motionDescription}, {motionStyle}',
-  cta: 'warm, inviting, slow dolly out, soft focus shift, {motionStyle}',
-} as const;
+export const CONTENT_TYPE_HINTS: Record<string, string> = {
+  carousel: 'Square 1:1 composition. Subject centered or rule-of-thirds. Clean background that works under text overlay.',
+  reel: 'Vertical 9:16 composition. Subject in center-bottom two-thirds. Top area can be atmospheric/bokeh. Will have motion applied.',
+  story: 'Vertical 9:16 composition. Bold, simple, immediate impact. Works at phone-screen glance speed.',
+};

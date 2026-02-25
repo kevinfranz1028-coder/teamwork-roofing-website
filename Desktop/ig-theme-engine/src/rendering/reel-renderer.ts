@@ -1,5 +1,6 @@
 import path from 'path';
 import { mkdirSync, existsSync, copyFileSync } from 'fs';
+import { execSync } from 'child_process';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import sharp from 'sharp';
@@ -13,8 +14,44 @@ import { generateImage } from '../visual-intelligence/image-router.js';
 import { generateVideo } from '../visual-intelligence/video-router.js';
 import { getStyleAnchor } from '../visual-intelligence/knowledge/style-anchors.js';
 import { CONFIG } from '../config/env.js';
+import { getActiveAISettings } from '../config/ai-settings.js';
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
+function getMediaDuration(filePath: string): number {
+  try {
+    const result = execSync(
+      `ffprobe -v quiet -print_format json -show_format "${filePath}"`,
+      { encoding: 'utf-8' }
+    );
+    return parseFloat(JSON.parse(result).format?.duration || '0');
+  } catch { return 0; }
+}
+
+function matchClipToAudioDuration(
+  clipPath: string, audioDuration: number, outputPath: string
+): string {
+  const clipDuration = getMediaDuration(clipPath);
+  if (clipDuration <= 0 || audioDuration <= 0) return clipPath;
+  const diff = audioDuration - clipDuration;
+  if (Math.abs(diff) < 0.1) return clipPath;
+
+  if (diff > 0) {
+    console.log(`    Extending clip by ${diff.toFixed(1)}s (freeze last frame)`);
+    execSync(
+      `ffmpeg -y -i "${clipPath}" -vf "tpad=stop_mode=clone:stop_duration=${diff.toFixed(2)}" -c:v libx264 -preset fast -crf 23 -an "${outputPath}"`,
+      { stdio: 'pipe' }
+    );
+    return outputPath;
+  } else {
+    console.log(`    Trimming clip by ${Math.abs(diff).toFixed(1)}s`);
+    execSync(
+      `ffmpeg -y -i "${clipPath}" -t ${audioDuration.toFixed(2)} -c:v libx264 -preset fast -crf 23 -an "${outputPath}"`,
+      { stdio: 'pipe' }
+    );
+    return outputPath;
+  }
+}
 
 /**
  * Render a reel as an MP4 video using the Visual Intelligence Layer:
@@ -49,7 +86,7 @@ export async function renderReel(
     try {
       const audioPath = await generateSpeech(voText, outputDir, audioFile);
       segmentAudioPaths.push(audioPath);
-      const audioDur = await probeAudioDuration(audioPath);
+      const audioDur = getMediaDuration(audioPath);
       if (audioDur > 0) {
         allSegments[i] = { ...seg, durationSeconds: audioDur + 0.3 };
       }
@@ -61,29 +98,59 @@ export async function renderReel(
     }
   }
 
-  // ─── Step 3: Generate visuals for each segment ───
-  console.log('  Generating visuals (stills → video)...');
-  const videoClipPaths: string[] = [];
-  const isVideoEnabled = process.env.ENABLE_VIDEO_GENERATION !== 'false' && !!process.env.FAL_API_KEY;
+  // ─── Step 3: Generate visuals (PARALLEL) ───
+  const aiSettings = getActiveAISettings() as any;
+  const isVideoEnabled = (aiSettings?.enable_video_generation ?? (process.env.ENABLE_VIDEO_GENERATION !== 'false'))
+    && !!process.env.FAL_API_KEY;
+  console.log(`  Video generation: ${isVideoEnabled ? 'ENABLED' : 'DISABLED'} (FAL_API_KEY: ${process.env.FAL_API_KEY ? 'set' : 'NOT SET'})`);
 
+  // Apply generateVideo overrides before parallel dispatch
   for (let i = 0; i < allSegments.length; i++) {
     const plan = plans[i];
-    const brief = briefs[i];
-
-    // 3a. Generate still image via Image Router (includes Quality Gate)
-    console.log(`  Segment ${i} — generating still image...`);
-    const image = await generateImage(plan, brief, outputDir, `still-${i}.png`);
-
-    // 3b. Generate video from still via Kling (if enabled)
-    let clipPath: string;
-    if (isVideoEnabled && plan.generateVideo) {
-      console.log(`  Segment ${i} — generating video clip...`);
-      const video = await generateVideo(image.path, plan, outputDir, `clip-${i}.mp4`);
-      clipPath = video.path;
-    } else {
-      clipPath = image.path; // Use still image (Ken Burns will be applied in compose)
+    if (isVideoEnabled && !plan.generateVideo) {
+      console.log(`  Segment ${i} — Creative Director set generateVideo=false, overriding to true for reel`);
+      plan.generateVideo = true;
     }
-    videoClipPaths.push(clipPath);
+    console.log(`  Segment ${i} — model: ${plan.model}, generateVideo: ${plan.generateVideo}, prompt: "${plan.prompt?.slice(0, 80)}..."`);
+  }
+
+  // 3a. Generate ALL still images in parallel
+  console.log(`  Generating ${allSegments.length} stills in parallel...`);
+  const imageStartTime = Date.now();
+  const images = await Promise.all(
+    plans.map((plan, i) => {
+      console.log(`  Segment ${i} — dispatching still image generation...`);
+      return generateImage(plan, briefs[i], outputDir, `still-${i}.png`);
+    })
+  );
+  console.log(`  All ${images.length} stills generated in ${((Date.now() - imageStartTime) / 1000).toFixed(1)}s`);
+
+  // 3b. Generate ALL video clips in parallel (if enabled)
+  let videoClipPaths: string[];
+  if (isVideoEnabled) {
+    console.log(`  Generating ${allSegments.length} Kling video clips in parallel...`);
+    const videoStartTime = Date.now();
+    const videos = await Promise.all(
+      images.map((image, i) => {
+        if (plans[i].generateVideo) {
+          console.log(`  Segment ${i} — dispatching Kling video generation...`);
+          return generateVideo(image.path, plans[i], outputDir, `clip-${i}.mp4`);
+        }
+        return Promise.resolve({ path: image.path, model: 'still-fallback' as const, durationSeconds: 0, fromImage: false });
+      })
+    );
+    videoClipPaths = videos.map((v, i) => {
+      if (v.model === 'still-fallback') {
+        console.log(`  Segment ${i} — using still image (video skipped or fell back)`);
+      } else {
+        console.log(`  Segment ${i} — Kling video generated: ${v.model}, ${v.durationSeconds}s`);
+      }
+      return v.path;
+    });
+    console.log(`  All ${videos.length} video clips generated in ${((Date.now() - videoStartTime) / 1000).toFixed(1)}s`);
+  } else {
+    console.log(`  Video disabled — using still images for all segments`);
+    videoClipPaths = images.map(img => img.path);
   }
 
   // ─── Step 4: Render text overlays ───
@@ -99,7 +166,7 @@ export async function renderReel(
   const totalDur = allSegments.reduce((s, seg) => s + seg.durationSeconds, 0);
   console.log(`  Total reel: ${totalDur.toFixed(1)}s across ${allSegments.length} segments`);
   const outputPath = path.join(outputDir, 'reel.mp4');
-  await composeVideo(videoClipPaths, overlayPaths, allSegments, voiceoverPath, outputPath, isVideoEnabled);
+  await composeVideo(videoClipPaths, overlayPaths, allSegments, segmentAudioPaths, voiceoverPath, outputPath, outputDir, isVideoEnabled);
 
   return outputPath;
 }
@@ -112,6 +179,13 @@ function buildVisualBriefs(
   config: RenderConfig
 ): VisualBrief[] {
   const anchor = getStyleAnchor();
+  const scenePrefix = script.sceneSetup
+    ? `Scene context: ${script.sceneSetup}. `
+    : '';
+
+  if (scenePrefix) {
+    console.log(`  Visual briefs anchored to scene: "${script.sceneSetup!.slice(0, 100)}..."`);
+  }
 
   return segments.map((seg, i) => ({
     contentType: 'reel' as const,
@@ -120,7 +194,7 @@ function buildVisualBriefs(
     totalSegments: segments.length,
     onScreenText: seg.text,
     voiceoverText: seg.voiceoverText || seg.text,
-    originalVisualDescription: seg.visualDescription || `professional ${CONFIG.app.niche} visual`,
+    originalVisualDescription: scenePrefix + (seg.visualDescription || `professional ${CONFIG.app.niche} visual`),
     brandContext: {
       niche: CONFIG.app.niche || 'Houseplant ICU',
       stylePrefix: anchor.imageStylePrefix,
@@ -175,15 +249,6 @@ function generateSilentSegment(outputDir: string, filename: string, durationSeco
   });
 }
 
-function probeAudioDuration(audioPath: string): Promise<number> {
-  return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(audioPath, (err, metadata) => {
-      if (err) return reject(err);
-      resolve(metadata.format.duration || 0);
-    });
-  });
-}
-
 function concatenateAudio(audioPaths: string[], outputDir: string): Promise<string> {
   const outputPath = path.join(outputDir, 'voiceover.mp3');
   if (audioPaths.length === 1) {
@@ -220,20 +285,12 @@ async function renderTextOverlays(
   await page.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
 
   const paths: string[] = [];
-  const bodySegments = segments.filter(s => s.segmentType === 'body');
-  const totalBodySteps = bodySegments.length;
-  let bodyIndex = 0;
 
   try {
     for (let i = 0; i < segments.length; i++) {
       const seg = segments[i];
       const segType = seg.segmentType || 'body';
-      let stepIdx: number | undefined;
-      if (segType === 'body') {
-        bodyIndex++;
-        stepIdx = bodyIndex;
-      }
-      const html = reelOverlayHtml(seg.text, config, segType, stepIdx, totalBodySteps);
+      const html = reelOverlayHtml(seg.text, segType, i, segments.length, config.handle);
       await page.setContent(html, { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => Promise.race([
         document.fonts.ready,
@@ -257,18 +314,47 @@ function composeVideo(
   clipPaths: string[],
   overlayPaths: string[],
   segments: ReelSegment[],
+  segmentAudioPaths: string[],
   voiceoverPath: string,
   outputPath: string,
+  outputDir: string,
   hasVideoClips: boolean
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const segmentCount = segments.length;
+
+    // ─── Match each clip's duration to its corresponding audio segment ───
+    console.log('  Matching clip durations to audio segments...');
+    const matchedClips: string[] = [];
+    for (let i = 0; i < segmentCount; i++) {
+      const clipPath = clipPaths[i];
+      const audioPath = segmentAudioPaths[i];
+      if (audioPath && existsSync(audioPath) && clipPath.endsWith('.mp4')) {
+        const audioDur = getMediaDuration(audioPath);
+        if (audioDur > 0) {
+          // Update segment duration to exact audio duration for accurate filter graph timing
+          segments[i] = { ...segments[i], durationSeconds: audioDur };
+          const matchedPath = path.join(outputDir, `clip-${i}-matched.mp4`);
+          try {
+            matchedClips.push(matchClipToAudioDuration(clipPath, audioDur, matchedPath));
+          } catch (err: any) {
+            console.log(`    Match failed for segment ${i}: ${err.message}, keeping original`);
+            matchedClips.push(clipPath);
+          }
+        } else {
+          matchedClips.push(clipPath);
+        }
+      } else {
+        matchedClips.push(clipPath);
+      }
+    }
+
     let filterComplex = '';
     const inputs: string[] = [];
 
-    // Add all video/image inputs
+    // Add all video/image inputs (use matched clips)
     for (let i = 0; i < segmentCount; i++) {
-      inputs.push(clipPaths[i]);
+      inputs.push(matchedClips[i]);
     }
     // Add all overlay inputs
     for (let i = 0; i < segmentCount; i++) {
@@ -281,10 +367,10 @@ function composeVideo(
     for (let i = 0; i < segmentCount; i++) {
       const dur = segments[i].durationSeconds;
       const frames = dur * 25;
-      const clipIsVideo = hasVideoClips && clipPaths[i].endsWith('.mp4');
+      const clipIsVideo = hasVideoClips && matchedClips[i].endsWith('.mp4');
 
       if (clipIsVideo) {
-        // Video clip from Kling — scale and trim to segment duration
+        // Video clip — already duration-matched; scale, fps-normalize, and trim as safety net
         filterComplex += `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=25,trim=duration=${dur},setpts=PTS-STARTPTS[bg${i}];`;
       } else {
         // Still image — use zoompan (Ken Burns) to generate video frames
@@ -341,6 +427,7 @@ function composeVideo(
         '-pix_fmt', 'yuv420p',
         '-movflags', '+faststart',
         '-r', '25',
+        '-shortest',
       ])
       .output(outputPath)
       .on('end', () => resolve())
@@ -395,7 +482,21 @@ function parseDurationFromTimestamp(timestamp: string | number): number | null {
  */
 export function parseReelScript(scriptJson: string): ReelScript {
   const parsed = JSON.parse(scriptJson);
-  const reel = parsed.reel || parsed;
+  const reel = parsed.reelScript || parsed.reel || parsed;
+
+  const sceneSetup = reel.sceneSetup || null;
+  const hookFound = !!(reel.hook);
+  const bodyFound = (reel.body || reel.segments || []).length;
+  const ctaFound = !!(reel.cta);
+  const voiceoverFound = !!(reel.voiceoverText);
+  const sceneFound = !!sceneSetup;
+  console.log(`  Script parse: hook=${hookFound}, body=${bodyFound} segments, cta=${ctaFound}, voiceover=${voiceoverFound}, sceneSetup=${sceneFound}`);
+  if (!sceneFound) {
+    console.warn('  WARNING: No sceneSetup found in reel script — visual continuity may be inconsistent');
+  }
+  if (bodyFound === 0) {
+    console.warn('  WARNING: No body segments found in reel script! Check script JSON wrapper key. Tried: parsed.reelScript, parsed.reel, parsed');
+  }
 
   const hookRaw = reel.hook;
   const hook = typeof hookRaw === 'string' ? hookRaw : hookRaw?.onScreenText || hookRaw?.text || '';
@@ -446,5 +547,6 @@ export function parseReelScript(scriptJson: string): ReelScript {
     segments, cta, ctaVisual, ctaDuration, ctaVoiceover,
     totalLength: reel.totalLength || 30,
     voiceoverText,
+    sceneSetup: typeof sceneSetup === 'string' ? sceneSetup : sceneSetup ? JSON.stringify(sceneSetup) : undefined,
   };
 }

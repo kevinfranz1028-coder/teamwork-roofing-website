@@ -1,183 +1,225 @@
-// Creative Director — Claude-powered AI brain that plans all visual generation
-import type { VisualBrief, VisualPlan } from './types.js';
-import { askClaudeJSON } from '../integrations/claude-client.js';
-import { getTopPromptPatterns, getWorstPromptPatterns, getRulesForModel } from './prompt-engineer.js';
-import { MODEL_REGISTRY } from './models/model-registry.js';
+import { CONFIG } from '../config/env.js';
+import { getActiveAISettings } from '../config/ai-settings.js';
 import { getStyleAnchor } from './knowledge/style-anchors.js';
+import { UNIVERSAL_NEVER, UNIVERSAL_ALWAYS, MODEL_TIPS } from './knowledge/model-rules.js';
+import { MODEL_REGISTRY } from './models/model-registry.js';
+import type { VisualBrief, VisualPlan, ImageModel } from './types.js';
+import { logApiCost } from '../utils/cost-tracker.js';
 
-const CREATIVE_DIRECTOR_SYSTEM = `You are the Creative Director for an Instagram content engine. Your job is to transform content script descriptions into production-ready visual generation instructions.
+const SYSTEM_PROMPT = `You are the Creative Director for an AI-powered Instagram plant care page called ThePlantICU. Your job is to plan the visual execution for each content segment.
 
-You have access to three image models and one video model:
+You select the optimal AI image model for each segment and rewrite vague content descriptions into precise photographic prompts that a professional photographer would understand.
 
-IMAGE MODELS:
-1. FLUX 2 Pro — Best for: photorealistic nature/plant photography, atmospheric scenes, macro close-ups, moody lighting. Weakness: text rendering is improved but not perfect. Cost: ~$0.03/megapixel. Speed: 6 seconds. Use this as DEFAULT for plant content.
+AVAILABLE IMAGE MODELS:
+- flux-2-pro: Best for photorealistic plant photography, nature macro, atmospheric lighting. DEFAULT CHOICE.
+- gpt-image-1.5: Best when text MUST appear in the image, or for complex multi-element compositions. Use sparingly.
+- ideogram-3: Best for typography-first designs, posters, social cards. Use only when text IS the visual.
 
-2. GPT Image 1.5 — Best for: scenes requiring readable text, product photography with labels, infographic-style images, complex multi-element compositions. Weakness: slightly less "cinematic" than FLUX. Cost: $0.04-$0.08. Speed: 8-15 seconds. Use when TEXT MUST appear in the image OR when composition is very complex.
+ABSOLUTE RULES — NEVER VIOLATE:
+${UNIVERSAL_NEVER.map(r => '- ' + r).join('\n')}
 
-3. Ideogram 3.0 — Best for: typography-heavy designs, poster-style layouts, images where text IS the design element. Weakness: general photorealism not as strong. Cost: ~$0.05. Speed: 10 seconds. Use ONLY for typography-first designs.
+ALWAYS DO:
+${UNIVERSAL_ALWAYS.map(r => '- ' + r).join('\n')}
 
-VIDEO MODEL:
-4. Kling 2.6 Pro (image-to-video) — Transforms a still image into 5-10 seconds of cinematic video with natural motion. Best for: bringing plant scenes to life (leaves swaying, water droplets, insects moving, light shifting). Cost: $0.07/sec without audio. Use for ALL reel segments.
+PROMPT WRITING STYLE:
+You write as if briefing a professional photographer. Use specific technical language:
+- Lens: "100mm f/2.8 macro lens" not "close-up"
+- Lighting: "warm side-lit golden hour light raking across leaves" not "nice lighting"
+- Depth: "shallow depth of field, f/2.8, subject tack sharp against creamy bokeh" not "blurry background"
+- Color: "warm amber and deep forest green palette, Kodak Portra 400 color science" not "warm colors"
+- Texture: "visible leaf venation, tiny water droplets on waxy surface" not "detailed leaf"
 
-ABSOLUTE RULES:
-- NEVER include text, words, letters, numbers, labels, logos, or watermarks in image prompts
-- NEVER ask for clocks, timers, watches, or time-display devices
-- NEVER ask for product packaging with brand names
-- NEVER ask for collages, split-screens, or multi-panel compositions
-- NEVER ask for UI elements, buttons, or interface mockups
-- ALL text goes in the HTML overlay layer, NEVER in the generated image
-- Every image prompt MUST describe a SINGLE cohesive scene from ONE camera angle
-- Every prompt MUST include: focal length, lighting direction, depth of field, color palette
+CRITICAL: If the content description mentions products, brands, clocks, timers, text, or before/after comparisons — REWRITE the visual to be purely photographic. Show the RESULT or the SUBJECT, never the product label.
 
-PHOTOGRAPHIC LANGUAGE REQUIREMENTS:
-Every image prompt must read like a professional photographer's shot list. Include:
-- Camera/lens: "Canon R5, 100mm f/2.8 macro" or "Sony A7R V, 35mm f/1.4"
-- Lighting: "soft north-facing window light" or "golden hour backlight" or "overcast diffused"
-- Depth of field: "shallow focus, f/2.8 bokeh" or "deep focus, f/11"
-- Color: "warm earth tones" or "cool blue-green palette" or "high contrast"
-- Texture: describe surfaces specifically ("wet soil granules", "fuzzy leaf trichomes")
-- Mood: "intimate", "dramatic", "clinical", "warm and inviting"
+For example:
+- "Yellow sticky trap with brand name" → "Close-up of a yellow adhesive card inserted in dark potting soil among green pothos leaves, dozens of tiny dark fungus gnats stuck to the surface, macro lens, shallow focus"
+- "Hour 24: Total annihilation" → "Clean healthy plant in terracotta pot, fresh dark soil surface with no visible pests, warm morning window light, sense of relief and renewal"
+- "Mosquito Bits bag next to plant" → "Fine golden granules scattered across dark moist soil surface, macro close-up showing granule texture, a few green leaves soft in background"
 
-OUTPUT FORMAT:
-For each visual element, return a JSON object:
-{
-  "model": "flux-2-pro" | "gpt-image-1.5" | "ideogram-3",
-  "prompt": "the rewritten photographic prompt",
-  "negative_prompt": "things to avoid",
-  "aspect_ratio": "9:16" | "1:1" | "16:9",
-  "generate_video": true | false,
-  "video_prompt": "motion description for Kling (if generate_video is true)",
-  "video_duration": 5 | 10,
-  "rationale": "brief explanation of model choice and prompt strategy"
-}`;
+Respond with a JSON array of VisualPlan objects, one per brief. No markdown, no backticks, just the JSON array.`;
 
 /**
- * Plan visuals for a single content segment.
- */
-export async function planVisuals(brief: VisualBrief): Promise<VisualPlan> {
-  const plans = await planVisualsBatch([brief]);
-  return plans[0];
-}
-
-/**
- * Plan visuals for a batch of segments (carousel slides, reel segments, etc).
- * Sending them all at once lets Claude ensure visual CONSISTENCY across the set.
+ * Send all visual briefs to Claude and get back a VisualPlan for each.
  */
 export async function planVisualsBatch(briefs: VisualBrief[]): Promise<VisualPlan[]> {
+  if (briefs.length === 0) return [];
+
   const anchor = getStyleAnchor();
+  const settings = getActiveAISettings() as any;
+  const defaultModel: ImageModel = settings?.default_image_model || 'flux-2-pro';
+  const enableVideo = settings?.enable_video_generation ?? (process.env.ENABLE_VIDEO_GENERATION !== 'false');
 
-  // Build context about what's worked/failed before
-  const defaultModel = briefs[0]?.brandContext?.stylePrefix ? 'flux-2-pro' : 'flux-2-pro';
-  const topPatterns = getTopPromptPatterns(defaultModel, 5);
-  const worstPatterns = getWorstPromptPatterns(defaultModel, 5);
+  // Build the user message with all briefs
+  const briefDescriptions = briefs.map((b, i) => (
+    `[Segment ${i}] type=${b.segmentType}, content="${b.contentType}", text="${b.onScreenText.slice(0, 100)}", visual="${b.originalVisualDescription.slice(0, 200)}", mood="${b.brandContext.mood}"`
+  )).join('\n');
 
-  let learningContext = '';
-  if (topPatterns.length > 0) {
-    learningContext += '\n\nHIGH-SCORING PROMPTS (use similar patterns):\n';
-    for (const p of topPatterns) {
-      learningContext += `- Score ${p.score}: "${p.prompt.slice(0, 150)}..."\n`;
+  const userMessage = `Plan visuals for ${briefs.length} segments. Default model: ${defaultModel}. Video generation: ${enableVideo ? 'enabled' : 'disabled'}.
+Photography anchors — Camera: ${anchor.cameraBody}, Lens: ${anchor.defaultLens}, Light: ${anchor.defaultLighting}, Color: ${anchor.defaultColorProfile}.
+
+BRIEFS:
+${briefDescriptions}
+
+Return a JSON array of ${briefs.length} objects, each with: model, prompt, negativePrompt, aspectRatio, generateVideo, motionPrompt, lens, lighting, depthOfField, colorPalette.
+For aspectRatio use "${briefs[0]?.contentType === 'carousel' ? '1:1' : '9:16'}".
+Set generateVideo to ${enableVideo} for reel segments, false for carousel/story.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': CONFIG.ai.apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: CONFIG.ai.model || 'claude-sonnet-4-5-20250929',
+        max_tokens: 4000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userMessage }],
+      }),
+    });
+
+    if (!response.ok) {
+      console.log(`    [Creative Director] Claude API error ${response.status}, using fallback plans`);
+      return briefs.map(b => buildFallbackPlan(b, defaultModel, enableVideo));
     }
-  }
-  if (worstPatterns.length > 0) {
-    learningContext += '\nLOW-SCORING PROMPTS (avoid these patterns):\n';
-    for (const p of worstPatterns) {
-      learningContext += `- Score ${p.score}: "${p.prompt.slice(0, 150)}..." Issues: ${p.issues}\n`;
+
+    const data = await response.json() as any;
+    const text = data.content?.[0]?.text || '';
+
+    // Log creative director cost
+    const cdInputTokens = data.usage?.input_tokens || 0;
+    const cdOutputTokens = data.usage?.output_tokens || 0;
+    const cdCost = (cdInputTokens / 1_000_000) * 3 + (cdOutputTokens / 1_000_000) * 15;
+    logApiCost({
+      provider: 'anthropic',
+      category: 'text',
+      endpoint: 'messages.create (creative-director)',
+      model: CONFIG.ai.model || 'claude-sonnet-4-5-20250929',
+      description: `Creative Director: ${briefs.length} segments`,
+      inputTokens: cdInputTokens,
+      outputTokens: cdOutputTokens,
+      estimatedCost: cdCost,
+    });
+
+    // Parse JSON array from response
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      console.log('    [Creative Director] Could not parse response, using fallback plans');
+      return briefs.map(b => buildFallbackPlan(b, defaultModel, enableVideo));
     }
+
+    const plans: VisualPlan[] = JSON.parse(jsonMatch[0]);
+
+    console.log(`    [Creative Director] Claude returned ${plans.length} plans`);
+    plans.forEach((p, i) => {
+      console.log(`      Plan ${i}: model=${p.model}, generateVideo=${p.generateVideo}, prompt="${(p.prompt || '').slice(0, 60)}..."`);
+    });
+
+    // Validate and fill gaps
+    return plans.map((plan, i) => ({
+      model: plan.model || defaultModel,
+      prompt: plan.prompt || briefs[i].originalVisualDescription,
+      negativePrompt: plan.negativePrompt || anchor.imageNegativePrompt,
+      aspectRatio: plan.aspectRatio || (briefs[i].contentType === 'carousel' ? '1:1' : '9:16'),
+      generateVideo: plan.generateVideo ?? (enableVideo && briefs[i].contentType === 'reel'),
+      motionPrompt: plan.motionPrompt || undefined,
+      motionStyle: plan.motionStyle || undefined,
+      lens: plan.lens || anchor.defaultLens,
+      lighting: plan.lighting || anchor.defaultLighting,
+      depthOfField: plan.depthOfField || 'shallow, f/2.8',
+      colorPalette: plan.colorPalette || anchor.defaultColorProfile,
+    }));
+  } catch (err: any) {
+    console.log(`    [Creative Director] Error: ${err.message?.slice(0, 100)}, using fallback plans`);
+    return briefs.map(b => buildFallbackPlan(b, defaultModel, enableVideo));
   }
-
-  const enableVideo = process.env.ENABLE_VIDEO_GENERATION !== 'false';
-  const contentType = briefs[0]?.contentType || 'carousel';
-
-  const userPrompt = `Plan visuals for this ${contentType} (${briefs.length} segments).
-
-BRAND STYLE:
-- Style prefix: ${anchor.imageStylePrefix}
-- Style suffix: ${anchor.imageStyleSuffix}
-- Video motion: ${anchor.videoMotionStyle}
-- Hook style: ${anchor.hookVisualStyle}
-- Body style: ${anchor.bodyVisualStyle}
-- CTA style: ${anchor.ctaVisualStyle}
-
-VIDEO GENERATION: ${enableVideo ? 'ENABLED — generate video for reel segments' : 'DISABLED — stills only'}
-${learningContext}
-
-SEGMENTS TO PLAN:
-${JSON.stringify(briefs.map((b, i) => ({
-  index: i,
-  type: b.segmentType,
-  text: b.onScreenText,
-  voiceover: b.voiceoverText || '',
-  visual: b.originalVisualDescription,
-})), null, 2)}
-
-Return a JSON array of ${briefs.length} visual plans, one per segment, in the same order. Ensure visual consistency across all segments (similar color grading, lighting style, camera perspective).`;
-
-  const result = await askClaudeJSON<VisualPlan[] | { plans: VisualPlan[] }>({
-    systemPrompt: CREATIVE_DIRECTOR_SYSTEM,
-    userPrompt,
-    maxTokens: 4096,
-    temperature: 0.4,
-  });
-
-  // Handle both array and wrapped formats
-  const plans: any[] = Array.isArray(result) ? result : (result as any).plans || [];
-
-  // Map to typed VisualPlan objects with sensible defaults
-  return briefs.map((brief, i) => {
-    const raw = plans[i] || {};
-    return {
-      model: raw.model || 'flux-2-pro',
-      prompt: raw.prompt || brief.originalVisualDescription,
-      negativePrompt: raw.negative_prompt || raw.negativePrompt || '',
-      aspectRatio: raw.aspect_ratio || raw.aspectRatio || (brief.contentType === 'carousel' ? '1:1' : '9:16'),
-      generateVideo: enableVideo && brief.contentType === 'reel' ? (raw.generate_video ?? raw.generateVideo ?? true) : false,
-      videoPrompt: raw.video_prompt || raw.videoPrompt || undefined,
-      videoDuration: raw.video_duration || raw.videoDuration || 5,
-      rationale: raw.rationale || '',
-    };
-  });
 }
 
 /**
- * Retry with adjusted prompt after a quality gate failure.
- * Returns a new VisualPlan with refined prompt.
+ * Retry a single plan with quality feedback.
  */
-export async function retryPlan(
-  failedPlan: VisualPlan,
-  qualityFeedback: string,
-  brief: VisualBrief
-): Promise<VisualPlan> {
-  const userPrompt = `A previous image generation FAILED the quality gate.
+export async function retryPlan(brief: VisualBrief, feedback: string): Promise<VisualPlan> {
+  const anchor = getStyleAnchor();
+  const settings = getActiveAISettings() as any;
+  const defaultModel: ImageModel = settings?.default_image_model || 'flux-2-pro';
 
-FAILED PROMPT: "${failedPlan.prompt}"
-MODEL USED: ${failedPlan.model}
-QUALITY FEEDBACK: "${qualityFeedback}"
+  console.log(`    [Creative Director] Retrying with feedback: ${feedback.slice(0, 80)}`);
 
-Original visual brief:
-- Content type: ${brief.contentType}
-- Segment type: ${brief.segmentType}
-- On-screen text: "${brief.onScreenText}"
-- Original description: "${brief.originalVisualDescription}"
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': CONFIG.ai.apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: CONFIG.ai.model || 'claude-sonnet-4-5-20250929',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: `Replan ONE segment. Previous attempt failed quality check.
 
-Please generate a REVISED visual plan that addresses the quality feedback. You may switch models if appropriate.
+Segment: type=${brief.segmentType}, visual="${brief.originalVisualDescription.slice(0, 200)}"
+Quality feedback: "${feedback}"
 
-Return a single JSON object (not an array).`;
+Write a BETTER prompt that avoids the issues. Return ONE JSON object (not array): {model, prompt, negativePrompt, aspectRatio, generateVideo, motionPrompt, lens, lighting, depthOfField, colorPalette}` }],
+      }),
+    });
 
-  const result = await askClaudeJSON<any>({
-    systemPrompt: CREATIVE_DIRECTOR_SYSTEM,
-    userPrompt,
-    maxTokens: 1024,
-    temperature: 0.5,
-  });
+    if (!response.ok) return buildFallbackPlan(brief, defaultModel, false);
 
+    const data = await response.json() as any;
+    const text = data.content?.[0]?.text || '';
+
+    // Log retry cost
+    const retryInputTokens = data.usage?.input_tokens || 0;
+    const retryOutputTokens = data.usage?.output_tokens || 0;
+    const retryCost = (retryInputTokens / 1_000_000) * 3 + (retryOutputTokens / 1_000_000) * 15;
+    logApiCost({
+      provider: 'anthropic',
+      category: 'text',
+      endpoint: 'messages.create (creative-director-retry)',
+      model: CONFIG.ai.model || 'claude-sonnet-4-5-20250929',
+      description: `Creative Director retry: ${brief.segmentType}`,
+      inputTokens: retryInputTokens,
+      outputTokens: retryOutputTokens,
+      estimatedCost: retryCost,
+    });
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return buildFallbackPlan(brief, defaultModel, false);
+
+    const plan = JSON.parse(jsonMatch[0]);
+    return {
+      model: plan.model || defaultModel,
+      prompt: plan.prompt || brief.originalVisualDescription,
+      negativePrompt: plan.negativePrompt || anchor.imageNegativePrompt,
+      aspectRatio: plan.aspectRatio || (brief.contentType === 'carousel' ? '1:1' : '9:16'),
+      generateVideo: plan.generateVideo ?? false,
+      motionPrompt: plan.motionPrompt,
+      lens: plan.lens || anchor.defaultLens,
+      lighting: plan.lighting || anchor.defaultLighting,
+      depthOfField: plan.depthOfField || 'shallow, f/2.8',
+      colorPalette: plan.colorPalette || anchor.defaultColorProfile,
+    };
+  } catch {
+    return buildFallbackPlan(brief, defaultModel, false);
+  }
+}
+
+function buildFallbackPlan(brief: VisualBrief, model: ImageModel, enableVideo: boolean): VisualPlan {
+  const anchor = getStyleAnchor();
   return {
-    model: result.model || failedPlan.model,
-    prompt: result.prompt || failedPlan.prompt,
-    negativePrompt: result.negative_prompt || result.negativePrompt || failedPlan.negativePrompt,
-    aspectRatio: result.aspect_ratio || result.aspectRatio || failedPlan.aspectRatio,
-    generateVideo: result.generate_video ?? result.generateVideo ?? failedPlan.generateVideo,
-    videoPrompt: result.video_prompt || result.videoPrompt || failedPlan.videoPrompt,
-    videoDuration: result.video_duration || result.videoDuration || failedPlan.videoDuration,
-    rationale: result.rationale || 'retry after quality failure',
+    model,
+    prompt: `${anchor.imageStylePrefix}. ${brief.originalVisualDescription}. ${brief.brandContext.mood} mood`,
+    negativePrompt: anchor.imageNegativePrompt,
+    aspectRatio: brief.contentType === 'carousel' ? '1:1' : '9:16',
+    generateVideo: enableVideo && brief.contentType === 'reel',
+    lens: anchor.defaultLens,
+    lighting: anchor.defaultLighting,
+    depthOfField: 'shallow, f/2.8',
+    colorPalette: anchor.defaultColorProfile,
   };
 }

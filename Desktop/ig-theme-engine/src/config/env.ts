@@ -49,6 +49,20 @@ export const CONFIG = {
     autoRender: process.env.AUTO_RENDER === 'true',
     renderReels: process.env.RENDER_REELS !== 'false', // default true
   },
+  fal: {
+    apiKey: process.env.FAL_API_KEY || '',
+  },
+  ideogram: {
+    apiKey: process.env.IDEOGRAM_API_KEY || '',
+  },
+  visualIntelligence: {
+    defaultImageModel: process.env.DEFAULT_IMAGE_MODEL || 'flux-2-pro',
+    defaultVideoModel: process.env.DEFAULT_VIDEO_MODEL || 'kling-2.6-pro',
+    enableVideoGeneration: process.env.ENABLE_VIDEO_GENERATION !== 'false',
+    qualityGateEnabled: process.env.QUALITY_GATE_ENABLED !== 'false',
+    qualityGateMinScore: parseInt(process.env.QUALITY_GATE_MIN_SCORE || '7'),
+    qualityGateMaxRetries: parseInt(process.env.QUALITY_GATE_MAX_RETRIES || '2'),
+  },
   paths: {
     data: path.resolve('data'),
     contentQueue: path.resolve('data/content-queue'),

@@ -923,9 +923,39 @@ function UpcomingScheduleSection({
   );
 }
 
-// ─── Section 3: Ready Content (previously in Queue) ─
+// ─── Section 3: All Content (organized by status) ───
 
-function ReadyContentSection({
+type FilterTab = 'all' | 'not_rendered' | 'rendered' | 'approved' | 'posted';
+
+const filterTabs: { key: FilterTab; label: string; color: string }[] = [
+  { key: 'all', label: 'All', color: 'text-white border-white' },
+  { key: 'not_rendered', label: 'Not Rendered', color: 'text-yellow-400 border-yellow-400' },
+  { key: 'rendered', label: 'Rendered', color: 'text-emerald-400 border-emerald-400' },
+  { key: 'approved', label: 'Approved', color: 'text-blue-400 border-blue-400' },
+  { key: 'posted', label: 'Posted', color: 'text-green-400 border-green-400' },
+];
+
+const statusBadge = (status: string): { label: string; className: string } => {
+  switch (status) {
+    case 'scripted': return { label: 'Not Rendered', className: 'bg-yellow-700/60 text-yellow-200' };
+    case 'designed': return { label: 'Rendered', className: 'bg-emerald-700/60 text-emerald-200' };
+    case 'approved': return { label: 'Approved', className: 'bg-blue-700/60 text-blue-200' };
+    case 'published': return { label: 'Posted', className: 'bg-green-700/60 text-green-200' };
+    default: return { label: status, className: 'bg-gray-700/60 text-gray-200' };
+  }
+};
+
+function formatDateGroup(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7) return `${diff} days ago`;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function AllContentSection({
   onScheduled,
   onPublished,
 }: {
@@ -933,6 +963,7 @@ function ReadyContentSection({
   onPublished: () => void;
 }) {
   const [items, setItems] = useState<QueueItem[]>([]);
+  const [filter, setFilter] = useState<FilterTab>('all');
   const [expanded, setExpanded] = useState<number | null>(null);
   const [posting, setPosting] = useState<number | null>(null);
   const [scheduling, setScheduling] = useState<number | null>(null);
@@ -944,8 +975,7 @@ function ReadyContentSection({
     try {
       const res = await fetch('/api/queue');
       const all = await res.json();
-      // Show scripted (awaiting approval) and designed (ready to publish) items
-      setItems(all.filter((item: QueueItem) => item.idea_status === 'scripted' || item.idea_status === 'designed'));
+      setItems(all);
     } catch {
       // Server not running
     }
@@ -1042,8 +1072,41 @@ function ReadyContentSection({
 
   if (items.length === 0) return null;
 
-  const scriptedItems = items.filter(i => i.idea_status === 'scripted');
-  const designedItems = items.filter(i => i.idea_status === 'designed');
+  // Filter items based on selected tab
+  const filteredItems = items.filter(item => {
+    switch (filter) {
+      case 'not_rendered': return item.idea_status === 'scripted';
+      case 'rendered': return item.idea_status === 'designed';
+      case 'approved': return item.idea_status === 'approved';
+      case 'posted': return item.idea_status === 'published';
+      default: return true;
+    }
+  });
+
+  // Sort by ID descending (newest first)
+  const sortedItems = [...filteredItems].sort((a, b) => b.id - a.id);
+
+  // Group by date (use batch_id date part or fallback to position)
+  const grouped: { label: string; items: QueueItem[] }[] = [];
+  const dateMap = new Map<string, QueueItem[]>();
+  for (const item of sortedItems) {
+    const dateKey = item.batch_id?.split('_')[0] || 'unknown';
+    if (!dateMap.has(dateKey)) dateMap.set(dateKey, []);
+    dateMap.get(dateKey)!.push(item);
+  }
+  for (const [dateKey, dateItems] of dateMap) {
+    const label = dateKey !== 'unknown' ? formatDateGroup(dateKey) : 'Other';
+    grouped.push({ label, items: dateItems });
+  }
+
+  // Count by status for tab badges
+  const counts = {
+    all: items.length,
+    not_rendered: items.filter(i => i.idea_status === 'scripted').length,
+    rendered: items.filter(i => i.idea_status === 'designed').length,
+    approved: items.filter(i => i.idea_status === 'approved').length,
+    posted: items.filter(i => i.idea_status === 'published').length,
+  };
 
   return (
     <div className="space-y-4">
@@ -1060,323 +1123,385 @@ function ReadyContentSection({
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Content Queue</h2>
-        <span className="text-sm text-gray-500">
-          {scriptedItems.length > 0 && <span className="text-yellow-400">{scriptedItems.length} awaiting approval</span>}
-          {scriptedItems.length > 0 && designedItems.length > 0 && <span className="mx-2">|</span>}
-          {designedItems.length > 0 && <span className="text-emerald-400">{designedItems.length} ready to publish</span>}
-        </span>
+        <h2 className="text-xl font-bold">All Content</h2>
+        <span className="text-sm text-gray-500">{items.length} total</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {items.map((item) => {
-          const slides = getItemSlides(item);
-          const thumb = slides.length > 0 ? slides[0] : null;
-          const isExpanded = expanded === item.id;
-          const status = cardStatus[item.id];
-          const isDesigned = item.idea_status === 'designed';
-          const isScripted = item.idea_status === 'scripted';
-          const isRendering = status?.type === 'rendering' || status?.type === 'regenerating';
-          let script: any = {};
-          try { script = JSON.parse(item.script_json || '{}'); } catch {}
-          let hashtags: string[] = [];
-          try { hashtags = item.hashtags ? (typeof item.hashtags === 'string' ? JSON.parse(item.hashtags) : item.hashtags) : []; } catch {}
+      {/* Filter Tabs */}
+      <div className="flex gap-1 overflow-x-auto pb-1">
+        {filterTabs.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setFilter(tab.key)}
+            className={`px-3 py-1.5 text-xs rounded-lg border transition-all whitespace-nowrap ${
+              filter === tab.key
+                ? `${tab.color} bg-gray-800 border-current font-medium`
+                : 'text-gray-500 border-gray-800 hover:border-gray-600 hover:text-gray-300'
+            }`}
+          >
+            {tab.label}
+            {counts[tab.key] > 0 && (
+              <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] ${
+                filter === tab.key ? 'bg-gray-700' : 'bg-gray-800'
+              }`}>
+                {counts[tab.key]}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
 
-          return (
-            <div
-              key={item.id}
-              className={`bg-gray-900 border rounded-xl overflow-hidden transition-all ${
-                status?.type === 'posted'
-                  ? 'border-green-500 ring-1 ring-green-500'
-                  : status?.type === 'scheduled'
-                    ? 'border-blue-500 ring-1 ring-blue-500'
-                    : status?.type === 'error'
-                      ? 'border-red-500/50'
-                      : isDesigned
-                        ? 'border-emerald-500/50'
-                        : 'border-gray-800 hover:border-gray-700'
-              }`}
-            >
-              {/* Visual area */}
-              {isDesigned && thumb ? (
-                <div
-                  className="relative aspect-square bg-gray-800 cursor-pointer group"
-                  onClick={() => slides.length > 0 && setPreview({ item, startIndex: 0 })}
-                >
-                  {isVideo(thumb) ? (
-                    <video src={thumb} muted playsInline className="w-full h-full object-cover" onMouseOver={e => (e.target as HTMLVideoElement).play()} onMouseOut={e => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0; }} />
-                  ) : (
-                    <img src={thumb} alt={item.title} className="w-full h-full object-cover" />
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-4 py-2 rounded-lg">
-                      {isVideo(thumb) ? 'Preview Reel' : (slides.length > 1 ? `Preview All ${slides.length} Slides` : 'Preview Post')}
-                    </span>
-                  </div>
-                  <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
-                    {item.content_type}
-                  </span>
-                  {slides.length > 1 && (
-                    <span className="absolute bottom-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
-                      {slides.length} slides
-                    </span>
-                  )}
-                  <span className="absolute top-2 right-2 text-xs bg-emerald-600 text-white px-2 py-0.5 rounded-full">
-                    rendered
-                  </span>
-                </div>
-              ) : isRendering ? (
-                <div className="relative aspect-[4/3] bg-gray-800 flex flex-col items-center justify-center gap-3">
-                  <span className="inline-block w-8 h-8 border-3 border-purple-400 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-sm text-purple-300">{status?.type === 'regenerating' ? 'Re-rendering visuals...' : 'Rendering visuals...'}</span>
-                  <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
-                    {item.content_type}
-                  </span>
-                </div>
-              ) : (
-                <div className="relative bg-gray-800/50 p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
-                      {item.content_type}
-                    </span>
-                    <span className="text-xs bg-yellow-700/60 text-yellow-200 px-2 py-0.5 rounded-full">
-                      awaiting approval
-                    </span>
-                  </div>
-                  {item.send_trigger && (
-                    <div>
-                      <span className="text-[10px] text-gray-500 uppercase tracking-wider">Send Trigger</span>
-                      <p className="text-xs text-gray-300">{item.send_trigger}</p>
-                    </div>
-                  )}
-                </div>
-              )}
+      {filteredItems.length === 0 ? (
+        <div className="text-center py-12 text-gray-500">
+          <p className="text-sm">No content in this category</p>
+        </div>
+      ) : (
+        grouped.map((group, gi) => (
+          <div key={gi} className="space-y-3">
+            <div className="flex items-center gap-3">
+              <h3 className="text-sm font-medium text-gray-400">{group.label}</h3>
+              <div className="flex-1 border-t border-gray-800" />
+              <span className="text-xs text-gray-600">{group.items.length} items</span>
+            </div>
 
-              {/* Info */}
-              <div className="p-4 space-y-2">
-                <h3 className="font-medium text-sm leading-tight">{item.title || 'Untitled'}</h3>
-                {item.hook && <p className="text-xs text-gray-400 line-clamp-2">{item.hook}</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {group.items.map((item) => {
+                const slides = getItemSlides(item);
+                const thumb = slides.length > 0 ? slides[0] : null;
+                const isExpanded = expanded === item.id;
+                const status = cardStatus[item.id];
+                const isDesigned = item.idea_status === 'designed' || item.idea_status === 'approved';
+                const isScripted = item.idea_status === 'scripted';
+                const isPublished = item.idea_status === 'published';
+                const isRendering = status?.type === 'rendering' || status?.type === 'regenerating';
+                const badge = statusBadge(item.idea_status);
+                let script: any = {};
+                try { script = JSON.parse(item.script_json || '{}'); } catch {}
+                let hashtags: string[] = [];
+                try { hashtags = item.hashtags ? (typeof item.hashtags === 'string' ? JSON.parse(item.hashtags) : item.hashtags) : []; } catch {}
 
-                {item.send_probability && (
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-gray-500">Send:</span>
-                    <span className={probColors[item.send_probability] || 'text-gray-400'}>
-                      {item.send_probability?.replace('_', ' ')}
-                    </span>
-                  </div>
-                )}
-
-                {/* Action buttons — vary by status */}
-                {status?.type === 'posted' ? (
-                  <div className="pt-2">
-                    <div className="w-full px-3 py-2 text-xs rounded-lg bg-green-900/40 border border-green-700 text-green-300 text-center font-medium">
-                      {status.message}
-                    </div>
-                  </div>
-                ) : status?.type === 'scheduled' ? (
-                  <div className="pt-2">
-                    <div className="w-full px-3 py-2 text-xs rounded-lg bg-blue-900/40 border border-blue-700 text-blue-300 text-center font-medium">
-                      {status.message}
-                    </div>
-                  </div>
-                ) : status?.type === 'error' ? (
-                  <div className="pt-2 space-y-2">
-                    <div className="w-full px-3 py-2 text-xs rounded-lg bg-red-900/40 border border-red-700 text-red-300 text-center">
-                      {status.message}
-                    </div>
-                    {isScripted ? (
-                      <button
-                        onClick={() => handleApproveContent(item.id)}
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors"
+                return (
+                  <div
+                    key={item.id}
+                    className={`bg-gray-900 border rounded-xl overflow-hidden transition-all ${
+                      isPublished
+                        ? 'border-green-500/40'
+                        : status?.type === 'posted'
+                          ? 'border-green-500 ring-1 ring-green-500'
+                          : status?.type === 'scheduled'
+                            ? 'border-blue-500 ring-1 ring-blue-500'
+                            : status?.type === 'error'
+                              ? 'border-red-500/50'
+                              : isDesigned
+                                ? 'border-emerald-500/50'
+                                : 'border-gray-800 hover:border-gray-700'
+                    }`}
+                  >
+                    {/* Visual area */}
+                    {(isDesigned || isPublished) && thumb ? (
+                      <div
+                        className="relative aspect-square bg-gray-800 cursor-pointer group"
+                        onClick={() => slides.length > 0 && setPreview({ item, startIndex: 0 })}
                       >
-                        Retry Approve Content
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handlePostNow(item.id)}
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-green-700 hover:bg-green-600 text-white font-medium transition-colors"
-                      >
-                        Retry Post to Instagram
-                      </button>
-                    )}
-                  </div>
-                ) : isRendering ? (
-                  <div className="pt-2">
-                    <button
-                      disabled
-                      className="w-full px-3 py-2 text-xs rounded-lg bg-gray-700 text-gray-400 cursor-not-allowed font-medium"
-                    >
-                      {status?.type === 'regenerating' ? 'Re-rendering...' : 'Rendering...'}
-                    </button>
-                  </div>
-                ) : isScripted ? (
-                  <div className="pt-2 space-y-1.5">
-                    <button
-                      onClick={() => setExpanded(isExpanded ? null : item.id)}
-                      className="w-full px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
-                    >
-                      {isExpanded ? 'Less' : 'More Info'}
-                    </button>
-                    <button
-                      onClick={() => handleApproveContent(item.id)}
-                      className="w-full px-3 py-2 text-xs rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors"
-                    >
-                      Approve Content
-                    </button>
-                    <button
-                      onClick={() => handleReject(item.id)}
-                      className="w-full px-3 py-1.5 bg-red-900/60 hover:bg-red-800 text-red-300 text-xs rounded-lg transition-colors"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                ) : (
-                  <div className="pt-2 space-y-1.5">
-                    <div className="flex gap-2">
-                      {slides.length > 0 && (
-                        <button
-                          onClick={() => setPreview({ item, startIndex: 0 })}
-                          className="flex-1 px-3 py-1.5 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs rounded-lg transition-colors"
-                        >
-                          Preview Full Post
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDownload(item.id)}
-                        className="px-3 py-1.5 bg-cyan-900/40 hover:bg-cyan-800/60 border border-cyan-700 text-cyan-300 text-xs rounded-lg transition-colors"
-                        title="Download"
-                      >
-                        Download
-                      </button>
-                      <button
-                        onClick={() => setExpanded(isExpanded ? null : item.id)}
-                        className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
-                      >
-                        {isExpanded ? 'Less' : 'Info'}
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => handlePostNow(item.id)}
-                      disabled={posting === item.id}
-                      className={`w-full px-3 py-2 text-xs rounded-lg transition-colors font-medium ${
-                        posting === item.id
-                          ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                          : 'bg-green-700 hover:bg-green-600 text-white'
-                      }`}
-                    >
-                      {posting === item.id ? 'Posting to Instagram...' : 'Post to Instagram'}
-                    </button>
-                    <div className="flex gap-1.5">
-                      <button
-                        onClick={() => handleSchedule(item.id)}
-                        disabled={scheduling === item.id}
-                        className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
-                          scheduling === item.id
-                            ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                            : 'bg-gray-800 hover:bg-gray-700 text-gray-400'
-                        }`}
-                      >
-                        {scheduling === item.id ? 'Scheduling...' : 'Schedule for Later'}
-                      </button>
-                      <button
-                        onClick={() => handleReject(item.id)}
-                        className="px-3 py-1.5 bg-red-900/60 hover:bg-red-800 text-red-300 text-xs rounded-lg transition-colors"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => handleRegenerate(item.id)}
-                      className="w-full px-3 py-1.5 text-xs rounded-lg transition-colors border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-gray-200"
-                    >
-                      Regenerate Visuals
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Expanded details */}
-              {isExpanded && (
-                <div className="border-t border-gray-800 p-4 space-y-4">
-                  {slides.length > 1 && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
-                        All Slides — click any to preview full-size
-                      </p>
-                      <div className="grid grid-cols-5 gap-1.5">
-                        {slides.map((src, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setPreview({ item, startIndex: i })}
-                            className="relative aspect-square rounded-md overflow-hidden border border-gray-700 hover:border-purple-500 transition-colors"
-                          >
-                            <img src={src} alt={`Slide ${i + 1}`} className="w-full h-full object-cover" />
-                            <span className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-gray-300 text-center py-0.5">
-                              {i + 1}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {item.caption && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Caption</p>
-                      <p className="text-xs text-gray-300 whitespace-pre-wrap">{item.caption}</p>
-                    </div>
-                  )}
-
-                  {script?.hook && item.content_type === 'reel' && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Reel Script</p>
-                      <div className="bg-gray-800 rounded-lg p-3 space-y-2">
-                        <div>
-                          <span className="text-xs text-pink-400">HOOK (0-1.7s):</span>
-                          <p className="text-xs mt-0.5">{script.hook.onScreenText}</p>
+                        {isVideo(thumb) ? (
+                          <video src={thumb} muted playsInline className="w-full h-full object-cover" onMouseOver={e => (e.target as HTMLVideoElement).play()} onMouseOut={e => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0; }} />
+                        ) : (
+                          <img src={thumb} alt={item.title} className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                          <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 px-4 py-2 rounded-lg">
+                            {isVideo(thumb) ? 'Preview Reel' : (slides.length > 1 ? `Preview All ${slides.length} Slides` : 'Preview Post')}
+                          </span>
                         </div>
-                        {script.body?.map((seg: any, i: number) => (
-                          <div key={i}>
-                            <span className="text-xs text-gray-500">{seg.timestamp}s:</span>
-                            <p className="text-xs mt-0.5">{seg.onScreenText}</p>
-                          </div>
-                        ))}
-                        {script.cta && (
+                        <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
+                          {item.content_type}
+                        </span>
+                        {slides.length > 1 && (
+                          <span className="absolute bottom-2 right-2 text-xs bg-gray-900/80 text-gray-300 px-2 py-0.5 rounded-full">
+                            {slides.length} slides
+                          </span>
+                        )}
+                        <span className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${badge.className}`}>
+                          {badge.label}
+                        </span>
+                      </div>
+                    ) : isRendering ? (
+                      <div className="relative aspect-[4/3] bg-gray-800 flex flex-col items-center justify-center gap-3">
+                        <span className="inline-block w-8 h-8 border-3 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-sm text-purple-300">{status?.type === 'regenerating' ? 'Re-rendering visuals...' : 'Rendering visuals...'}</span>
+                        <span className={`absolute top-2 left-2 text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
+                          {item.content_type}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="relative bg-gray-800/50 p-4 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs text-white px-2 py-0.5 rounded-full ${typeColors[item.content_type] || 'bg-gray-600'}`}>
+                            {item.content_type}
+                          </span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${badge.className}`}>
+                            {badge.label}
+                          </span>
+                        </div>
+                        {item.send_trigger && (
                           <div>
-                            <span className="text-xs text-green-400">CTA:</span>
-                            <p className="text-xs mt-0.5">{script.cta.onScreenText}</p>
+                            <span className="text-[10px] text-gray-500 uppercase tracking-wider">Send Trigger</span>
+                            <p className="text-xs text-gray-300">{item.send_trigger}</p>
                           </div>
                         )}
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {hashtags.length > 0 && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Hashtags</p>
-                      <div className="flex flex-wrap gap-1">
-                        {hashtags.map((tag: string, i: number) => (
-                          <span key={i} className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">
-                            #{tag.replace('#', '')}
+                    {/* Info */}
+                    <div className="p-4 space-y-2">
+                      <h3 className="font-medium text-sm leading-tight">{item.title || 'Untitled'}</h3>
+                      {item.hook && <p className="text-xs text-gray-400 line-clamp-2">{item.hook}</p>}
+
+                      {item.send_probability && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-gray-500">Send:</span>
+                          <span className={probColors[item.send_probability] || 'text-gray-400'}>
+                            {item.send_probability?.replace('_', ' ')}
                           </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                        </div>
+                      )}
 
-                  {item.dm_trigger_keyword && (
-                    <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-3">
-                      <p className="text-xs text-purple-400">
-                        DM Trigger: "{item.dm_trigger_keyword}"
-                      </p>
+                      {/* Action buttons — vary by status */}
+                      {isPublished ? (
+                        <div className="pt-2 space-y-1.5">
+                          <div className="w-full px-3 py-2 text-xs rounded-lg bg-green-900/40 border border-green-700 text-green-300 text-center font-medium">
+                            Posted to Instagram
+                          </div>
+                          <div className="flex gap-2">
+                            {slides.length > 0 && (
+                              <button
+                                onClick={() => setPreview({ item, startIndex: 0 })}
+                                className="flex-1 px-3 py-1.5 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs rounded-lg transition-colors"
+                              >
+                                Preview
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDownload(item.id)}
+                              className="px-3 py-1.5 bg-cyan-900/40 hover:bg-cyan-800/60 border border-cyan-700 text-cyan-300 text-xs rounded-lg transition-colors"
+                            >
+                              Download
+                            </button>
+                          </div>
+                        </div>
+                      ) : status?.type === 'posted' ? (
+                        <div className="pt-2">
+                          <div className="w-full px-3 py-2 text-xs rounded-lg bg-green-900/40 border border-green-700 text-green-300 text-center font-medium">
+                            {status.message}
+                          </div>
+                        </div>
+                      ) : status?.type === 'scheduled' ? (
+                        <div className="pt-2">
+                          <div className="w-full px-3 py-2 text-xs rounded-lg bg-blue-900/40 border border-blue-700 text-blue-300 text-center font-medium">
+                            {status.message}
+                          </div>
+                        </div>
+                      ) : status?.type === 'error' ? (
+                        <div className="pt-2 space-y-2">
+                          <div className="w-full px-3 py-2 text-xs rounded-lg bg-red-900/40 border border-red-700 text-red-300 text-center">
+                            {status.message}
+                          </div>
+                          {isScripted ? (
+                            <button
+                              onClick={() => handleApproveContent(item.id)}
+                              className="w-full px-3 py-2 text-xs rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors"
+                            >
+                              Retry Approve Content
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handlePostNow(item.id)}
+                              className="w-full px-3 py-2 text-xs rounded-lg bg-green-700 hover:bg-green-600 text-white font-medium transition-colors"
+                            >
+                              Retry Post to Instagram
+                            </button>
+                          )}
+                        </div>
+                      ) : isRendering ? (
+                        <div className="pt-2">
+                          <button
+                            disabled
+                            className="w-full px-3 py-2 text-xs rounded-lg bg-gray-700 text-gray-400 cursor-not-allowed font-medium"
+                          >
+                            {status?.type === 'regenerating' ? 'Re-rendering...' : 'Rendering...'}
+                          </button>
+                        </div>
+                      ) : isScripted ? (
+                        <div className="pt-2 space-y-1.5">
+                          <button
+                            onClick={() => setExpanded(isExpanded ? null : item.id)}
+                            className="w-full px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
+                          >
+                            {isExpanded ? 'Less' : 'More Info'}
+                          </button>
+                          <button
+                            onClick={() => handleApproveContent(item.id)}
+                            className="w-full px-3 py-2 text-xs rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors"
+                          >
+                            Approve Content
+                          </button>
+                          <button
+                            onClick={() => handleReject(item.id)}
+                            className="w-full px-3 py-1.5 bg-red-900/60 hover:bg-red-800 text-red-300 text-xs rounded-lg transition-colors"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="pt-2 space-y-1.5">
+                          <div className="flex gap-2">
+                            {slides.length > 0 && (
+                              <button
+                                onClick={() => setPreview({ item, startIndex: 0 })}
+                                className="flex-1 px-3 py-1.5 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs rounded-lg transition-colors"
+                              >
+                                Preview Full Post
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDownload(item.id)}
+                              className="px-3 py-1.5 bg-cyan-900/40 hover:bg-cyan-800/60 border border-cyan-700 text-cyan-300 text-xs rounded-lg transition-colors"
+                              title="Download"
+                            >
+                              Download
+                            </button>
+                            <button
+                              onClick={() => setExpanded(isExpanded ? null : item.id)}
+                              className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg transition-colors"
+                            >
+                              {isExpanded ? 'Less' : 'Info'}
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handlePostNow(item.id)}
+                            disabled={posting === item.id}
+                            className={`w-full px-3 py-2 text-xs rounded-lg transition-colors font-medium ${
+                              posting === item.id
+                                ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                : 'bg-green-700 hover:bg-green-600 text-white'
+                            }`}
+                          >
+                            {posting === item.id ? 'Posting to Instagram...' : 'Post to Instagram'}
+                          </button>
+                          <div className="flex gap-1.5">
+                            <button
+                              onClick={() => handleSchedule(item.id)}
+                              disabled={scheduling === item.id}
+                              className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                                scheduling === item.id
+                                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                  : 'bg-gray-800 hover:bg-gray-700 text-gray-400'
+                              }`}
+                            >
+                              {scheduling === item.id ? 'Scheduling...' : 'Schedule for Later'}
+                            </button>
+                            <button
+                              onClick={() => handleReject(item.id)}
+                              className="px-3 py-1.5 bg-red-900/60 hover:bg-red-800 text-red-300 text-xs rounded-lg transition-colors"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handleRegenerate(item.id)}
+                            className="w-full px-3 py-1.5 text-xs rounded-lg transition-colors border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-gray-200"
+                          >
+                            Regenerate Visuals
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
+
+                    {/* Expanded details */}
+                    {isExpanded && (
+                      <div className="border-t border-gray-800 p-4 space-y-4">
+                        {slides.length > 1 && (
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+                              All Slides — click any to preview full-size
+                            </p>
+                            <div className="grid grid-cols-5 gap-1.5">
+                              {slides.map((src, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => setPreview({ item, startIndex: i })}
+                                  className="relative aspect-square rounded-md overflow-hidden border border-gray-700 hover:border-purple-500 transition-colors"
+                                >
+                                  <img src={src} alt={`Slide ${i + 1}`} className="w-full h-full object-cover" />
+                                  <span className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-gray-300 text-center py-0.5">
+                                    {i + 1}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {item.caption && (
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Caption</p>
+                            <p className="text-xs text-gray-300 whitespace-pre-wrap">{item.caption}</p>
+                          </div>
+                        )}
+
+                        {script?.hook && item.content_type === 'reel' && (
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Reel Script</p>
+                            <div className="bg-gray-800 rounded-lg p-3 space-y-2">
+                              <div>
+                                <span className="text-xs text-pink-400">HOOK (0-1.7s):</span>
+                                <p className="text-xs mt-0.5">{script.hook.onScreenText}</p>
+                              </div>
+                              {script.body?.map((seg: any, i: number) => (
+                                <div key={i}>
+                                  <span className="text-xs text-gray-500">{seg.timestamp}s:</span>
+                                  <p className="text-xs mt-0.5">{seg.onScreenText}</p>
+                                </div>
+                              ))}
+                              {script.cta && (
+                                <div>
+                                  <span className="text-xs text-green-400">CTA:</span>
+                                  <p className="text-xs mt-0.5">{script.cta.onScreenText}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {hashtags.length > 0 && (
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Hashtags</p>
+                            <div className="flex flex-wrap gap-1">
+                              {hashtags.map((tag: string, i: number) => (
+                                <span key={i} className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">
+                                  #{tag.replace('#', '')}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {item.dm_trigger_keyword && (
+                          <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-3">
+                            <p className="text-xs text-purple-400">
+                              DM Trigger: "{item.dm_trigger_keyword}"
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }
@@ -1411,7 +1536,7 @@ export default function Content() {
 
       <div className="border-t border-gray-800" />
 
-      <ReadyContentSection onScheduled={fetchSchedule} onPublished={refreshAll} />
+      <AllContentSection onScheduled={fetchSchedule} onPublished={refreshAll} />
     </div>
   );
 }

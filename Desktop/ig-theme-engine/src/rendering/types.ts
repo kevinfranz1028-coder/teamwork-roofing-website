@@ -58,6 +58,7 @@ export interface ReelScript {
   ctaVoiceover?: string;
   totalLength: number;
   voiceoverText: string;
+  sceneSetup?: string;
 }
 
 export interface RenderConfig {

@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { CONFIG } from '../config/env.js';
 import { getSetting } from '../config/ai-settings.js';
 import { withRetry } from '../utils/retry.js';
+import { logApiCost } from '../utils/cost-tracker.js';
 
 const client = new Anthropic({ apiKey: CONFIG.ai.apiKey });
 
@@ -38,11 +39,24 @@ export async function askClaude(request: ClaudeRequest): Promise<ClaudeResponse>
     const inputCost = (response.usage.input_tokens / 1_000_000) * 3;
     const outputCost = (response.usage.output_tokens / 1_000_000) * 15;
 
+    const totalCost = inputCost + outputCost;
+
+    logApiCost({
+      provider: 'anthropic',
+      category: 'text',
+      endpoint: 'messages.create',
+      model: CONFIG.ai.model,
+      description: request.systemPrompt.slice(0, 80),
+      inputTokens: response.usage.input_tokens,
+      outputTokens: response.usage.output_tokens,
+      estimatedCost: totalCost,
+    });
+
     return {
       text,
       inputTokens: response.usage.input_tokens,
       outputTokens: response.usage.output_tokens,
-      cost: inputCost + outputCost,
+      cost: totalCost,
     };
   }, {
     maxAttempts: 3,

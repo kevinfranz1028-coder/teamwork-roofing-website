@@ -6,7 +6,7 @@ interface ReelScript {
   hook: {
     onScreenText: string;
     visual: string;
-    audio: string;
+    voiceoverScript: string;
   };
   body: Array<{
     timestamp: number;
@@ -14,16 +14,25 @@ interface ReelScript {
     voiceoverScript: string;
     visual: string;
     pacing: 'fast' | 'medium' | 'slow';
+    segmentType: string;
+    durationSeconds: number;
   }>;
   cta: {
     onScreenText: string;
-    voiceover: string;
+    voiceoverScript: string;
     visual: string;
   };
+  voiceoverText: string;
   totalLength: number;
   audioMood: string;
-  captionKeywords: string[];
-  hashtags: string[];
+  caption: {
+    hookLine: string;
+    body: string;
+    cta: string;
+    seoKeywords: string[];
+    hashtags: string[];
+  };
+  dmTrigger: string;
 }
 
 export async function buildReel(
@@ -37,14 +46,16 @@ export async function buildReel(
   });
 
   // Store the script in database
+  const caption = result.caption || {} as any;
   insertRow('content_scripts', {
     idea_id: idea.id,
     content_type: 'reel',
     script_json: JSON.stringify(result),
-    caption: result.captionKeywords.join(', '),
-    caption_keywords: JSON.stringify(result.captionKeywords),
-    hashtags: JSON.stringify(result.hashtags),
-    cta_text: result.cta.onScreenText,
+    caption: `${caption.hookLine || ''}\n\n${caption.body || ''}\n\n${caption.cta || ''}`,
+    caption_keywords: JSON.stringify(caption.seoKeywords || []),
+    hashtags: JSON.stringify(caption.hashtags || []),
+    cta_text: result.cta?.onScreenText || '',
+    dm_trigger_keyword: result.dmTrigger || '',
   });
 
   return result;

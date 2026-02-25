@@ -80,9 +80,9 @@ app.get('/api/queue', (req, res) => {
     FROM content_scripts cs
     JOIN content_ideas ci ON cs.idea_id = ci.id
     LEFT JOIN rendered_assets ra ON ra.script_id = cs.id
-    WHERE ci.status IN ('scripted', 'approved', 'designed')
+    WHERE ci.status IN ('scripted', 'approved', 'designed', 'published')
     ORDER BY cs.created_at DESC
-    LIMIT 50
+    LIMIT 100
   `).all().map((row: any) => ({
     ...row,
     local_paths: row.local_paths ? JSON.parse(row.local_paths) : [],
@@ -905,6 +905,141 @@ app.get('/api/download/:scriptId', (req, res) => {
     });
     archive.finalize();
   }
+});
+
+// ─── API Costs ─────────────────────────────────────
+app.get('/api/costs/summary', (req, res) => {
+  const db = getDb();
+  const period = (req.query.period as string) || 'all';
+
+  let dateFilter = '';
+  if (period === 'today') dateFilter = "AND created_at >= date('now')";
+  else if (period === '7d') dateFilter = "AND created_at >= date('now', '-7 days')";
+  else if (period === '30d') dateFilter = "AND created_at >= date('now', '-30 days')";
+
+  const totalRow = db.prepare(`SELECT COALESCE(SUM(estimated_cost), 0) as total, COUNT(*) as calls FROM api_costs WHERE 1=1 ${dateFilter}`).get() as any;
+
+  const byProvider = db.prepare(`SELECT provider, COALESCE(SUM(estimated_cost), 0) as total, COUNT(*) as calls FROM api_costs WHERE 1=1 ${dateFilter} GROUP BY provider ORDER BY total DESC`).all();
+
+  const byCategory = db.prepare(`SELECT category, COALESCE(SUM(estimated_cost), 0) as total, COUNT(*) as calls FROM api_costs WHERE 1=1 ${dateFilter} GROUP BY category ORDER BY total DESC`).all();
+
+  const periods = {
+    today: (db.prepare("SELECT COALESCE(SUM(estimated_cost), 0) as total FROM api_costs WHERE created_at >= date('now')").get() as any).total,
+    week: (db.prepare("SELECT COALESCE(SUM(estimated_cost), 0) as total FROM api_costs WHERE created_at >= date('now', '-7 days')").get() as any).total,
+    month: (db.prepare("SELECT COALESCE(SUM(estimated_cost), 0) as total FROM api_costs WHERE created_at >= date('now', '-30 days')").get() as any).total,
+    all: (db.prepare("SELECT COALESCE(SUM(estimated_cost), 0) as total FROM api_costs").get() as any).total,
+  };
+
+  res.json({ total: totalRow.total, calls: totalRow.calls, byProvider, byCategory, periods });
+});
+
+app.get('/api/costs/breakdown', (req, res) => {
+  const db = getDb();
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+  const offset = (page - 1) * limit;
+  const provider = req.query.provider as string;
+  const category = req.query.category as string;
+
+  let where = 'WHERE 1=1';
+  const params: any[] = [];
+  if (provider) { where += ' AND provider = ?'; params.push(provider); }
+  if (category) { where += ' AND category = ?'; params.push(category); }
+
+  const totalRow = db.prepare(`SELECT COUNT(*) as count FROM api_costs ${where}`).get(...params) as any;
+  const rows = db.prepare(`SELECT * FROM api_costs ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(...params, limit, offset);
+
+  res.json({ items: rows, total: totalRow.count, page, limit });
+});
+
+app.get('/api/costs/by-project', (req, res) => {
+  const db = getDb();
+
+  // Use project_label if set, otherwise fall back to idea_id
+  const rows = db.prepare(`
+    SELECT
+      COALESCE(project_label, CAST(idea_id AS TEXT), 'unassigned') as project_key,
+      COUNT(*) as calls,
+      ROUND(COALESCE(SUM(estimated_cost), 0), 4) as total_cost,
+      ROUND(COALESCE(SUM(CASE WHEN category = 'image' THEN estimated_cost ELSE 0 END), 0), 4) as image_cost,
+      ROUND(COALESCE(SUM(CASE WHEN category = 'video' THEN estimated_cost ELSE 0 END), 0), 4) as video_cost,
+      ROUND(COALESCE(SUM(CASE WHEN category = 'text' THEN estimated_cost ELSE 0 END), 0), 4) as text_cost,
+      ROUND(COALESCE(SUM(CASE WHEN category = 'tts' THEN estimated_cost ELSE 0 END), 0), 4) as tts_cost,
+      ROUND(COALESCE(SUM(CASE WHEN category = 'vision' THEN estimated_cost ELSE 0 END), 0), 4) as vision_cost,
+      MIN(created_at) as first_cost,
+      MAX(created_at) as last_cost
+    FROM api_costs
+    GROUP BY project_key
+    ORDER BY total_cost DESC
+  `).all() as any[];
+
+  const projects = rows.map((row: any) => {
+    let title = row.project_key;
+    let contentType = 'unknown';
+
+    // Try to match project_key to content_ideas
+    const ideaId = parseInt(row.project_key);
+    if (!isNaN(ideaId)) {
+      const idea = db.prepare('SELECT title, content_type FROM content_ideas WHERE id = ?').get(ideaId) as any;
+      if (idea) {
+        title = idea.title;
+        contentType = idea.content_type;
+      }
+    }
+
+    // Infer type from label pattern
+    if (row.project_key === 'reel-batch') {
+      title = 'Reel Rendering (images, video, TTS)';
+      contentType = 'reel';
+    } else if (row.project_key === 'carousel-batch') {
+      title = 'Carousel Rendering (background images)';
+      contentType = 'carousel';
+    } else if (row.project_key === 'quality-gate') {
+      title = 'Quality Gate (vision checks)';
+      contentType = 'mixed';
+    } else if (row.project_key === 'idea-generation') {
+      title = 'Content Idea Generation';
+      contentType = 'mixed';
+    } else if (row.project_key.startsWith('carousel-')) {
+      contentType = 'carousel';
+      if (title === row.project_key) title = `Carousel #${row.project_key.replace('carousel-', '')}`;
+    } else if (row.project_key.startsWith('reel-')) {
+      contentType = 'reel';
+      if (title === row.project_key) title = `Reel #${row.project_key.replace('reel-', '')}`;
+    } else if (row.project_key === 'unassigned') {
+      title = 'Shared / Unassigned';
+      contentType = 'mixed';
+    }
+
+    return {
+      projectKey: row.project_key,
+      title,
+      contentType,
+      calls: row.calls,
+      totalCost: row.total_cost,
+      breakdown: {
+        image: row.image_cost,
+        video: row.video_cost,
+        text: row.text_cost,
+        tts: row.tts_cost,
+        vision: row.vision_cost,
+      },
+      firstCost: row.first_cost,
+      lastCost: row.last_cost,
+    };
+  });
+
+  res.json(projects);
+});
+
+app.get('/api/costs/balances', (_req, res) => {
+  res.json({
+    anthropic: { status: 'check_dashboard', url: 'https://console.anthropic.com/settings/billing' },
+    openai: { status: 'check_dashboard', url: 'https://platform.openai.com/usage' },
+    replicate: { status: 'check_dashboard', url: 'https://replicate.com/account/billing' },
+    fal: { status: 'check_dashboard', url: 'https://fal.ai/dashboard/billing' },
+    ideogram: { status: 'check_dashboard', url: 'https://ideogram.ai/manage' },
+  });
 });
 
 // ─── Serve Rendered Assets ─────────────────────────

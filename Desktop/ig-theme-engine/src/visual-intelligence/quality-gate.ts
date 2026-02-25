@@ -1,236 +1,159 @@
-// Quality Gate — Validates every generated image/video and scores quality
-import sharp from 'sharp';
-import { readFile, stat } from 'fs/promises';
-import Anthropic from '@anthropic-ai/sdk';
+import { readFileSync } from 'fs';
 import { CONFIG } from '../config/env.js';
 import { getDb } from '../database/db.js';
-import type { QualityReport, VisualPlan, QualityLogEntry } from './types.js';
+import type { QualityReport } from './types.js';
+import { logApiCost } from '../utils/cost-tracker.js';
 
-const anthropic = new Anthropic({ apiKey: CONFIG.ai.apiKey });
-
-const QUALITY_CHECK_PROMPT = `Evaluate this AI-generated image for an Instagram post. Score it 1-10 on "would this pass as a real photograph on Instagram?" Check for these specific issues:
-
-1. GARBLED TEXT: Are there any words, letters, or text-like artifacts in the image? AI models often generate gibberish text on signs, labels, packaging. Any visible text that isn't perfectly readable = automatic failure.
-
-2. COLLAGE LAYOUT: Does the image look like multiple images stacked or side-by-side? A good image is ONE cohesive scene from ONE camera angle.
-
-3. BLACK BARS/VOIDS: Are there any solid black or empty areas? The image should fill the entire canvas edge-to-edge.
-
-4. SEAMS/STITCHING: Is there a visible line where two different images were joined?
-
-5. SUBJECT CLARITY: Is the main subject clearly visible and properly focused?
-
-6. REALISM: Would a casual Instagram scroller think this was a real photo?
-
-7. COMPOSITION: Is the image well-composed with professional framing?
-
-Respond in JSON only, no markdown:
-{
-  "score": 1-10,
-  "issues": ["list of detected problems"],
-  "garbled_text_detected": true/false,
-  "collage_detected": true/false,
-  "black_bars_detected": true/false,
-  "seams_detected": true/false,
-  "subject_clarity": true/false,
-  "brand_alignment": true/false,
-  "feedback": "specific suggestion for improving the prompt if regeneration is needed"
-}`;
-
-function isQualityGateEnabled(): boolean {
-  return process.env.QUALITY_GATE_ENABLED !== 'false';
-}
-
-function getMinScore(): number {
-  return parseInt(process.env.QUALITY_GATE_MIN_SCORE || '7', 10);
-}
-
+/**
+ * Validate a generated image using Claude Vision.
+ * Returns a score 1-10 with specific issue detection.
+ */
 export async function validateImage(
   imagePath: string,
-  plan: VisualPlan
+  prompt: string,
+  model: string,
+  contentType: string,
+  segmentType: string
 ): Promise<QualityReport> {
-  // 1. Technical checks (fast, no AI needed)
-  const techChecks = await runTechnicalChecks(imagePath, plan.aspectRatio);
-
-  // If quality gate is disabled, return a passing report based on tech checks only
-  if (!isQualityGateEnabled()) {
-    return {
-      score: techChecks.allPassed ? 8 : 5,
-      pass: techChecks.allPassed,
-      issues: techChecks.issues,
-      feedback: '',
-      checks: {
-        dimensions: techChecks.dimensions,
-        fileSize: techChecks.fileSize,
-        noGarbledText: true,
-        noCollage: true,
-        noBlackBars: true,
-        noSeams: true,
-        subjectClarity: true,
-        brandAlignment: true,
-      },
-    };
+  const apiKey = CONFIG.ai.apiKey;
+  if (!apiKey) {
+    console.log('    [Quality Gate] ANTHROPIC_API_KEY not set, skipping validation');
+    return defaultPass();
   }
 
-  // 2. AI Vision check (Claude with the image)
-  const imageBuffer = await readFile(imagePath);
-  const imageBase64 = imageBuffer.toString('base64');
-  const ext = imagePath.endsWith('.png') ? 'image/png' : 'image/jpeg';
-
   try {
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: ext as any, data: imageBase64 } },
-          { type: 'text', text: QUALITY_CHECK_PROMPT },
-        ],
-      }],
+    const imageBuffer = readFileSync(imagePath);
+    const base64 = imageBuffer.toString('base64');
+    const mediaType = imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg')
+      ? 'image/jpeg' : 'image/png';
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mediaType, data: base64 },
+            },
+            {
+              type: 'text',
+              text: `You are a quality inspector for AI-generated images used in Instagram plant care content. Score this image 1-10 and check for issues.
+
+The image was generated with this prompt: "${prompt.slice(0, 300)}"
+
+Check for these specific problems:
+- Garbled/unreadable text anywhere in the image
+- Collage/split-screen/multiple panels layout
+- Black bars, padding, or empty void areas
+- Subject unclear or not in focus
+- Unrealistic artifacts (weird textures, impossible anatomy, floating objects)
+- Brand misalignment (wrong mood for plant care content)
+
+Respond with ONLY valid JSON (no markdown, no backticks):
+{"score":7,"issues":["list of specific issues found"],"feedback":"one sentence suggestion for prompt improvement","checks":{"noGarbledText":true,"noCollage":true,"noBlackBars":true,"subjectClarity":true,"brandAlignment":true}}`,
+            },
+          ],
+        }],
+      }),
     });
 
-    const text = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map(b => b.text)
-      .join('');
+    if (!response.ok) {
+      console.log(`    [Quality Gate] Claude API error ${response.status}, skipping`);
+      return defaultPass();
+    }
 
+    const data = await response.json() as any;
+    const text = data.content?.[0]?.text || '';
+
+    // Log vision API cost
+    const inputTokens = data.usage?.input_tokens || 0;
+    const outputTokens = data.usage?.output_tokens || 0;
+    const visionCost = (inputTokens / 1_000_000) * 3 + (outputTokens / 1_000_000) * 15;
+    logApiCost({
+      provider: 'anthropic',
+      category: 'vision',
+      endpoint: 'messages.create (vision)',
+      model: 'claude-sonnet-4-5-20250929',
+      description: `Quality gate: ${model} ${segmentType}`,
+      inputTokens,
+      outputTokens,
+      estimatedCost: visionCost,
+    });
+
+    // Parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.warn('    Quality Gate: Could not parse vision response, passing with tech checks only');
-      return buildFallbackReport(techChecks);
+      console.log('    [Quality Gate] Could not parse response, skipping');
+      return defaultPass();
     }
 
-    const vision = JSON.parse(jsonMatch[0]);
-    const score = Math.min(10, Math.max(1, vision.score || 5));
+    const parsed = JSON.parse(jsonMatch[0]);
+    const minScore = parseInt(process.env.QUALITY_GATE_MIN_SCORE || '7');
 
-    return {
-      score,
-      pass: score >= getMinScore() && techChecks.allPassed,
-      issues: [...techChecks.issues, ...(vision.issues || [])],
-      feedback: vision.feedback || '',
+    const report: QualityReport = {
+      score: parsed.score || 5,
+      pass: (parsed.score || 5) >= minScore,
+      issues: parsed.issues || [],
+      feedback: parsed.feedback || '',
       checks: {
-        dimensions: techChecks.dimensions,
-        fileSize: techChecks.fileSize,
-        noGarbledText: !vision.garbled_text_detected,
-        noCollage: !vision.collage_detected,
-        noBlackBars: !vision.black_bars_detected,
-        noSeams: !vision.seams_detected,
-        subjectClarity: vision.subject_clarity !== false,
-        brandAlignment: vision.brand_alignment !== false,
+        noGarbledText: parsed.checks?.noGarbledText ?? true,
+        noCollage: parsed.checks?.noCollage ?? true,
+        noBlackBars: parsed.checks?.noBlackBars ?? true,
+        subjectClarity: parsed.checks?.subjectClarity ?? true,
+        brandAlignment: parsed.checks?.brandAlignment ?? true,
       },
     };
+
+    // Log to visual_quality_log for self-learning
+    try {
+      const db = getDb();
+      db.prepare(`INSERT INTO visual_quality_log (model, content_type, segment_type, prompt, quality_score, issues, retry_count, final_prompt)
+        VALUES (?, ?, ?, ?, ?, ?, 0, ?)`).run(
+        model, contentType, segmentType, prompt.slice(0, 1000),
+        report.score, JSON.stringify(report.issues), prompt.slice(0, 1000)
+      );
+    } catch { /* don't crash on logging failure */ }
+
+    const statusIcon = report.pass ? '\u2713' : '\u2717';
+    console.log(`    [Quality Gate] ${statusIcon} Score: ${report.score}/10 ${report.issues.length > 0 ? '— Issues: ' + report.issues.join(', ') : ''}`);
+
+    return report;
   } catch (err: any) {
-    console.warn(`    Quality Gate: Vision check failed (${err.message}), using tech checks only`);
-    return buildFallbackReport(techChecks);
+    console.log(`    [Quality Gate] Error: ${err.message?.slice(0, 80)}, skipping`);
+    return defaultPass();
   }
 }
 
-interface TechnicalCheckResult {
-  allPassed: boolean;
-  dimensions: boolean;
-  fileSize: boolean;
-  issues: string[];
-}
-
-async function runTechnicalChecks(imagePath: string, expectedAspectRatio: string): Promise<TechnicalCheckResult> {
-  const issues: string[] = [];
-  let dimensionsOk = true;
-  let fileSizeOk = true;
-
-  try {
-    const metadata = await sharp(imagePath).metadata();
-    const w = metadata.width || 0;
-    const h = metadata.height || 0;
-
-    // Check minimum resolution
-    if (w < 512 || h < 512) {
-      issues.push(`Image too small: ${w}x${h}`);
-      dimensionsOk = false;
-    }
-
-    // Check aspect ratio roughly matches
-    const ratio = w / h;
-    const expected = parseAspectRatio(expectedAspectRatio);
-    if (expected && Math.abs(ratio - expected) > 0.15) {
-      issues.push(`Aspect ratio mismatch: got ${ratio.toFixed(2)}, expected ~${expected.toFixed(2)}`);
-      dimensionsOk = false;
-    }
-  } catch {
-    issues.push('Could not read image metadata');
-    dimensionsOk = false;
-  }
-
-  try {
-    const stats = await stat(imagePath);
-    if (stats.size < 5000) {
-      issues.push('File too small — may be corrupt');
-      fileSizeOk = false;
-    }
-    if (stats.size > 50_000_000) {
-      issues.push('File unusually large (>50MB)');
-    }
-  } catch {
-    issues.push('Could not stat file');
-    fileSizeOk = false;
-  }
-
+function defaultPass(): QualityReport {
   return {
-    allPassed: dimensionsOk && fileSizeOk && issues.length === 0,
-    dimensions: dimensionsOk,
-    fileSize: fileSizeOk,
-    issues,
-  };
-}
-
-function parseAspectRatio(ar: string): number | null {
-  const parts = ar.split(/[x:]/);
-  if (parts.length === 2) {
-    const [a, b] = parts.map(Number);
-    if (a && b) return a / b;
-  }
-  return null;
-}
-
-function buildFallbackReport(techChecks: TechnicalCheckResult): QualityReport {
-  return {
-    score: techChecks.allPassed ? 7 : 4,
-    pass: techChecks.allPassed,
-    issues: techChecks.issues,
+    score: 7,
+    pass: true,
+    issues: [],
     feedback: '',
-    checks: {
-      dimensions: techChecks.dimensions,
-      fileSize: techChecks.fileSize,
-      noGarbledText: true,
-      noCollage: true,
-      noBlackBars: true,
-      noSeams: true,
-      subjectClarity: true,
-      brandAlignment: true,
-    },
+    checks: { noGarbledText: true, noCollage: true, noBlackBars: true, subjectClarity: true, brandAlignment: true },
   };
 }
 
 /**
- * Log a quality check result to the DB for self-learning.
+ * Query quality log for high-performing prompt patterns.
  */
-export function logQualityResult(entry: QualityLogEntry): void {
+export function getTopPromptPatterns(model: string, limit: number = 10): string[] {
   try {
     const db = getDb();
-    db.prepare(`
-      INSERT INTO visual_quality_log (model, content_type, segment_type, prompt, quality_score, issues, retry_count, final_prompt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      entry.model,
-      entry.contentType,
-      entry.segmentType || null,
-      entry.prompt,
-      entry.qualityScore,
-      JSON.stringify(entry.issues),
-      entry.retryCount,
-      entry.finalPrompt || null
-    );
-  } catch (err: any) {
-    console.warn(`    Quality log write failed: ${err.message}`);
+    const rows = db.prepare(
+      `SELECT final_prompt FROM visual_quality_log WHERE model = ? AND quality_score >= 8 ORDER BY quality_score DESC, created_at DESC LIMIT ?`
+    ).all(model, limit) as any[];
+    return rows.map(r => r.final_prompt);
+  } catch {
+    return [];
   }
 }

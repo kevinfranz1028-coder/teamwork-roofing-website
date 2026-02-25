@@ -10,6 +10,7 @@ import { CONFIG } from '../../config/env.js';
 interface ContentOption {
   title: string;
   content_type: 'carousel' | 'reel';
+  content_pillar?: string;
   hook: string;
   value_proposition: string;
   emotional_trigger: string;
@@ -68,11 +69,30 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
     console.log(chalk.gray(`  Using creative brief: "${activeBrief.title}"`));
   }
 
+  // Load recent titles for deduplication (last 30 ideas)
+  const recentIdeas = db.prepare(
+    'SELECT title, content_pillar FROM content_ideas ORDER BY created_at DESC LIMIT 30'
+  ).all() as { title: string; content_pillar: string | null }[];
+
+  const recentTitles = recentIdeas.map(i => i.title);
+
+  // Count pillar distribution from last 30 ideas
+  const pillarCounts: Record<string, number> = {
+    'diagnosis': 0, 'treatment': 0, 'prevention': 0, 'debunk': 0, 'trending-rescue': 0
+  };
+  for (const idea of recentIdeas) {
+    if (idea.content_pillar && pillarCounts[idea.content_pillar] !== undefined) {
+      pillarCounts[idea.content_pillar]++;
+    }
+  }
+
+  console.log(chalk.gray(`  Dedup: ${recentTitles.length} recent titles loaded, pillar counts: ${JSON.stringify(pillarCounts)}`));
+
   // Step 1: Generate 5 ideas via Claude
   console.log(chalk.gray('  Step 1/2: Generating ideas via Claude...'));
   const userPrompt = briefContext
-    ? OPTIONS_ENGINE_USER(niche, CONFIG.content.carouselSlideCount) + briefContext
-    : OPTIONS_ENGINE_USER(niche, CONFIG.content.carouselSlideCount);
+    ? OPTIONS_ENGINE_USER(niche, CONFIG.content.carouselSlideCount, recentTitles, pillarCounts) + briefContext
+    : OPTIONS_ENGINE_USER(niche, CONFIG.content.carouselSlideCount, recentTitles, pillarCounts);
 
   const result = await askClaudeJSON<OptionsResult>({
     systemPrompt: DAILY_ENGINE_SYSTEM(niche, briefContext),
@@ -84,8 +104,8 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
     throw new Error('Claude returned no options');
   }
 
-  // Step 2: Insert ideas + script each one
-  console.log(chalk.gray(`  Step 2/2: Scripting ${result.options.length} ideas...`));
+  // Step 2: Insert all ideas, then script them in PARALLEL
+  console.log(chalk.gray(`  Step 2/2: Scripting ${result.options.length} ideas in parallel...`));
 
   // Load brand system for builders
   const brand = db.prepare(
@@ -93,13 +113,9 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
   ).get() as { config_json: string } | undefined;
   const brandSystem = brand ? JSON.parse(brand.config_json) : {};
 
-  const batchOptions: GeneratedBatch['options'] = [];
-
-  for (let i = 0; i < result.options.length; i++) {
-    const opt = result.options[i];
+  // Insert all ideas into DB first (fast, synchronous)
+  const ideaEntries = result.options.map((opt, i) => {
     console.log(chalk.gray(`    [${i + 1}/5] ${opt.content_type}: ${opt.title}`));
-
-    // Insert idea into content_ideas
     const ideaId = insertRow('content_ideas', {
       title: opt.title,
       content_type: opt.content_type,
@@ -110,11 +126,17 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
       send_probability: opt.send_probability,
       save_probability: opt.save_probability,
       caption_seo_keywords: JSON.stringify(opt.caption_seo_keywords),
+      content_pillar: opt.content_pillar || null,
       status: 'scripted',
       batch_id: batchId,
     }) as number;
+    return { opt, ideaId };
+  });
 
-    // Build script via existing builders
+  // Script all 5 ideas in parallel via Claude
+  const scriptStartTime = Date.now();
+  console.log(chalk.gray(`    Dispatching ${ideaEntries.length} script builds in parallel...`));
+  await Promise.all(ideaEntries.map(async ({ opt, ideaId }) => {
     const builderIdea = {
       id: ideaId,
       title: opt.title,
@@ -122,7 +144,6 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
       formatNotes: opt.formatNotes || '',
       captionKeywords: opt.caption_seo_keywords || [],
     };
-
     try {
       if (opt.content_type === 'carousel') {
         await buildCarousel(builderIdea, brandSystem);
@@ -132,8 +153,12 @@ export async function generateContentOptions(): Promise<GeneratedBatch> {
     } catch (err: any) {
       console.log(chalk.yellow(`    Script failed for "${opt.title}": ${err.message}`));
     }
+  }));
+  console.log(chalk.gray(`    All scripts built in ${((Date.now() - scriptStartTime) / 1000).toFixed(1)}s`));
 
-    // Find the script that was just inserted
+  // Collect results
+  const batchOptions: GeneratedBatch['options'] = [];
+  for (const { opt, ideaId } of ideaEntries) {
     const script = db.prepare(
       'SELECT id FROM content_scripts WHERE idea_id = ? ORDER BY created_at DESC LIMIT 1'
     ).get(ideaId) as { id: number } | undefined;

@@ -291,113 +291,80 @@ function getInteractiveElementHtml(slide: StorySlideContent, config: RenderConfi
 
 export function reelOverlayHtml(
   text: string,
-  config: RenderConfig,
   segmentType: 'hook' | 'body' | 'cta' = 'body',
-  segmentIndex?: number,
-  totalSegments?: number
+  segmentIndex: number = 0,
+  totalSegments: number = 1,
+  brandHandle: string = '@ThePlantICU'
 ): string {
-  const accentFont = config.fonts.accent || 'JetBrains Mono';
-
-  const hookStyles = `
-    .overlay-text {
-      font-size: 72px; font-weight: 900; line-height: 1.1;
-      text-transform: uppercase; letter-spacing: -2px;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6);
-      max-width: 900px;
-      padding: 50px 60px;
-      border-left: 6px solid ${config.brandColors.accent};
-    }
-  `;
-
-  const bodyStyles = `
-    .overlay-text {
-      font-size: 48px; font-weight: 700; line-height: 1.3;
-      text-shadow: 0 3px 15px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5);
-      max-width: 860px;
-      padding: 40px 60px;
-      background: linear-gradient(135deg, rgba(27,67,50,0.85), rgba(10,15,13,0.75));
-      border-radius: 16px;
-      backdrop-filter: blur(8px);
-    }
-    .step-indicator {
-      font-family: '${accentFont}', monospace;
-      font-size: 20px; font-weight: 600;
-      color: ${config.brandColors.accent};
-      letter-spacing: 3px; text-transform: uppercase;
-      margin-bottom: 16px;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    }
-  `;
-
-  const ctaStyles = `
-    .overlay-text {
-      font-size: 52px; font-weight: 900; line-height: 1.2;
-      text-align: center;
-      text-shadow: 0 3px 15px rgba(0,0,0,0.7);
-      max-width: 800px;
-      margin-bottom: 30px;
-    }
-    .cta-button {
-      display: inline-block;
-      background: ${config.brandColors.accent};
-      color: #FFFFFF;
-      padding: 20px 50px;
-      border-radius: 40px;
-      font-size: 28px; font-weight: 700;
-      font-family: '${config.fonts.headline}', sans-serif;
-      box-shadow: 0 6px 25px rgba(212,165,116,0.4);
-    }
-    .handle {
-      margin-top: 20px;
-      font-size: 22px; opacity: 0.8;
-      font-family: '${config.fonts.body}', sans-serif;
-    }
-  `;
-
-  const styleMap = { hook: hookStyles, body: bodyStyles, cta: ctaStyles };
-
-  const stepLabel = segmentType === 'body' && segmentIndex !== undefined && totalSegments
-    ? `<div class="step-indicator">Step ${segmentIndex} of ${totalSegments}</div>`
-    : '';
-
-  const ctaButton = segmentType === 'cta'
-    ? `<div class="cta-button">Follow @ThePlantICU</div><div class="handle">Your plant's second chance starts here</div>`
-    : '';
-
-  const justification = segmentType === 'cta' ? 'center' : 'flex-end';
-  const alignment = segmentType === 'cta' ? 'center' : 'left';
+  const fontSize = segmentType === 'hook' ? '42px' : segmentType === 'cta' ? '36px' : '32px';
+  const fontWeight = segmentType === 'hook' ? '800' : '600';
+  const maxWidth = segmentType === 'hook' ? '85%' : '80%';
+  const bottomOffset = segmentType === 'cta' ? '18%' : '12%';
 
   return `<!DOCTYPE html>
-<html><head><style>
-  @import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(config.fonts.headline)}:wght@700;900&family=${encodeURIComponent(config.fonts.body)}:wght@400;600&family=JetBrains+Mono:wght@500;600&display=swap');
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    width: 1080px; height: 1920px;
-    background: transparent;
-    display: flex; flex-direction: column; justify-content: ${justification};
-    align-items: ${segmentType === 'cta' ? 'center' : 'flex-start'};
-    padding: 0 50px ${segmentType === 'cta' ? '300px' : '180px'};
-    font-family: '${config.fonts.headline}', sans-serif;
-    color: #FFFFFF; text-align: ${alignment};
-  }
-  ${styleMap[segmentType]}
-  .watermark {
-    position: absolute; bottom: 30px; right: 40px;
-    font-size: 18px; opacity: 0.4;
-    font-family: '${config.fonts.body}', sans-serif;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-  }
-  .progress-bar {
-    position: absolute; bottom: 0; left: 0;
-    height: 4px;
-    background: ${config.brandColors.accent};
-    opacity: 0.8;
-  }
-</style></head><body>
-  ${stepLabel}
-  <div class="overlay-text">${escapeHtml(text)}</div>
-  ${ctaButton}
-  <div class="watermark">@ThePlantICU</div>
-  ${segmentIndex !== undefined && totalSegments ? `<div class="progress-bar" style="width: ${((segmentIndex + 1) / (totalSegments + 2)) * 100}%"></div>` : ''}
-</body></html>`;
+<html>
+<head>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1080px;
+      height: 1920px;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      font-family: 'Inter', -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    .gradient-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.7) 100%);
+      pointer-events: none;
+    }
+
+    .subtitle {
+      position: absolute;
+      bottom: ${bottomOffset};
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: ${maxWidth};
+      text-align: center;
+      color: white;
+      font-size: ${fontSize};
+      font-weight: ${fontWeight};
+      line-height: 1.3;
+      text-shadow:
+        0 2px 8px rgba(0,0,0,0.8),
+        0 1px 3px rgba(0,0,0,0.9);
+      letter-spacing: -0.02em;
+      word-wrap: break-word;
+    }
+
+    .watermark {
+      position: absolute;
+      top: 48px;
+      right: 36px;
+      color: rgba(255,255,255,0.7);
+      font-size: 22px;
+      font-weight: 600;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+      letter-spacing: 0.01em;
+    }
+  </style>
+</head>
+<body>
+  <div class="gradient-overlay"></div>
+  ${text ? `<div class="subtitle">${escapeHtml(text)}</div>` : ''}
+  ${segmentType === 'cta' || segmentIndex === 0 ? `<div class="watermark">${escapeHtml(brandHandle)}</div>` : ''}
+</body>
+</html>`;
 }

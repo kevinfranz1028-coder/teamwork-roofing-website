@@ -1,5 +1,14 @@
 export function viralBlueprintPrompt(niche: string, subNiche: string): string {
-  return `For the niche: "${niche}" (sub-niche: ${subNiche})
+  return `Generate ideas across these 5 @ThePlantICU content pillars — aim for at least 2 ideas per pillar:
+1. DIAGNOSIS — symptom identification, "what's wrong with my plant" detective work
+2. TREATMENT — step-by-step recovery, rescue protocols
+3. PREVENTION — seasonal prep, care routines, common mistakes to avoid
+4. DEBUNK — myth-busting, correcting bad plant advice from the internet
+5. TRENDING RESCUE — timely hooks tied to seasons, viral moments, or cultural trends
+
+For each idea include a "contentPillar" field with one of: diagnosis, treatment, prevention, debunk, trending-rescue
+
+For the niche: "${niche}" (sub-niche: ${subNiche})
 
 Analyze the content patterns of top-performing ORIGINAL theme pages in this space and give me:
 
@@ -18,6 +27,7 @@ For EACH idea include:
 - formatNotes: For carousels: slide count (8-12), text density. For reels: length in seconds (under 30 for discovery), text overlay style
 - captionKeywords: 5-8 natural keywords for Instagram search SEO
 - hashtagSuggestions: Max 3-5 specific hashtags for categorization only
+- contentPillar: One of: diagnosis, treatment, prevention, debunk, trending-rescue
 
 2. The 3 content "formulas" that appear repeatedly in viral ORIGINAL posts for this niche (not reposts)
 
@@ -32,7 +42,8 @@ Return as JSON: {
     type: "carousel" | "reel",
     title, hook, valueProposition, emotionalTrigger,
     sendTrigger, sendProbability, saveProbability,
-    watchTimeStrategy, formatNotes, captionKeywords: [], hashtagSuggestions: []
+    watchTimeStrategy, formatNotes, captionKeywords: [], hashtagSuggestions: [],
+    contentPillar: "diagnosis" | "treatment" | "prevention" | "debunk" | "trending-rescue"
   }],
   viralFormulas: [{ name, description, whyItWorks }],
   postingCadence: { postsPerWeek, reelsPerWeek, carouselsPerWeek, storiesPerDay, rationale },
@@ -40,18 +51,20 @@ Return as JSON: {
 }`;
 }
 
-export const VIRAL_BLUEPRINT_SYSTEM = `You are a viral content strategist with deep knowledge of Instagram's 2026 algorithm.
+export const VIRAL_BLUEPRINT_SYSTEM = `You are a viral content strategist specializing in faceless Instagram pages in 2026, with deep expertise in the houseplant/indoor gardening niche.
 
-KEY ALGORITHM FACTS YOU MUST USE:
-- Watch time is the #1 ranking signal. Users decide to scroll in 1.7 seconds.
+## ALGORITHM FACTS
+- Watch time is #1 ranking signal. Scroll decision happens in 1.7 seconds.
 - DM sends carry 3-5x more weight than likes for reaching new audiences.
-- 694,000 Reels are sent via DM every minute — this is the growth engine.
-- Saves indicate personal value, but sends indicate SOCIAL value — sends > saves.
-- Content must be 100% original — no reposts, no screenshots, no curated clips.
-- Reels under 30 seconds outperform for discovery. 30-90 seconds for existing followers.
-- Carousels with 8-12 slides outperform shorter ones (more dwell time).
-- Original audio gets priority distribution over trending sounds.
-- Caption keyword SEO drives more discovery than hashtags.
-- Instagram penalizes overly promotional content — 80% value / 20% promotional max.
+- 694,000 Reels are sent via DM every minute — this is THE growth engine.
+- Saves = personal value. Sends = SOCIAL value. Sends > saves for growth.
+- 100% original content required — no reposts, screenshots, or curated clips.
+- Reels under 30 seconds outperform for discovery.
+- Original audio gets priority distribution.
+- Caption keyword SEO > hashtags for discovery.
+- 80% value / 20% promotional max.
 
-Your content ideas must be genuinely original and optimized for SENDS first, saves second.`;
+## PLANTICU IDENTITY
+@ThePlantICU is a plant diagnostic authority — think plant ER, not garden blog. Voice is concerned but competent plant nurse. Slightly dramatic because plants are actually dying and someone has to care. Content must be specific (name the plant, name the problem, name the fix), sendable (someone has a SPECIFIC person to DM it to), and original.
+
+Your ideas must be genuinely original and optimized for SENDS first, saves second.`;
