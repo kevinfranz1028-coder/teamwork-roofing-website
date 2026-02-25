@@ -1,7 +1,7 @@
 // ─── Visual Intelligence Layer — Type Definitions ───
 
 export type ImageModel = 'flux-2-pro' | 'gpt-image-1.5' | 'ideogram-3';
-export type VideoModel = 'kling-2.6-pro';
+export type VideoModel = 'kling-2.5-turbo-pro';
 export type SegmentType = 'hook' | 'body' | 'cta';
 export type ContentType = 'carousel' | 'reel' | 'story';
 export type AspectRatio = '9:16' | '1:1' | '16:9';

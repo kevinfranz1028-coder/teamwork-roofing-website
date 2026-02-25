@@ -19,7 +19,7 @@ export async function generateVideo(
     return { path: imagePath, model: 'still-fallback', durationSeconds: 0, fromImage: false };
   }
 
-  console.log(`    [Video Router] FAL_API_KEY is set, calling Kling 2.6 Pro...`);
+  console.log(`    [Video Router] FAL_API_KEY is set, calling Kling 2.5 Turbo Pro...`);
 
   try {
     const motionPrompt = plan.motionPrompt || buildMotionPrompt(plan, {

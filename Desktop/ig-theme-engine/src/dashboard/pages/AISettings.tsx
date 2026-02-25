@@ -57,7 +57,7 @@ const emptyForm: AISettingsForm = {
   image_negative_prompt: '',
   temperature: 0.7,
   default_image_model: 'flux-2-pro',
-  default_video_model: 'kling-2.6-pro',
+  default_video_model: 'kling-2.5-turbo-pro',
   enable_video_generation: true,
   video_motion_style: '',
   quality_gate_enabled: true,
@@ -82,7 +82,7 @@ function parseSettingToForm(s: any): AISettingsForm {
     image_negative_prompt: s.image_negative_prompt || '',
     temperature: s.temperature,
     default_image_model: s.default_image_model || 'flux-2-pro',
-    default_video_model: s.default_video_model || 'kling-2.6-pro',
+    default_video_model: s.default_video_model || 'kling-2.5-turbo-pro',
     enable_video_generation: s.enable_video_generation ?? true,
     video_motion_style: s.video_motion_style || '',
     quality_gate_enabled: s.quality_gate_enabled ?? true,
@@ -398,7 +398,7 @@ export default function AISettings() {
                   onChange={e => setForm({ ...form, default_video_model: e.target.value })}
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
                 >
-                  <option value="kling-2.6-pro">Kling 2.6 Pro (fal.ai)</option>
+                  <option value="kling-2.5-turbo-pro">Kling 2.5 Turbo Pro (fal.ai)</option>
                 </select>
               </div>
               <div className="flex items-center gap-3">

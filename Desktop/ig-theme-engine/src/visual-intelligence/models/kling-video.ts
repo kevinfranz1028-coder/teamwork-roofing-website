@@ -20,7 +20,7 @@ export async function generateVideoFromImage(
   const { fal } = await import('@fal-ai/client');
   fal.config({ credentials: apiKey });
 
-  console.log(`    [Kling 2.6 Pro] Generating ${durationSeconds}s video from still...`);
+  console.log(`    [Kling 2.5 Turbo Pro] Generating ${durationSeconds}s video from still...`);
 
   // Read image as data URI
   const imageBuffer = readFileSync(imagePath);
@@ -56,7 +56,7 @@ export async function generateVideoFromImage(
   const outputPath = path.join(outputDir, filename);
   await writeFile(outputPath, videoBuffer);
 
-  console.log(`    [Kling 2.6 Pro] Saved: ${filename} (${durationSeconds}s)`);
+  console.log(`    [Kling 2.5 Turbo Pro] Saved: ${filename} (${durationSeconds}s)`);
 
   logApiCost({
     provider: 'fal',
@@ -70,7 +70,7 @@ export async function generateVideoFromImage(
 
   return {
     path: outputPath,
-    model: 'kling-2.6-pro',
+    model: 'kling-2.5-turbo-pro',
     durationSeconds,
     fromImage: true,
   };

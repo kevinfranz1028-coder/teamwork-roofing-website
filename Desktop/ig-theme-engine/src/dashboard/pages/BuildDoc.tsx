@@ -226,7 +226,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     h2('1. Overview');
 
     h3('1.1 What Is This Application?');
-    p('ThePlantICU Content Engine is a full-stack application that automates the entire Instagram content lifecycle for a faceless theme page. It uses Claude AI (Anthropic) to generate content ideas, write production-ready scripts, and direct visual creation through a multi-model Visual Intelligence Layer. Those scripts are rendered into publishable assets (carousel PNGs, reel MP4 videos, story frames) using a Creative Director (Claude), three AI image models (FLUX 2 Pro, GPT Image 1.5, Ideogram 3.0), Kling 2.6 Pro video generation, a Quality Gate (Claude Vision), Puppeteer, OpenAI text-to-speech, and ffmpeg. The finished assets are uploaded to Cloudinary and published to Instagram via the Graph API.');
+    p('ThePlantICU Content Engine is a full-stack application that automates the entire Instagram content lifecycle for a faceless theme page. It uses Claude AI (Anthropic) to generate content ideas, write production-ready scripts, and direct visual creation through a multi-model Visual Intelligence Layer. Those scripts are rendered into publishable assets (carousel PNGs, reel MP4 videos, story frames) using a Creative Director (Claude), three AI image models (FLUX 2 Pro, GPT Image 1.5, Ideogram 3.0), Kling 2.5 Turbo Pro video generation, a Quality Gate (Claude Vision), Puppeteer, OpenAI text-to-speech, and ffmpeg. The finished assets are uploaded to Cloudinary and published to Instagram via the Graph API.');
     p('A React dashboard provides a browser-based control center for approving content, configuring AI behavior, tracking analytics, managing revenue, and monitoring the entire pipeline.');
 
     h3('1.2 Core Design Principles');
@@ -244,9 +244,9 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     p('**Database:** SQLite via `better-sqlite3` — single-file database with WAL mode and foreign keys. Zero configuration, perfect for a single-operator tool.');
     p('**CLI:** Commander.js providing 25+ terminal commands for headless operation.');
     p('**AI Content Generation:** Anthropic Claude API (Sonnet 4.5 by default) for all text generation. Includes JSON repair logic for truncated responses.');
-    p('**Visual Intelligence Layer:** Multi-model AI image and video generation pipeline. A Claude-powered Creative Director plans every visual with photographic language (lens, lighting, DoF, color). Three image models: FLUX 2 Pro (Replicate), GPT Image 1.5 (OpenAI), Ideogram 3.0 (Ideogram API). One video model: Kling 2.6 Pro via fal.ai for image-to-video generation. A Quality Gate uses Claude Vision to score every output 1-10 and auto-retries failures with refined prompts. Self-learning feedback loop stores results in visual_quality_log for prompt optimization.');
+    p('**Visual Intelligence Layer:** Multi-model AI image and video generation pipeline. A Claude-powered Creative Director plans every visual with photographic language (lens, lighting, DoF, color). Three image models: FLUX 2 Pro (Replicate), GPT Image 1.5 (OpenAI), Ideogram 3.0 (Ideogram API). One video model: Kling 2.5 Turbo Pro via fal.ai for image-to-video generation. A Quality Gate uses Claude Vision to score every output 1-10 and auto-retries failures with refined prompts. Self-learning feedback loop stores results in visual_quality_log for prompt optimization.');
     p('**AI Image Generation:** FLUX 2 Pro (Replicate) as default, GPT Image 1.5 (OpenAI) for photorealistic/text-heavy, Ideogram 3.0 for typography/logos. Model selection driven by Creative Director based on content needs.');
-    p('**AI Video Generation:** Kling 2.6 Pro via fal.ai for image-to-video and text-to-video. Graceful fallback to Ken Burns zoom stills when video generation is disabled or unavailable.');
+    p('**AI Video Generation:** Kling 2.5 Turbo Pro via fal.ai for image-to-video and text-to-video. Graceful fallback to Ken Burns zoom stills when video generation is disabled or unavailable.');
     p('**Voiceover:** OpenAI Text-to-Speech API (tts-1 model) with 6 voice options for reel narration. Per-segment TTS generation ensures voiceover is perfectly synced with visuals — audio duration drives each segment\'s visual length.');
     p('**Visual Rendering:** Puppeteer (headless Chrome) renders HTML/CSS templates to PNG screenshots. ffmpeg composes reel MP4 videos with crossfade transitions and per-segment audio-synced timing. Supports both video clips (from Kling) and still images (Ken Burns zoom).');
     p('**CDN:** Cloudinary for hosting rendered assets with public HTTPS URLs (required by Instagram Graph API for publishing).');
@@ -324,7 +324,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
       '**Step 5 — Content Options:** Module 04 generates 5 variations of a content idea (different angles, hooks, formats) so the operator can choose the strongest direction before committing to full script generation.',
       '**Step 6 — Script Building:** Module 03 takes the selected idea and produces a production-ready script. For carousels: 10-slide structure with hook/value/CTA slides, headlines, body text, AI image prompts (designNotes), and text hierarchy. For reels: timed segments with timestamp ranges (e.g. "4-7s"), on-screen text, per-segment voiceover scripts, visual descriptions, and pacing notes. The renderer parses multiple Claude field name variants (voiceover, voiceoverScript, audio) and timestamp formats ("4-7s", "0:02-0:05").',
       '**Step 7 — Approval Gate:** The operator reviews the script in the dashboard Content page. They can approve (moves to rendering), reject (archives), or edit the script. Nothing proceeds without explicit human action.',
-      '**Step 8 — Visual Rendering (Visual Intelligence Layer):** Approved scripts are rendered into publishable assets via the multi-model Visual Intelligence pipeline. The Creative Director (Claude AI) plans every visual with photographic language — selecting the optimal model (FLUX 2 Pro, GPT Image, or Ideogram), lens type, lighting, DoF, and color palette. The Image Router generates images and the Quality Gate (Claude Vision) validates each one, scoring 1-10 and auto-retrying with refined prompts if below threshold. For reels: per-segment TTS voiceover drives timing, Kling 2.6 Pro generates video from still images (falls back to Ken Burns zoom), segments are composed into MP4 by ffmpeg with crossfade transitions.',
+      '**Step 8 — Visual Rendering (Visual Intelligence Layer):** Approved scripts are rendered into publishable assets via the multi-model Visual Intelligence pipeline. The Creative Director (Claude AI) plans every visual with photographic language — selecting the optimal model (FLUX 2 Pro, GPT Image, or Ideogram), lens type, lighting, DoF, and color palette. The Image Router generates images and the Quality Gate (Claude Vision) validates each one, scoring 1-10 and auto-retrying with refined prompts if below threshold. For reels: per-segment TTS voiceover drives timing, Kling 2.5 Turbo Pro generates video from still images (falls back to Ken Burns zoom), segments are composed into MP4 by ffmpeg with crossfade transitions.',
       '**Step 9 — CDN Upload:** Rendered assets (PNGs, MP4s) are uploaded to Cloudinary, which provides public HTTPS URLs. Instagram Graph API requires publicly accessible URLs to create media containers.',
       '**Step 10 — Publishing:** The operator triggers "Post to Instagram" from the dashboard. The system calls Instagram Graph API to create media containers and publish the post. Carousel posts use `createCarouselItemContainer()` for each slide, then `createCarouselContainer()` + `publishMedia()`. Reels use `publishReel()` with the video URL.',
       '**Step 11 — Analytics:** Instagram Graph API insights are pulled daily via `refreshAnalytics()`. Metrics tracked: impressions, reach, sends, saves, likes, comments, shares, video views, watch time. Computed metrics: sends/reach %, likes/reach %, engagement rate. Weekly scorecards grade performance with traffic-light indicators.',
@@ -343,7 +343,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     bullet('**image_negative_prompt** → Appended as "Do not include: ..." to image prompts. Example: "blurry, low quality, text, watermark, deformed".');
     bullet('**temperature** → Overrides the default 0.7 temperature for all Claude API calls. Lower = more focused/predictable. Higher = more creative/varied.');
     bullet('**default_image_model** → Default model for the Image Router (flux-2-pro, gpt-image-1.5, or ideogram-3). Creative Director can override per-segment.');
-    bullet('**default_video_model** → Video model (kling-2.6-pro). Used by Video Router for image-to-video generation.');
+    bullet('**default_video_model** → Video model (kling-2.5-turbo-pro). Used by Video Router for image-to-video generation.');
     bullet('**enable_video_generation** → Master toggle for video generation. When false, reels use Ken Burns zoom on still images.');
     bullet('**video_motion_style** → Default motion style for Kling video generation (e.g., "gentle zoom with parallax", "slow orbit").');
     bullet('**quality_gate_enabled** → Enables Claude Vision validation of every generated image, scoring 1-10.');
@@ -365,7 +365,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
       { file: 'dashboard/pages/PipelineStatus.tsx', name: 'Pipeline Status', desc: 'Displays current pipeline phase (idle/generating/rendering/publishing) with color-coded status, last run timestamp, error log, and today\'s content package preview (carousel, reel, stories with DM triggers). Includes a "Run Daily Pipeline" button that triggers the full generate→render→approve workflow. Auto-refreshes every 5 seconds.' },
       { file: 'dashboard/pages/Content.tsx', name: 'Content', desc: 'The main content management hub with filter tabs (All, Not Rendered, Rendered, Approved, Posted) and date-grouped cards sorted newest first. Each card shows visual thumbnail, status badge (Not Rendered/Rendered/Approved/Posted), content type, and context-sensitive actions. Not-rendered items: "Approve Content" (triggers Visual Intelligence rendering). Rendered items: "Post to Instagram", "Schedule for Later", "Regenerate Visuals", "Preview Full Post", "Download". Posted items: read-only with preview/download only. Includes full-screen slide preview modal, DM trigger keywords, hashtags, reel script details, and send probability scoring.' },
       { file: 'dashboard/pages/CreativeBrief.tsx', name: 'Creative Brief', desc: 'CRUD interface for creative direction profiles. Each brief contains: title, notes/inspiration, competitor Instagram links (parsed from URLs), content angles (tag-style chips), mood & themes, visual style, and target emotions. The active brief (green border) guides AI content generation. Past briefs are listed with Activate/Edit/Delete buttons. Creating a new brief auto-deactivates the previous one.' },
-      { file: 'dashboard/pages/AISettings.tsx', name: 'AI Settings', desc: 'CRUD interface for AI behavior profiles. Seven sections: (1) Claude Personality — system prompt textarea with Reset to Default, (2) Image Prompt Instructions — carousel design instruction and reel visual instruction textareas, (3) Image Generation Style — style prefix, suffix, and negative prompt, (4) Model Parameters — temperature slider, (5) Visual Intelligence Layer — default image model (FLUX 2 Pro/GPT Image/Ideogram), default video model (Kling 2.6 Pro), video generation toggle, quality gate toggle and min score, (6) Photography Anchors — camera body, default lens, default lighting, default color profile, (7) Segment Visual Styles — video motion style, hook/body/CTA visual styles. Profiles can be versioned, activated, and compared.' },
+      { file: 'dashboard/pages/AISettings.tsx', name: 'AI Settings', desc: 'CRUD interface for AI behavior profiles. Seven sections: (1) Claude Personality — system prompt textarea with Reset to Default, (2) Image Prompt Instructions — carousel design instruction and reel visual instruction textareas, (3) Image Generation Style — style prefix, suffix, and negative prompt, (4) Model Parameters — temperature slider, (5) Visual Intelligence Layer — default image model (FLUX 2 Pro/GPT Image/Ideogram), default video model (Kling 2.5 Turbo Pro), video generation toggle, quality gate toggle and min score, (6) Photography Anchors — camera body, default lens, default lighting, default color profile, (7) Segment Visual Styles — video motion style, hook/body/CTA visual styles. Profiles can be versioned, activated, and compared.' },
       { file: 'dashboard/pages/Analytics.tsx', name: 'Analytics', desc: '30-day performance overview. Summary cards: total reach, total sends, total saves, average engagement rate, average sends/reach %. Per-post table sorted by sends/reach showing every published post with individual metrics. "Refresh Analytics" button pulls latest data from Instagram Graph API.' },
       { file: 'dashboard/pages/Scorecard.tsx', name: 'Scorecard', desc: 'Weekly KPI dashboard. Each metric gets a traffic-light health status: green (healthy), yellow (needs attention), red (critical). Tracked KPIs: sends/reach %, engagement rate, posts published per week, revenue. Historical scorecard comparison shows trends over time.' },
       { file: 'dashboard/pages/Revenue.tsx', name: 'Revenue', desc: 'Revenue tracking dashboard. Manual entry form (date, source, description, amount). Summary cards: total revenue, this month, last month. By-source breakdown. AI strategy generator that takes current follower count and recommends revenue streams, pricing, and setup steps.' },
@@ -507,7 +507,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
   // ─── RENDERING ───────────────────────────────────
   if (inc('rendering')) {
     h2('9. Rendering Pipeline');
-    p('The rendering pipeline converts JSON content scripts into publishable visual assets using the **Visual Intelligence Layer** — a multi-model AI pipeline with Claude-powered creative direction, automated quality validation, and self-learning prompt optimization. It uses Puppeteer (headless Chrome) for HTML→PNG rendering, FLUX 2 Pro / GPT Image / Ideogram for AI images, Kling 2.6 Pro for video generation, OpenAI TTS for voiceover audio, and ffmpeg for final video composition.');
+    p('The rendering pipeline converts JSON content scripts into publishable visual assets using the **Visual Intelligence Layer** — a multi-model AI pipeline with Claude-powered creative direction, automated quality validation, and self-learning prompt optimization. It uses Puppeteer (headless Chrome) for HTML→PNG rendering, FLUX 2 Pro / GPT Image / Ideogram for AI images, Kling 2.5 Turbo Pro for video generation, OpenAI TTS for voiceover audio, and ffmpeg for final video composition.');
 
     h3('9.1 Visual Intelligence Layer — Architecture');
     p('The Visual Intelligence Layer is a 6-component AI pipeline that manages the entire visual creation workflow. Every image and video generated by the system flows through this pipeline. Source files live in `src/visual-intelligence/`.');
@@ -532,10 +532,10 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     bullet('**Fallback chain:** Primary model fails → fallback to FLUX 2 Pro → all attempts fail → legacy `generateBackground()` (replicate-api.ts) → gradient fallback via Puppeteer');
 
     h4('Component 3: Video Router (`video-router.ts`)');
-    p('Generates video clips from still images using Kling 2.6 Pro via fal.ai. Called after Image Router for reel segments when video generation is enabled.');
+    p('Generates video clips from still images using Kling 2.5 Turbo Pro via fal.ai. Called after Image Router for reel segments when video generation is enabled.');
     bullet('**Input:** Image path, `VisualPlan`, output directory, filename');
     bullet('**Output:** `GeneratedVideo` with path, model, duration, fromImage flag');
-    bullet('**Kling integration:** Uses `@fal-ai/client` package with dynamic import (`const { fal } = await import(\'@fal-ai/client\')`). Model endpoint: `fal-ai/kling-video/v2/master/image-to-video`. Supports 5s and 10s durations, 9:16 aspect ratio.');
+    bullet('**Kling integration:** Uses `@fal-ai/client` package with dynamic import (`const { fal } = await import(\'@fal-ai/client\')`). Model endpoint: `fal-ai/kling-video/v2.5-turbo/pro/image-to-video`. Supports 5s and 10s durations, 9:16 aspect ratio.');
     bullet('**Motion prompt:** Uses `plan.motionPrompt` if Creative Director provided one, otherwise generates via `buildMotionPrompt()` from the Prompt Engineer');
     bullet('**Graceful fallback:** If `FAL_API_KEY` not set or Kling fails, returns the still image path with `model: \'still-fallback\'`. The reel renderer then applies Ken Burns zoompan effect via ffmpeg.');
     bullet('**Video-forced for reels:** The reel renderer overrides `plan.generateVideo = true` for all segments when video generation is enabled, even if the Creative Director returned false. This ensures reels always get Kling video when the feature is on.');
@@ -566,7 +566,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     bullet('**`flux-2-pro.ts`** — Replicate SDK integration. Calls `black-forest-labs/flux-2-pro`. Uses `aspect_ratio` string parameter (not width/height). Handles Replicate SDK `FileOutput` return type (which extends ReadableStream) — extracts the download URL via `String(output)`. Settings: `prompt_upsampling: true`, `guidance: 3.5`, `safety_tolerance: 5`.');
     bullet('**`gpt-image.ts`** — Raw `fetch()` to OpenAI API (`https://api.openai.com/v1/images/generations`). Model: `gpt-image-1`. Response format: `b64_json`. Size mapping: 1:1→1024x1024, 9:16→1024x1536, 16:9→1536x1024. Quality: high.');
     bullet('**`ideogram.ts`** — Raw `fetch()` to Ideogram API (`https://api.ideogram.ai/api/v1/ideogram-v3/generate`). Aspect ratio mapping: 1:1→ASPECT_1_1, 9:16→ASPECT_9_16, 16:9→ASPECT_16_9. Supports negative prompts natively.');
-    bullet('**`kling-video.ts`** — fal.ai client integration. Dynamic import: `const { fal } = await import(\'@fal-ai/client\')`. Model: `fal-ai/kling-video/v2/master/image-to-video`. Uploads image to fal storage first, then runs inference. Supports 5s and 10s duration. Returns MP4.');
+    bullet('**`kling-video.ts`** — fal.ai client integration. Dynamic import: `const { fal } = await import(\'@fal-ai/client\')`. Model: `fal-ai/kling-video/v2.5-turbo/pro/image-to-video`. Uploads image to fal storage first, then runs inference. Supports 5s and 10s duration. Returns MP4.');
     bullet('**`model-registry.ts`** — `MODEL_REGISTRY` Record keyed by `ImageModel`. Each entry has: `id`, `name`, `strengths`, `weaknesses`, `bestFor`, `costPerImage`, `avgGenerationSeconds`, `maxPromptLength`, `supportsNegativePrompt`. Used by Creative Director for informed model selection.');
 
     h3('9.2 Carousel Rendering (Visual Intelligence)');
@@ -585,7 +585,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     bullet('**Step 2 — Creative Director planning:** Build VisualBriefs for all segments, send to Creative Director via `planVisualsBatch()`. Returns per-segment VisualPlans with model, photographic prompt, motion prompt for video, lens/lighting/DoF/color specifications. The reel renderer forces `generateVideo=true` for all segments when video generation is enabled.');
     bullet('**Step 3 — Per-segment TTS:** Generate OpenAI TTS audio for each segment individually (hook, each body segment, CTA). Probe each clip\'s actual duration via ffprobe, set visual segment duration = audio duration + 0.3s buffer. This ensures perfect audio-visual sync. Falls back to generated silent audio on TTS failure.');
     bullet('**Step 4 — AI image generation:** Image Router generates per-segment background images via planned model (default FLUX 2 Pro, 9:16 aspect). Quality Gate validates each image with auto-retry on failure. Detailed logging shows model used, prompt, and quality score for each segment.');
-    bullet('**Step 5 — AI video generation:** Video Router sends each still image + motion prompt to Kling 2.6 Pro (fal.ai) for image-to-video generation. Generates 5-second clips per segment. The reel renderer reads `isVideoEnabled` from both the AI Settings database AND the `ENABLE_VIDEO_GENERATION` env var, and requires `FAL_API_KEY` to be set. Falls back to still image (Ken Burns applied later) when disabled or failed.');
+    bullet('**Step 5 — AI video generation:** Video Router sends each still image + motion prompt to Kling 2.5 Turbo Pro (fal.ai) for image-to-video generation. Generates 5-second clips per segment. The reel renderer reads `isVideoEnabled` from both the AI Settings database AND the `ENABLE_VIDEO_GENERATION` env var, and requires `FAL_API_KEY` to be set. Falls back to still image (Ken Burns applied later) when disabled or failed.');
     bullet('**Step 6 — Text overlays:** Render transparent PNG overlays via Puppeteer using `reelOverlayHtml()` templates at 1080x1920.');
     bullet('**Step 7 — Audio stitching:** Concatenate all per-segment audio clips into one continuous voiceover track via ffmpeg.');
     bullet('**Step 8 — Video composition:** ffmpeg composes the final MP4 using a complex filter graph. For segments with Kling video clips (.mp4): scales to 1080x1920 and trims to segment duration. For segments with still images: applies Ken Burns zoompan effect (slow zoom to 1.03x) to generate video frames. All segments joined with 0.3s crossfade transitions. Transparent text overlay composited on each segment. Voiceover audio track mixed in. Output: H.264 video, AAC audio, 25fps, yuv420p pixel format, faststart flag for web streaming.');
@@ -771,7 +771,7 @@ function OverviewSection() {
       </SectionCard>
       <SectionCard title="Tech Stack">
         <div className="flex flex-wrap gap-2">
-          {['TypeScript','Node.js','Express','React','Vite','Tailwind CSS','SQLite (better-sqlite3)','Puppeteer','ffmpeg','Commander.js','Claude API (Anthropic)','Claude Vision (Quality Gate)','Instagram Graph API','FLUX 2 Pro (Replicate)','GPT Image 1.5 (OpenAI)','Ideogram 3.0','Kling 2.6 Pro (fal.ai)','Cloudinary','OpenAI TTS','Buffer API'].map((t) => (
+          {['TypeScript','Node.js','Express','React','Vite','Tailwind CSS','SQLite (better-sqlite3)','Puppeteer','ffmpeg','Commander.js','Claude API (Anthropic)','Claude Vision (Quality Gate)','Instagram Graph API','FLUX 2 Pro (Replicate)','GPT Image 1.5 (OpenAI)','Ideogram 3.0','Kling 2.5 Turbo Pro (fal.ai)','Cloudinary','OpenAI TTS','Buffer API'].map((t) => (
             <span key={t} className="px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-xs text-gray-300">{t}</span>
           ))}
         </div>
@@ -853,7 +853,7 @@ function DataFlowSection() {
             { step: '5', label: 'Content Options', detail: 'Module 04 presents 5 variations for user selection (different angles/hooks)', color: 'text-yellow-400' },
             { step: '6', label: 'Script Building', detail: 'Module 03 converts chosen idea into production-ready carousel/reel/story script', color: 'text-green-400' },
             { step: '7', label: 'Approval Gate', detail: 'User reviews script in dashboard — approve, reject, or edit', color: 'text-purple-400' },
-            { step: '8', label: 'Visual Intelligence', detail: 'Creative Director plans visuals → Image Router (FLUX 2 Pro/GPT Image/Ideogram) → Quality Gate validates → Video Router (Kling 2.6 Pro) → ffmpeg composition', color: 'text-pink-400' },
+            { step: '8', label: 'Visual Intelligence', detail: 'Creative Director plans visuals → Image Router (FLUX 2 Pro/GPT Image/Ideogram) → Quality Gate validates → Video Router (Kling 2.5 Turbo Pro) → ffmpeg composition', color: 'text-pink-400' },
             { step: '9', label: 'CDN Upload', detail: 'Cloudinary hosts rendered assets with public HTTPS URLs', color: 'text-pink-400' },
             { step: '10', label: 'Publishing', detail: 'Instagram Graph API publishes carousel/reel. Buffer for scheduling.', color: 'text-green-400' },
             { step: '11', label: 'Analytics', detail: 'Graph API pulls impressions, reach, sends, saves. Weekly scorecard generated.', color: 'text-blue-400' },
@@ -887,7 +887,7 @@ Content Calendar:
           <p><Tag color="yellow">Negative Prompt</Tag> Added as &quot;Do not include: ...&quot; to image prompts</p>
           <p><Tag color="orange">Temperature</Tag> Controls Claude&apos;s creativity (0.0 = focused, 1.0 = creative)</p>
           <p><Tag color="pink">Default Image Model</Tag> FLUX 2 Pro, GPT Image 1.5, or Ideogram 3 — Creative Director can override per-segment</p>
-          <p><Tag color="pink">Video Generation</Tag> Enable/disable Kling 2.6 Pro video — falls back to Ken Burns zoom stills</p>
+          <p><Tag color="pink">Video Generation</Tag> Enable/disable Kling 2.5 Turbo Pro video — falls back to Ken Burns zoom stills</p>
           <p><Tag color="blue">Quality Gate</Tag> Claude Vision validates every image (score 1-10), auto-retries on failure</p>
           <p><Tag color="green">Photography Anchors</Tag> Camera body, lens, lighting, color profile — defaults for Creative Director</p>
           <p><Tag color="purple">Segment Styles</Tag> Hook/body/CTA visual style anchors for Creative Director planning</p>
@@ -962,7 +962,7 @@ function IntegrationsSection({ live }: { live: LiveData | null }) {
     { name: 'FLUX 2 Pro (Replicate)', file: 'integrations/replicate-api.ts', model: 'black-forest-labs/flux-2-pro', usage: 'Default AI image model via Visual Intelligence Image Router. Legacy generateBackground() still available.', features: ['Visual Intelligence: flux-2-pro.ts', 'Legacy: generateBackground()', 'Aspect ratio: 9:16 / 1:1', 'prompt_upsampling enabled', 'AI Settings style injection'] },
     { name: 'GPT Image 1.5 (OpenAI)', file: 'visual-intelligence/models/gpt-image.ts', model: 'gpt-image-1.5', usage: 'Photorealistic and text-heavy image generation via Visual Intelligence Image Router', features: ['generateGPTImage()', 'Aspect ratio mapping to OpenAI sizes', 'b64_json and URL response handling', 'Best for: photorealism, text in images'] },
     { name: 'Ideogram 3.0', file: 'visual-intelligence/models/ideogram.ts', model: 'ideogram-3', usage: 'Typography and logo-focused image generation via Visual Intelligence Image Router', features: ['generateIdeogram()', 'REST API integration', 'Aspect ratio mapping', 'Best for: logos, typography, stylized text'] },
-    { name: 'Kling 2.6 Pro (fal.ai)', file: 'visual-intelligence/models/kling-video.ts', model: 'kling-2.6-pro', usage: 'Image-to-video and text-to-video generation for reels via Visual Intelligence Video Router', features: ['generateVideoFromImage()', 'generateVideoFromText()', '5s and 10s durations', '9:16 aspect ratio', 'fal.ai serverless client', 'Graceful fallback to Ken Burns stills'] },
+    { name: 'Kling 2.5 Turbo Pro (fal.ai)', file: 'visual-intelligence/models/kling-video.ts', model: 'kling-2.5-turbo-pro', usage: 'Image-to-video and text-to-video generation for reels via Visual Intelligence Video Router', features: ['generateVideoFromImage()', 'generateVideoFromText()', '5s and 10s durations', '9:16 aspect ratio', 'fal.ai serverless client', 'Graceful fallback to Ken Burns stills'] },
     { name: 'Cloudinary', file: 'integrations/cloudinary-api.ts', model: 'Upload API', usage: 'CDN hosting for rendered images and videos', features: ['uploadImage()', 'uploadVideo()', 'uploadImages()', 'Folder organization'] },
     { name: 'OpenAI TTS', file: 'integrations/tts-api.ts', model: 'tts-1', usage: 'Per-segment reel voiceover generation (audio drives visual timing)', features: ['generateSpeech()', '6 voice options', 'MP3 output', 'Per-segment TTS calls', 'ffprobe duration probing', 'Audio-driven segment timing'] },
     { name: 'Buffer', file: 'integrations/buffer-api.ts', model: 'API v1', usage: 'Optional social media scheduling', features: ['getProfiles()', 'createPost() / schedulePost()', 'addToQueue()', 'getPostingSchedule()'] },
@@ -1147,10 +1147,10 @@ function RenderingSection() {
 
           <div className="bg-gray-800 rounded-lg p-4">
             <h4 className="text-sm font-semibold text-pink-400 mb-2">3. Video Router <code className="text-gray-500 text-xs ml-2">video-router.ts</code></h4>
-            <p className="text-xs text-gray-400 mb-2">Kling 2.6 Pro via fal.ai for image-to-video. Forced on for reels when enabled.</p>
+            <p className="text-xs text-gray-400 mb-2">Kling 2.5 Turbo Pro via fal.ai for image-to-video. Forced on for reels when enabled.</p>
             <div className="text-xs text-gray-500 space-y-1">
               <p>- <strong className="text-gray-300">generateVideo(imagePath, plan, dir, file)</strong> → GeneratedVideo (path, model, duration)</p>
-              <p>- Uses @fal-ai/client with dynamic import. Endpoint: fal-ai/kling-video/v2/master/image-to-video</p>
+              <p>- Uses @fal-ai/client with dynamic import. Endpoint: fal-ai/kling-video/v2.5-turbo/pro/image-to-video</p>
               <p>- Reel renderer forces generateVideo=true even if Creative Director returned false</p>
               <p>- Fallback: FAL_API_KEY missing or Kling fails → returns still image (Ken Burns applied by ffmpeg)</p>
             </div>
@@ -1219,10 +1219,10 @@ function RenderingSection() {
           </div>
           <div className="bg-gray-800 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
-              <strong className="text-pink-400 text-sm">Kling 2.6 Pro</strong>
+              <strong className="text-pink-400 text-sm">Kling 2.5 Turbo Pro</strong>
               <code className="text-gray-600 text-xs">kling-video.ts</code>
             </div>
-            <p className="text-xs text-gray-500">fal.ai client (dynamic import). Endpoint: fal-ai/kling-video/v2/master/image-to-video. Uploads image to fal storage → inference. 5s/10s duration, 9:16 aspect. Returns MP4.</p>
+            <p className="text-xs text-gray-500">fal.ai client (dynamic import). Endpoint: fal-ai/kling-video/v2.5-turbo/pro/image-to-video. Uploads image to fal storage → inference. 5s/10s duration, 9:16 aspect. Returns MP4.</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
@@ -1267,7 +1267,7 @@ function RenderingSection() {
           </div>
           <div className="bg-gray-800/50 rounded p-2">
             <p className="text-xs text-pink-400 font-semibold mb-1">Step 5: Kling Video Generation</p>
-            <p className="text-xs">Video Router sends each still + motion prompt to Kling 2.6 Pro (fal.ai). 5s clips per segment. Requires FAL_API_KEY + ENABLE_VIDEO_GENERATION. Reads both env var and AI Settings DB. Falls back to still image (Ken Burns applied in Step 8).</p>
+            <p className="text-xs">Video Router sends each still + motion prompt to Kling 2.5 Turbo Pro (fal.ai). 5s clips per segment. Requires FAL_API_KEY + ENABLE_VIDEO_GENERATION. Reads both env var and AI Settings DB. Falls back to still image (Ken Burns applied in Step 8).</p>
           </div>
           <div className="bg-gray-800/50 rounded p-2">
             <p className="text-xs text-yellow-400 font-semibold mb-1">Step 6: Text Overlays</p>
@@ -1353,7 +1353,7 @@ function ConfigSection({ live }: { live: LiveData | null }) {
           {[
             { group: 'AI / Anthropic', vars: ['ANTHROPIC_API_KEY — Claude API key', 'CLAUDE_MODEL — Model ID (default: claude-sonnet-4-5-20250929)'] },
             { group: 'Instagram Graph API', vars: ['INSTAGRAM_ACCESS_TOKEN — Long-lived token (60 days)', 'INSTAGRAM_BUSINESS_ACCOUNT_ID — Business account ID'] },
-            { group: 'Image Generation', vars: ['REPLICATE_API_TOKEN — Replicate API token (FLUX 2 Pro)', 'FAL_API_KEY — fal.ai key (Kling 2.6 Pro video)', 'IDEOGRAM_API_KEY — Ideogram 3.0 API key', 'DEFAULT_IMAGE_MODEL — flux-2-pro | gpt-image-1.5 | ideogram-3', 'DEFAULT_VIDEO_MODEL — kling-2.6-pro', 'ENABLE_VIDEO_GENERATION — true/false (Kling i2v for reels)', 'QUALITY_GATE_ENABLED — true/false (Claude Vision validation)', 'QUALITY_GATE_MIN_SCORE — Minimum score 1-10', 'QUALITY_GATE_MAX_RETRIES — Max retry attempts'] },
+            { group: 'Image Generation', vars: ['REPLICATE_API_TOKEN — Replicate API token (FLUX 2 Pro)', 'FAL_API_KEY — fal.ai key (Kling 2.5 Turbo Pro video)', 'IDEOGRAM_API_KEY — Ideogram 3.0 API key', 'DEFAULT_IMAGE_MODEL — flux-2-pro | gpt-image-1.5 | ideogram-3', 'DEFAULT_VIDEO_MODEL — kling-2.5-turbo-pro', 'ENABLE_VIDEO_GENERATION — true/false (Kling i2v for reels)', 'QUALITY_GATE_ENABLED — true/false (Claude Vision validation)', 'QUALITY_GATE_MIN_SCORE — Minimum score 1-10', 'QUALITY_GATE_MAX_RETRIES — Max retry attempts'] },
             { group: 'Media Hosting', vars: ['CLOUDINARY_CLOUD_NAME — Cloudinary account', 'CLOUDINARY_API_KEY — API key', 'CLOUDINARY_API_SECRET — API secret'] },
             { group: 'Audio / TTS', vars: ['OPENAI_API_KEY — OpenAI TTS (tts-1 model)'] },
             { group: 'Scheduling (Optional)', vars: ['BUFFER_ACCESS_TOKEN — Buffer scheduling API'] },

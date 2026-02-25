@@ -57,7 +57,7 @@ export const CONFIG = {
   },
   visualIntelligence: {
     defaultImageModel: process.env.DEFAULT_IMAGE_MODEL || 'flux-2-pro',
-    defaultVideoModel: process.env.DEFAULT_VIDEO_MODEL || 'kling-2.6-pro',
+    defaultVideoModel: process.env.DEFAULT_VIDEO_MODEL || 'kling-2.5-turbo-pro',
     enableVideoGeneration: process.env.ENABLE_VIDEO_GENERATION !== 'false',
     qualityGateEnabled: process.env.QUALITY_GATE_ENABLED !== 'false',
     qualityGateMinScore: parseInt(process.env.QUALITY_GATE_MIN_SCORE || '7'),
