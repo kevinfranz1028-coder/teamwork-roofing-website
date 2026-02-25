@@ -234,7 +234,7 @@ export function getLatestBatch(): any | null {
       emotionalTrigger: idea.emotional_trigger,
       sendProbability: idea.send_probability,
       caption: idea.caption,
-      hashtags: idea.hashtags ? JSON.parse(idea.hashtags) : [],
+      hashtags: idea.hashtags ? (() => { try { const h = JSON.parse(idea.hashtags); return Array.isArray(h) ? h : String(h).split(/\s+/); } catch { return String(idea.hashtags).split(/\s+/); } })() : [],
       dmTrigger: idea.dm_trigger_keyword,
       scriptJson: idea.script_json,
       localPaths,

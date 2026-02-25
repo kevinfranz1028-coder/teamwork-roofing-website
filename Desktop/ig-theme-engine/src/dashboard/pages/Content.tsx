@@ -244,7 +244,7 @@ function SlidePreview({
             <p className="text-gray-300 text-xs whitespace-pre-wrap">{caption}</p>
             {hashtags && hashtags.length > 0 && (
               <p className="text-blue-400 text-xs">
-                {hashtags.map(t => `#${t.replace('#', '')}`).join(' ')}
+                {(Array.isArray(hashtags) ? hashtags : String(hashtags).split(/\s+/)).map(t => `#${t.replace(/#/g, '')}`).join(' ')}
               </p>
             )}
           </div>
@@ -1116,7 +1116,7 @@ function AllContentSection({
           startIndex={preview.startIndex}
           title={preview.item.title}
           caption={preview.item.caption || ''}
-          hashtags={preview.item.hashtags ? (typeof preview.item.hashtags === 'string' ? JSON.parse(preview.item.hashtags) : preview.item.hashtags) : []}
+          hashtags={preview.item.hashtags ? (() => { try { const h = typeof preview.item.hashtags === 'string' ? JSON.parse(preview.item.hashtags) : preview.item.hashtags; return Array.isArray(h) ? h : String(h).split(/\s+/); } catch { return String(preview.item.hashtags).split(/\s+/); } })() : []}
           scriptId={preview.item.id}
           onClose={() => setPreview(null)}
         />
