@@ -103,7 +103,7 @@ const tableDescriptions: Record<string, string> = {
   email_list: 'Email subscribers captured via DM automation flows.',
   dm_flows: 'DM automation trigger-response flows (5-7 step sequences).',
   cross_platform_log: 'History of platform adaptations (TikTok, YouTube, Pinterest, Twitter).',
-  api_costs: 'Claude API usage tracking for cost monitoring.',
+  api_costs: 'API cost tracking per call — provider (anthropic/openai/replicate/fal/ideogram), category (text/image/video/tts/vision), model, estimated cost, tokens, duration, linked idea_id, and project grouping.',
   creative_briefs: 'Creative direction profiles guiding AI content generation.',
   ai_settings: 'AI behavior profiles: prompts, image style, temperature, Visual Intelligence settings (model selection, quality gate, photography anchors, segment styles).',
   visual_quality_log: 'Quality Gate results: model, prompt hash, score, pass/fail, feedback, retry count. Powers self-learning prompt optimization.',
@@ -170,6 +170,10 @@ const routeDescriptions: Record<string, string> = {
   'POST /api/fingerprint/audit': 'Audit queued content for originality violations',
   'GET /api/build-doc': 'Auto-discovery endpoint for this build document',
   'GET /api/queue/:id/download': 'Download rendered assets (ZIP for carousels, MP4 for reels)',
+  'GET /api/costs/summary': 'Cost totals by provider and category over time periods (today/7d/30d/all). Auto-refreshes every 30s.',
+  'GET /api/costs/breakdown': 'Individual API call line items — timestamp, provider, model, description, cost, tokens. Paginated and filterable by provider/category.',
+  'GET /api/costs/by-project': 'Cost breakdown grouped by project (linked idea_id). Shows per-project totals across all providers.',
+  'GET /api/costs/balances': 'Current API key balance check per provider (where supported). Returns balance amounts or "check provider dashboard".',
 };
 
 const moduleDescriptions: Record<string, { name: string; description: string; exports: string[] }> = {
@@ -354,7 +358,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
     p('The dashboard is a React single-page application served as static files by Express. All pages are tab-navigated from `App.tsx`. Each page communicates with the backend via `fetch()` calls to `/api/*` endpoints.');
 
     h4('`src/dashboard/App.tsx` — Shell & Navigation');
-    p('The root component. Renders the header with ThePlantICU branding, tab navigation bar, and the active page component. Tabs: Pipeline, Content, Brief, AI Settings, Analytics, Scorecard, Revenue, Build Checklist, Build Doc.');
+    p('The root component. Renders the header with ThePlantICU branding, tab navigation bar, and the active page component. Tabs: Pipeline, Content, Brief, AI Settings, Analytics, Scorecard, Revenue, API Costs, Build Checklist, Build Doc.');
     fileBlock('dashboard/App.tsx');
 
     const dashPages = [
@@ -367,6 +371,7 @@ function generateMarkdown(sectionId: SectionId | 'all', live: LiveData | null): 
       { file: 'dashboard/pages/Revenue.tsx', name: 'Revenue', desc: 'Revenue tracking dashboard. Manual entry form (date, source, description, amount). Summary cards: total revenue, this month, last month. By-source breakdown. AI strategy generator that takes current follower count and recommends revenue streams, pricing, and setup steps.' },
       { file: 'dashboard/pages/BuildChecklist.tsx', name: 'Build Checklist', desc: 'Development progress tracker with 70+ items across 18 sections (project scaffold, database, Claude client, modules 0-10, orchestrator, analytics, CLI, dashboard, integrations, utilities). Each item is marked Done/Partial/Missing with optional notes. Overall completion percentage and section-level progress bars.' },
       { file: 'dashboard/pages/BuildDoc.tsx', name: 'Build Document', desc: 'This page. Auto-updating technical documentation that fetches live data from `/api/build-doc` (database schema, API routes, source file tree, config status). Download buttons generate comprehensive Markdown files with full source code included.' },
+      { file: 'dashboard/pages/APICosts.tsx', name: 'API Costs', desc: 'Real-time cost visibility dashboard tracking spend across all 5 API providers (Anthropic, OpenAI, Replicate, fal.ai, Ideogram). Top row: total spend cards for Today/This Week/This Month/All Time. Provider cards show per-provider spend and call count. Category breakdown visualizes Text vs Image vs Video vs TTS vs Vision spend. Scrollable cost log table lists individual API calls with timestamp, provider, model, description, cost, and tokens — filterable by provider. Auto-refreshes every 30 seconds.' },
       { file: 'dashboard/pages/ContentOptions.tsx', name: 'Content Options', desc: 'Shows the 5 content option variations from the latest generation batch. Each option displays the idea title, hook, format type, send trigger, and send probability score. The operator selects their preferred option to proceed to script building.' },
     ];
 
@@ -902,6 +907,7 @@ function PagesSection() {
     { name: 'Scorecard', desc: 'Weekly KPI dashboard with traffic-light health scoring.', features: ['Traffic-light KPIs', 'Historical trend', 'Health scoring'] },
     { name: 'Revenue', desc: 'Revenue tracking with manual entry, source breakdown, AI strategy generator.', features: ['Revenue entry', 'Source breakdown', 'AI strategy'] },
     { name: 'Build Checklist', desc: '70+ item progress tracker across 18 sections.', features: ['Progress bars', 'Status badges', 'Completion summary'] },
+    { name: 'API Costs', desc: 'Real-time cost tracking across Anthropic, OpenAI, Replicate, fal.ai, and Ideogram. Per-provider and per-category breakdowns.', features: ['Spend cards (today/week/month/all)', 'Provider breakdown', 'Category breakdown', 'Cost log table', 'Provider filter', 'Auto-refresh'] },
     { name: 'Build Document', desc: 'This page — auto-updating documentation with per-section download.', features: ['Live data', 'Per-section download', 'Full download'] },
   ];
   return (

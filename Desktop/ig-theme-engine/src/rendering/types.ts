@@ -58,7 +58,13 @@ export interface ReelScript {
   ctaVoiceover?: string;
   totalLength: number;
   voiceoverText: string;
-  sceneSetup?: string;
+  sceneSetup?: {
+    plant: string;
+    pot: string;
+    setting: string;
+    lighting: string;
+    condition: string;
+  } | null;
 }
 
 export interface RenderConfig {

@@ -43,27 +43,7 @@ export const DEFAULT_CAROUSEL_DESIGN_INSTRUCTION = `AI image generation prompt f
 - NO text in the image. NO humans/faces. NO watermarks.
 Example: "Overhead shot of a monstera deliciosa with three yellowing leaves laid on a white marble surface, a pair of pruning shears beside it, warm natural side light from a window, shallow depth of field, earth-tone palette, 1080x1080"`;
 
-export const DEFAULT_REEL_VISUAL_INSTRUCTION = `Kling video generation prompt — describe a MOTION SEQUENCE, not a static image. This prompt drives Kling AI video (image-to-video), so describe what the camera DOES:
-
-REQUIRED ELEMENTS:
-- Camera motion: "camera slowly pushes in", "gentle drift to the right", "slow zoom into leaf surface", "camera pulls back to reveal"
-- The specific plant, its condition, and what's visible at this camera distance
-- Lighting direction and mood (consistent with the sceneSetup for this reel)
-- Depth of field and focus behavior: "shallow DOF with background softly blurred", "focus racks from pot to leaf"
-- Motion speed: use "slow", "gentle", "subtle" — Kling works best with slow, deliberate camera moves
-- Format: 9:16 vertical
-
-GOOD EXAMPLES:
-- "Camera slowly pushes in toward a drooping pothos on a wooden nightstand, golden afternoon light from the left, shallow depth of field, the brown leaf tips gradually fill the frame, 9:16"
-- "Gentle camera drift across the surface of a monstera leaf, revealing tiny brown spots and yellowing edges, soft overhead light, macro detail becoming visible, shallow DOF, 9:16"
-- "Slow pull back from extreme close-up of mushy brown roots to reveal the full plant being held above its terracotta pot, warm overhead lighting, soil particles falling, 9:16"
-
-BAD EXAMPLES:
-- "Close-up of a dying plant" (no motion, no specifics)
-- "Dramatic plant rescue scene with cinematic lighting" (abstract, no camera direction)
-- "Beautiful monstera in a cozy room" (static description, no motion cue for Kling)
-
-CONTINUITY RULE: This visual MUST be part of the same scene as all other segments in this reel. Same plant, same room, same lighting. The camera just moves to a different position or zoom level.`;
+export const DEFAULT_REEL_VISUAL_INSTRUCTION = `Kling image-to-video motion prompt — describe a CAMERA MOTION SEQUENCE, not a static scene. Required elements: (1) camera motion verb ("slowly pushes in", "gentle drift", "pulls back"), (2) specific plant and condition from sceneSetup, (3) lighting direction matching sceneSetup, (4) what changes in frame as camera moves, (5) depth of field, (6) motion speed ("slow", "gentle"), (7) 9:16 format. This prompt will generate a 5-second video clip — the camera MUST MOVE. Every visual must reference the SAME plant/pot/room/lighting from the sceneSetup field. Example: "Camera slowly pushes in toward drooping pothos on wooden nightstand, golden afternoon light from left, shallow DOF, brown leaf tips gradually fill frame, 9:16"`;
 
 // ─── Dynamic Getters ─────────────────────────────────
 
@@ -143,104 +123,97 @@ IDEA: "${idea.title}"
 HOOK: "${idea.hook}"
 FORMAT NOTES: ${idea.formatNotes}
 
-## THE PLANTICU REEL FORMULA
+THE PLANTICU REEL FORMULA:
 This reel follows the "Plant ER" narrative arc: ALARM → DIAGNOSIS → TREATMENT → HOPE
 
-## CRITICAL: ONE CONTINUOUS VISUAL JOURNEY
-Your reel must feel like ONE continuous video, not a slideshow of unrelated images. Every viral plant reel uses this technique:
+═══════════════════════════════════════════
+CRITICAL: SCENE CONTINUITY RULES
+═══════════════════════════════════════════
 
-**THE SCENE:** Pick ONE specific plant, in ONE specific setting, with ONE consistent lighting setup. Every segment takes place in this same scene. The camera MOVES through the scene — it doesn't teleport to a new location.
+This reel must feel like ONE continuous visual journey — NOT a slideshow of disconnected stock images.
 
-**THE CAMERA PATH:** Describe the camera's journey through the scene:
-- Hook: Wide establishing shot (the plant in its environment)
-- Body segment 1: Camera moves closer, revealing the problem
-- Body segment 2: Camera zooms to macro — extreme detail of the issue
-- Body segment 3: Camera holds on the treatment action (hands working, but no face)
-- Body segment 4 (if needed): Camera begins pulling back
-- CTA: Camera returns to wide shot — same plant, same room, but the feeling has shifted from alarm to hope
+You MUST first define a sceneSetup that EVERY visual in the reel references:
 
-**VISUAL CONTINUITY RULES:**
-- ALL segments must reference the SAME plant species, pot, and setting
-- Describe camera MOTION in every visual field: "camera slowly pushes in toward...", "camera drifts right to reveal...", "camera pulls back to show..."
-- Adjacent segments should share visual elements — if segment 2 ends on a leaf close-up, segment 3 should start from a similar perspective
-- Lighting stays consistent across all segments (same time of day, same direction)
-- Maximum 4-5 unique Kling video clips for the entire reel (NOT one per segment)
+sceneSetup: {
+  plant: The SPECIFIC plant species featured (e.g., "monstera deliciosa with 6 mature leaves")
+  pot: The SPECIFIC pot (e.g., "white ceramic pot with drainage saucer")
+  setting: The SPECIFIC location (e.g., "wooden nightstand next to a bed, bedroom with white walls")
+  lighting: The SPECIFIC light (e.g., "warm late-afternoon golden light from a window on the left")
+  condition: The plant's visible problem (e.g., "three leaves showing brown crispy edges, slight drooping")
+}
 
-**VISUAL DESCRIPTION FORMAT for Kling video generation:**
-Each visual field is used as a Kling image-to-video prompt. Write them as MOTION descriptions:
-- GOOD: "Camera slowly zooms into the base of the snake plant stem, revealing brown mushy tissue where it meets the soil, warm overhead light, shallow depth of field, 9:16"
-- GOOD: "Slow camera drift across the leaf surface showing microscopic brown spots spreading, soft focus breathing effect, camera remains mostly static with gentle movement, 9:16"
-- BAD: "Close-up of a snake plant with root rot" (no motion, no continuity, generic)
-- BAD: "Dramatic plant emergency scene" (abstract, produces garbage)
+EVERY visual field below must describe the SAME plant, in the SAME pot, in the SAME room, with the SAME lighting from the sceneSetup. The ONLY thing that changes between segments is the CAMERA POSITION and what action is being shown.
+
+═══════════════════════════════════════════
+CAMERA MOTION RULES (for Kling AI video)
+═══════════════════════════════════════════
+
+Every "visual" field is a prompt for Kling image-to-video AI. You MUST describe CAMERA MOTION, not static scenes.
+
+Required format: "[Camera motion verb] + [specific subject from sceneSetup] + [lighting] + [what changes in frame]"
+
+Good examples:
+- "Camera slowly pushes in toward the browning leaf tips of the monstera on the wooden nightstand, golden afternoon light from left, shallow depth of field, damaged edges gradually fill the frame, 9:16"
+- "Gentle drift downward revealing the soil surface in the white ceramic pot, same warm lighting, camera settles on dry cracked soil, 9:16"
+- "Camera pulls back slowly from the monstera's fresh new leaf unfurling, warm light catches the glossy surface, wider shot reveals the full healthy plant on the nightstand, 9:16"
+
+Bad examples (DO NOT DO THIS):
+- "Close-up of dying plant" (no motion, no specifics, no scene reference)
+- "Hands repotting a monstera" (different scene! no camera motion!)
+- "Dramatic plant rescue visual" (abstract, no motion, no scene reference)
+
+Camera path structure:
+- Hook: WIDE or MEDIUM establishing shot of the plant in its setting
+- Body segments: Camera moves CLOSER — medium shots, then macro details
+- CTA: Camera PULLS BACK OUT to show the full plant, now with hopeful mood shift
+
+═══════════════════════════════════════════
+REEL STRUCTURE
+═══════════════════════════════════════════
 
 Create the full Reel script:
 
-### sceneSetup (NEW — required field)
-Describe the ONE scene that the entire reel takes place in. This anchors visual continuity:
-- plant: Exact species and its current condition
-- setting: Specific location (bedroom nightstand, kitchen windowsill, bathroom shelf, etc.)
-- lighting: Time of day, light direction, mood
-- pot: Type and color
-- props: Any visible items (watering can, soil bag, pruning shears, etc.)
-- colorPalette: Dominant colors in the scene
+sceneSetup: (as defined above — ONE plant, ONE pot, ONE room, ONE light source)
 
-Example: "A drooping pothos in a white ceramic pot on a wooden bedroom nightstand. Late afternoon golden light streaming from a window on the left. A small watering can and a moisture meter sit beside the pot. Warm earth tones — golden wood, white ceramic, deep green leaves with brown edges."
-
-### hook (0-2 seconds): THE SCROLL-STOPPER
+hook (0-3 seconds): THE SCROLL-STOPPER
 - onScreenText: Bold, alarming statement — open loop or shock. Max 8 words. Examples: "Your monstera is DROWNING" / "This is NOT underwatering" / "Your $200 plant has 48 hours"
-- visual: ${visualInstruction} — WIDE establishing shot of the scene. The plant and its problem should be immediately visible. Include camera direction: "camera slowly pushes forward toward..."
-- voiceoverScript: Match the text energy — short, punchy, concerned tone. Under 8 words.
+- visual: ${visualInstruction} — Wide or medium shot establishing the plant in its setting. MUST reference sceneSetup. MUST include camera motion.
+- voiceoverScript: Match the text energy — short, punchy, concerned tone. One sentence.
 - segmentType: "hook"
-- durationSeconds: 2
 
-### body (2-20 seconds): THE DIAGNOSIS & TREATMENT
-Array of 3-4 segments (NOT 5-7 — fewer clips = better visual continuity). Each with:
-- timestamp: Start time in seconds
-- onScreenText: One clear point per segment. Max 10 words. Written as SUBTITLES, not headlines.
-- voiceoverScript: 1-2 sentences, conversational. Like explaining to a worried friend.
-- visual: ${visualInstruction} — MUST continue the camera journey from the previous segment. Describe the camera MOVEMENT, not just a static scene. Reference the same plant/setting from sceneSetup.
-- pacing: "fast" for alarm segments, "medium" for explanation, "slow" for important steps
-- segmentType: "body"
-- durationSeconds: 3-5 seconds per segment
+body (3-20 seconds): THE DIAGNOSIS & TREATMENT
+- Array of EXACTLY 3-4 segments (NOT 5, NOT 6, NOT 7). Each with:
+  - timestamp: Start time in seconds
+  - onScreenText: One clear insight per segment. Max 12 words. DO NOT use "Step 1:", "Step 2:" format — write natural phrases like "Check the soil first" or "Those brown tips? That's salt burn"
+  - voiceoverScript: Expand naturally — conversational, like explaining to a worried friend. 1-2 sentences per segment. This should FLOW as a continuous conversation, not read like bullet points.
+  - visual: ${visualInstruction} — Camera moves to a new angle of the SAME plant from sceneSetup. Each segment's camera position should follow logically from the previous one (wide → medium → close-up → macro, or similar journey).
+  - segmentType: "body"
+  - durationSeconds: 4-5 seconds per segment
 
-### cta (last 3-4 seconds): THE HOPE + ENGAGEMENT DRIVER
-- onScreenText: Engagement-driving CTA that invites comments. NOT just "Follow @ThePlantICU".
-  GOOD CTAs: "Tell me your plant — I'll diagnose it" / "Drop your plant's name, I'll tell you what's wrong" / "Which plant should I rescue next?" / "Send this to someone whose [plant] needs help"
-  BAD CTAs: "Follow @ThePlantICU" / "Like and share" / "Follow for more"
-  The CTA should drive COMMENTS and SENDS, not just follows. Comments boost reach. "Follow" CTAs are passive.
-- voiceoverScript: Warm, reassuring close. "Your plant's not dead yet. Tell me what you're growing... I'll help." Conversational, inviting.
-- visual: ${visualInstruction} — Camera pulls BACK to the wide establishing shot from the hook, but the mood has shifted — warmer, more hopeful. Same plant, same room. Include "@ThePlantICU" as a small watermark element.
+cta (last 3-5 seconds): THE HOPE + ENGAGEMENT DRIVER
+- onScreenText: An engagement-driving question or challenge. NOT "Follow @ThePlantICU". Instead use comment-drivers like:
+  - "What plant should I rescue next?"
+  - "Drop your plant's symptoms below"
+  - "Which of YOUR plants needs this?"
+  - "Tell me your plant — I'll diagnose it"
+  - "Tag someone whose monstera needs help"
+- voiceoverScript: Warm, reassuring close that invites interaction. Example: "Your plant's not done yet. Tell me what you're dealing with — I'll help you fix it."
+- visual: ${visualInstruction} — Camera PULLS BACK to show the full plant from sceneSetup, but now with a warmer/more hopeful mood (brighter light, slight glow). Same plant, same room.
 - segmentType: "cta"
-- durationSeconds: 4
 
-### totalLength: Target 20-27 seconds (sweet spot: 22-25s)
+totalLength: Target 20-28 seconds (sweet spot for discovery reach)
+audioMood: "Calm urgency — concerned but competent, like a nurse giving instructions. NOT dramatic/anxious. Reassuring expertise."
 
-### audioMood: "Calm urgency — concerned but competent, like a nurse giving instructions. NOT dramatic/anxious. Reassuring expertise."
+voiceoverText: Complete voiceover script as one continuous, flowing paragraph. It should read like someone naturally talking — NOT like reading a list of steps. No "Step one... Step two..." phrasing. Natural speech with pauses and transitions like "Now here's the thing..." and "What you actually want to do is..." This will be sent to TTS.
 
-## VOICEOVER PACING (CRITICAL)
-voiceoverText: Write the COMPLETE voiceover as one continuous, natural paragraph. This goes directly to TTS.
-- Use "..." for natural pauses between thoughts
-- Vary sentence length: short punchy for urgency, longer flowing for explanation
-- Hook VO: SHORT (under 8 words, said fast)
-- Body VO: Breathe — 1-2 sentences per segment, don't cram
-- CTA VO: Slow down — warm, reassuring, slightly slower pace
-- Write like you're TALKING to a worried friend, not reading a teleprompter
-- NEVER write stage directions like "(pause)" or "(concerned tone)" — TTS ignores them
-- Good: "Your pothos... is telling you something. See these brown tips? That's not sunburn. That's salt buildup from tap water. Here's the fix... flush the soil with filtered water until it runs clear. Do this once a month. Your plant will bounce back in two weeks. Tell me what plant you're struggling with... I'll help."
-- Bad: "Today we will discuss brown tips on pothos plants. The primary cause is mineral buildup. The recommended treatment is soil flushing."
-
-### caption:
-- hookLine: First line creates curiosity gap (gets cut off in feed → drives tap-through). NOT a summary.
-- body: 60-100 words. Lead with the diagnosis, then treatment summary. Include 1 personal touch. Conversational.
-- cta: Rotate between engagement drivers:
-  - Comment trigger: "Drop a if this happened to you" / "Which plant should I rescue next?"
-  - Send trigger: "Send to someone whose [plant] needs help" / "Tag your friend who overwaters everything"
-  - Save trigger: "Save this for your next watering day"
-  - DM trigger: "DM me [KEYWORD] for the free [resource]"
+caption:
+- hookLine: First line creates curiosity gap (gets cut off in feed → drives tap-through)
+- body: 60-100 words. Lead with the diagnosis, then treatment summary. Include 1 personal touch.
+- cta: Engagement driver matching the on-screen CTA. Ask a question that invites comments.
 - seoKeywords: ${idea.captionKeywords.join(', ')} woven naturally into caption text — never keyword-stuffed
 - hashtags: Max 5, specific: #PlantICU #HouseplantRescue #PlantDiagnosis #[SpecificPlant] #[SpecificProblem]
 
-### dmTrigger: Keyword + value offer for the story companion. E.g., "DM me RESCUE for the free recovery checklist"
+dmTrigger: Keyword + value offer for the story companion. E.g., "DM me RESCUE for the free recovery checklist"
 
-Return as JSON matching this exact structure. The sceneSetup field is required — it's what ensures visual continuity across the entire reel.`;
+Return as JSON.`;
 }

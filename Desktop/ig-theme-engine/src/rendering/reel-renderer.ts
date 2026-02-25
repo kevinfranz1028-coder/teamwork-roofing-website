@@ -179,12 +179,12 @@ function buildVisualBriefs(
   config: RenderConfig
 ): VisualBrief[] {
   const anchor = getStyleAnchor();
-  const scenePrefix = script.sceneSetup
-    ? `Scene context: ${script.sceneSetup}. `
+  const sceneStr = script.sceneSetup
+    ? `Scene context: ${script.sceneSetup.plant} in ${script.sceneSetup.pot}, ${script.sceneSetup.setting}, ${script.sceneSetup.lighting}, showing ${script.sceneSetup.condition}. `
     : '';
 
-  if (scenePrefix) {
-    console.log(`  Visual briefs anchored to scene: "${script.sceneSetup!.slice(0, 100)}..."`);
+  if (sceneStr) {
+    console.log(`  Visual briefs anchored to scene: plant=${script.sceneSetup!.plant}, setting=${script.sceneSetup!.setting}`);
   }
 
   return segments.map((seg, i) => ({
@@ -194,7 +194,7 @@ function buildVisualBriefs(
     totalSegments: segments.length,
     onScreenText: seg.text,
     voiceoverText: seg.voiceoverText || seg.text,
-    originalVisualDescription: scenePrefix + (seg.visualDescription || `professional ${CONFIG.app.niche} visual`),
+    originalVisualDescription: sceneStr + (seg.visualDescription || `professional ${CONFIG.app.niche} visual`),
     brandContext: {
       niche: CONFIG.app.niche || 'Houseplant ICU',
       stylePrefix: anchor.imageStylePrefix,
@@ -290,7 +290,7 @@ async function renderTextOverlays(
     for (let i = 0; i < segments.length; i++) {
       const seg = segments[i];
       const segType = seg.segmentType || 'body';
-      const html = reelOverlayHtml(seg.text, segType, i, segments.length, config.handle);
+      const html = reelOverlayHtml(seg.text, config, segType, i, segments.length);
       await page.setContent(html, { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => Promise.race([
         document.fonts.ready,
@@ -484,17 +484,7 @@ export function parseReelScript(scriptJson: string): ReelScript {
   const parsed = JSON.parse(scriptJson);
   const reel = parsed.reelScript || parsed.reel || parsed;
 
-  const sceneSetup = reel.sceneSetup || null;
-  const hookFound = !!(reel.hook);
-  const bodyFound = (reel.body || reel.segments || []).length;
-  const ctaFound = !!(reel.cta);
-  const voiceoverFound = !!(reel.voiceoverText);
-  const sceneFound = !!sceneSetup;
-  console.log(`  Script parse: hook=${hookFound}, body=${bodyFound} segments, cta=${ctaFound}, voiceover=${voiceoverFound}, sceneSetup=${sceneFound}`);
-  if (!sceneFound) {
-    console.warn('  WARNING: No sceneSetup found in reel script — visual continuity may be inconsistent');
-  }
-  if (bodyFound === 0) {
+  if ((reel.body || reel.segments || []).length === 0) {
     console.warn('  WARNING: No body segments found in reel script! Check script JSON wrapper key. Tried: parsed.reelScript, parsed.reel, parsed');
   }
 
@@ -542,11 +532,31 @@ export function parseReelScript(scriptJson: string): ReelScript {
   const hookVisual = typeof hookRaw === 'object' ? (hookRaw?.visual || hookRaw?.visualDescription || '') : '';
   const ctaVisual = typeof ctaRaw === 'object' ? (ctaRaw?.visual || ctaRaw?.visualDescription || '') : '';
 
+  // Extract sceneSetup for visual consistency
+  const sceneSetup = reel.sceneSetup || null;
+  if (sceneSetup) {
+    console.log(`  sceneSetup: plant=${sceneSetup.plant}, setting=${sceneSetup.setting}`);
+  } else {
+    console.warn('  ⚠️ No sceneSetup found in reel script — visual continuity will be degraded');
+  }
+
+  console.log(`  Parsed reel: hook="${hook.substring(0, 40)}...", ${segments.length} body segments, cta="${cta.substring(0, 40)}..."`);
+  if (segments.length === 0) {
+    console.warn('  ⚠️ Zero body segments parsed from reel script!');
+  }
+
   return {
-    hook, hookVisual, hookDuration, hookVoiceover,
-    segments, cta, ctaVisual, ctaDuration, ctaVoiceover,
+    hook,
+    hookVisual,
+    hookDuration,
+    hookVoiceover,
+    segments,
+    cta,
+    ctaVisual,
+    ctaDuration,
+    ctaVoiceover,
     totalLength: reel.totalLength || 30,
     voiceoverText,
-    sceneSetup: typeof sceneSetup === 'string' ? sceneSetup : sceneSetup ? JSON.stringify(sceneSetup) : undefined,
+    sceneSetup,
   };
 }

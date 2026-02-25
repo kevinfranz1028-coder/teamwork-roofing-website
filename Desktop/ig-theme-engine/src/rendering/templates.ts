@@ -291,80 +291,76 @@ function getInteractiveElementHtml(slide: StorySlideContent, config: RenderConfi
 
 export function reelOverlayHtml(
   text: string,
+  config: RenderConfig,
   segmentType: 'hook' | 'body' | 'cta' = 'body',
-  segmentIndex: number = 0,
-  totalSegments: number = 1,
-  brandHandle: string = '@ThePlantICU'
+  segmentIndex?: number,
+  totalSegments?: number
 ): string {
-  const fontSize = segmentType === 'hook' ? '42px' : segmentType === 'cta' ? '36px' : '32px';
-  const fontWeight = segmentType === 'hook' ? '800' : '600';
-  const maxWidth = segmentType === 'hook' ? '85%' : '80%';
-  const bottomOffset = segmentType === 'cta' ? '18%' : '12%';
+  // Simple subtitle-style overlays — no glassmorphism, no step counters, no progress bars
+  const hookStyles = `
+    .overlay-text {
+      font-size: 42px; font-weight: 800; line-height: 1.2;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5);
+      max-width: 900px;
+      text-align: center;
+    }
+  `;
+
+  const bodyStyles = `
+    .overlay-text {
+      font-size: 32px; font-weight: 600; line-height: 1.35;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5);
+      max-width: 860px;
+      text-align: center;
+    }
+  `;
+
+  const ctaStyles = `
+    .overlay-text {
+      font-size: 36px; font-weight: 600; line-height: 1.25;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5);
+      max-width: 800px;
+      text-align: center;
+    }
+  `;
+
+  const styleMap = { hook: hookStyles, body: bodyStyles, cta: ctaStyles };
+
+  // Only show watermark on hook and CTA frames
+  const showWatermark = segmentType === 'hook' || segmentType === 'cta';
 
   return `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      width: 1080px;
-      height: 1920px;
-      background: transparent;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      font-family: 'Inter', -apple-system, sans-serif;
-      overflow: hidden;
-    }
-
-    .gradient-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 40%;
-      background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.7) 100%);
-      pointer-events: none;
-    }
-
-    .subtitle {
-      position: absolute;
-      bottom: ${bottomOffset};
-      left: 50%;
-      transform: translateX(-50%);
-      max-width: ${maxWidth};
-      text-align: center;
-      color: white;
-      font-size: ${fontSize};
-      font-weight: ${fontWeight};
-      line-height: 1.3;
-      text-shadow:
-        0 2px 8px rgba(0,0,0,0.8),
-        0 1px 3px rgba(0,0,0,0.9);
-      letter-spacing: -0.02em;
-      word-wrap: break-word;
-    }
-
-    .watermark {
-      position: absolute;
-      top: 48px;
-      right: 36px;
-      color: rgba(255,255,255,0.7);
-      font-size: 22px;
-      font-weight: 600;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-      letter-spacing: 0.01em;
-    }
-  </style>
-</head>
-<body>
-  <div class="gradient-overlay"></div>
-  ${text ? `<div class="subtitle">${escapeHtml(text)}</div>` : ''}
-  ${segmentType === 'cta' || segmentIndex === 0 ? `<div class="watermark">${escapeHtml(brandHandle)}</div>` : ''}
-</body>
-</html>`;
+<html><head><style>
+  @import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(config.fonts.headline)}:wght@600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; height: 1920px;
+    background: transparent;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    align-items: center;
+    padding: 0 60px 160px;
+    font-family: '${config.fonts.headline}', sans-serif;
+    color: #FFFFFF;
+  }
+  /* Subtle bottom gradient for text readability */
+  body::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 400px;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.0) 100%);
+    pointer-events: none;
+  }
+  ${styleMap[segmentType]}
+  .overlay-text { position: relative; z-index: 1; }
+  .watermark {
+    position: absolute; top: 40px; right: 40px;
+    font-size: 20px; opacity: 0.6;
+    font-family: '${config.fonts.body || config.fonts.headline}', sans-serif;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+    z-index: 1;
+  }
+</style></head><body>
+  <div class="overlay-text">${escapeHtml(text)}</div>
+  ${showWatermark ? '<div class="watermark">@theplanticu</div>' : ''}
+</body></html>`;
 }
