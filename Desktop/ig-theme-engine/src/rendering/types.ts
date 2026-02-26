@@ -6,6 +6,7 @@ export interface SlideContent {
   headline: string;
   bodyText: string;
   designNotes?: string;
+  pexelsSearch?: string[];
   type: 'hook' | 'value' | 'cta';
   visualPlan?: VisualPlan;
   generatedImage?: GeneratedImage;
@@ -97,3 +98,81 @@ export interface DailyRenderedPackage {
   reel?: RenderedAssets;
   stories?: RenderedAssets;
 }
+
+// ─── Reel Engine v2 Types (Stock Video Pipeline) ───
+
+export type ReelFormat = 'quick_hit' | 'hot_take' | 'deep_dive' | 'before_after' | 'list_drop';
+
+export interface ReelSegmentV2 {
+  onScreenText: string;
+  voiceover: string;
+  pexelsSearch: string[];
+  targetDuration: number;
+  actualDuration?: number;
+  segmentType: 'hook' | 'body' | 'cta';
+}
+
+export interface ReelScriptV2 {
+  reelFormat: ReelFormat;
+  hook: {
+    onScreenText: string;
+    voiceover: string;
+    pexelsSearch: string[];
+  };
+  segments: Array<{
+    onScreenText: string;
+    voiceover: string;
+    pexelsSearch: string[];
+    targetDuration: number;
+    segmentType: 'body';
+  }>;
+  cta: {
+    onScreenText: string;
+    voiceover: string;
+    pexelsSearch: string[];
+  };
+  caption: {
+    hookLine: string;
+    body: string;
+    cta: string;
+    seoKeywords: string[];
+    hashtags: string[];
+  };
+  dmTrigger: string;
+  totalLength: number;
+  audioMood?: string;
+  voiceoverText?: string;
+}
+
+export const REEL_FORMATS: Record<ReelFormat, { label: string; maxSeconds: number; segmentCount: [number, number]; description: string }> = {
+  quick_hit: {
+    label: 'Quick Hit',
+    maxSeconds: 15,
+    segmentCount: [2, 3],
+    description: 'Fast, punchy — one insight delivered in under 15 seconds',
+  },
+  hot_take: {
+    label: 'Hot Take',
+    maxSeconds: 20,
+    segmentCount: [2, 3],
+    description: 'Controversial or surprising opinion — challenges common advice',
+  },
+  deep_dive: {
+    label: 'Deep Dive',
+    maxSeconds: 28,
+    segmentCount: [3, 4],
+    description: 'Full diagnosis + treatment — the Plant ER narrative arc',
+  },
+  before_after: {
+    label: 'Before/After',
+    maxSeconds: 20,
+    segmentCount: [2, 3],
+    description: 'Dramatic transformation — problem → solution → result',
+  },
+  list_drop: {
+    label: 'List Drop',
+    maxSeconds: 25,
+    segmentCount: [3, 5],
+    description: 'Rapid-fire list — "3 signs your plant is..." or "5 things to never..."',
+  },
+};

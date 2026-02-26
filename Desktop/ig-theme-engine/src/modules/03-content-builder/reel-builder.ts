@@ -1,45 +1,13 @@
 import { askClaudeJSON } from '../../integrations/claude-client.js';
 import { getContentBuilderSystem, reelBuilderPrompt } from './prompts.js';
 import { insertRow } from '../../database/db.js';
-
-interface ReelScript {
-  hook: {
-    onScreenText: string;
-    visual: string;
-    voiceoverScript: string;
-  };
-  body: Array<{
-    timestamp: number;
-    onScreenText: string;
-    voiceoverScript: string;
-    visual: string;
-    pacing: 'fast' | 'medium' | 'slow';
-    segmentType: string;
-    durationSeconds: number;
-  }>;
-  cta: {
-    onScreenText: string;
-    voiceoverScript: string;
-    visual: string;
-  };
-  voiceoverText: string;
-  totalLength: number;
-  audioMood: string;
-  caption: {
-    hookLine: string;
-    body: string;
-    cta: string;
-    seoKeywords: string[];
-    hashtags: string[];
-  };
-  dmTrigger: string;
-}
+import type { ReelScriptV2 } from '../../rendering/types.js';
 
 export async function buildReel(
   idea: { id: number; title: string; hook: string; formatNotes: string; captionKeywords: string[] },
   brandSystem: any
-): Promise<ReelScript> {
-  const result = await askClaudeJSON<ReelScript>({
+): Promise<ReelScriptV2> {
+  const result = await askClaudeJSON<ReelScriptV2>({
     systemPrompt: getContentBuilderSystem(),
     userPrompt: reelBuilderPrompt(idea, brandSystem),
     maxTokens: 4096,

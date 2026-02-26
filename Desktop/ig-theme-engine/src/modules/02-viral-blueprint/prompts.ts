@@ -24,7 +24,7 @@ For EACH idea include:
 - sendProbability: (high / very_high / extreme)
 - saveProbability: (high / very_high / extreme)
 - watchTimeStrategy: How does this hold attention through completion?
-- formatNotes: For carousels: slide count (8-12), text density. For reels: length in seconds (under 30 for discovery), text overlay style
+- formatNotes: For carousels: slide count (8-12), text density. For reels: choose one of 5 formats — quick_hit (under 15s, 2-3 segments), hot_take (under 20s, 2-3 segments), deep_dive (under 28s, 3-4 segments), before_after (under 20s, 2-3 segments), list_drop (under 25s, 3-5 segments). All reels use real stock video footage, not AI images.
 - captionKeywords: 5-8 natural keywords for Instagram search SEO
 - hashtagSuggestions: Max 3-5 specific hashtags for categorization only
 - contentPillar: One of: diagnosis, treatment, prevention, debunk, trending-rescue

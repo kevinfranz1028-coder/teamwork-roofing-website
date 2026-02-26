@@ -35,7 +35,11 @@ export const CONFIG = {
     apiKey: process.env.CLOUDINARY_API_KEY || '',
     apiSecret: process.env.CLOUDINARY_API_SECRET || '',
   },
+  pexels: {
+    apiKey: process.env.PEXELS_API_KEY || '',
+  },
   replicate: {
+    // Legacy — replaced by Pexels stock video/photo pipeline
     apiToken: process.env.REPLICATE_API_TOKEN || '',
   },
   manychat: {

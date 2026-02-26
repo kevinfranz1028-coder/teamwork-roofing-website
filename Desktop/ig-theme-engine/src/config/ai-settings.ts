@@ -24,6 +24,9 @@ interface AISettings {
   default_lens: string | null;
   default_lighting: string | null;
   default_color_profile: string | null;
+  pexels_video_style_terms: string | null;
+  pexels_photo_style_terms: string | null;
+  pexels_exclude_terms: string | null;
   created_at: string;
   updated_at: string;
 }

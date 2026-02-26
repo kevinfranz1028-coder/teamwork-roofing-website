@@ -3,7 +3,7 @@ import { getDb, insertRow } from '../database/db.js';
 import { CONFIG } from '../config/env.js';
 import { renderCarouselSlides, parseCarouselScript } from './carousel-renderer.js';
 import { renderStorySlides, parseStoryScript } from './story-renderer.js';
-import { renderReel, parseReelScript } from './reel-renderer.js';
+import { renderReelV2, parseReelScriptV2 } from './reel-renderer.js';
 import { uploadImages, uploadVideo } from '../integrations/cloudinary-api.js';
 import { closeBrowser } from './browser-pool.js';
 import type { RenderConfig, RenderedAssets, DailyRenderedPackage } from './types.js';
@@ -85,8 +85,8 @@ export async function renderScript(scriptId: number): Promise<RenderedAssets | n
         console.log(chalk.yellow('  Reel rendering disabled (RENDER_REELS=false)'));
         return null;
       }
-      const reelScript = parseReelScript(script.script_json);
-      const reelPath = await renderReel(reelScript, config, scriptId);
+      const reelScript = parseReelScriptV2(script.script_json);
+      const reelPath = await renderReelV2(reelScript, config, scriptId);
       localPaths = [reelPath];
     } else {
       console.log(chalk.yellow(`  No renderable content for script ${scriptId} (${script.content_type})`));

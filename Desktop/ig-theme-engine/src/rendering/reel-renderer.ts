@@ -1,5 +1,5 @@
 import path from 'path';
-import { mkdirSync, existsSync, copyFileSync } from 'fs';
+import { mkdirSync, existsSync, copyFileSync, unlinkSync } from 'fs';
 import { execSync } from 'child_process';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
@@ -7,16 +7,13 @@ import sharp from 'sharp';
 import { getBrowser } from './browser-pool.js';
 import { reelOverlayHtml } from './templates.js';
 import { generateSpeech } from '../integrations/tts-api.js';
-import type { ReelScript, ReelSegment, RenderConfig } from './types.js';
-import type { VisualBrief, VisualPlan } from '../visual-intelligence/types.js';
-import { planVisualsBatch, retryPlan } from '../visual-intelligence/creative-director.js';
-import { generateImage } from '../visual-intelligence/image-router.js';
-import { generateVideo } from '../visual-intelligence/video-router.js';
-import { getStyleAnchor } from '../visual-intelligence/knowledge/style-anchors.js';
+import { findAndDownloadVideoClip } from '../integrations/pexels-api.js';
+import type { ReelScript, ReelSegment, ReelScriptV2, ReelSegmentV2, RenderConfig } from './types.js';
 import { CONFIG } from '../config/env.js';
-import { getActiveAISettings } from '../config/ai-settings.js';
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
+// ─── Audio Utilities ───
 
 function getMediaDuration(filePath: string): number {
   try {
@@ -52,187 +49,6 @@ function matchClipToAudioDuration(
     return outputPath;
   }
 }
-
-/**
- * Render a reel as an MP4 video using the Visual Intelligence Layer:
- * 1. Creative Director plans visuals for ALL segments at once
- * 2. Generate per-segment TTS FIRST (audio drives timing)
- * 3. For each segment: generate still → quality gate → video → text overlay
- * 4. Compose video with crossfade transitions + audio
- */
-export async function renderReel(
-  script: ReelScript,
-  renderConfig: RenderConfig,
-  scriptId: number
-): Promise<string> {
-  const outputDir = path.join(CONFIG.paths.assets, `reel-${scriptId}`);
-  if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
-
-  const allSegments = buildSegmentList(script);
-
-  // ─── Step 1: Creative Director plans visuals ───
-  console.log('  Creative Director planning visuals...');
-  const briefs = buildVisualBriefs(allSegments, script, renderConfig);
-  const plans = await planVisualsBatch(briefs);
-  console.log(`  Creative Director planned ${plans.length} segments`);
-
-  // ─── Step 2: Generate per-segment TTS (audio drives timing) ───
-  console.log('  Generating per-segment voiceover...');
-  const segmentAudioPaths: string[] = [];
-  for (let i = 0; i < allSegments.length; i++) {
-    const seg = allSegments[i];
-    const voText = seg.voiceoverText || seg.text;
-    const audioFile = `vo-${i}.mp3`;
-    try {
-      const audioPath = await generateSpeech(voText, outputDir, audioFile);
-      segmentAudioPaths.push(audioPath);
-      const audioDur = getMediaDuration(audioPath);
-      if (audioDur > 0) {
-        allSegments[i] = { ...seg, durationSeconds: audioDur + 0.3 };
-      }
-      console.log(`    Segment ${i} (${seg.segmentType}): ${audioDur.toFixed(1)}s audio → ${allSegments[i].durationSeconds.toFixed(1)}s visual`);
-    } catch (err: any) {
-      console.log(`    TTS failed for segment ${i}: ${err.message}, using ${seg.durationSeconds}s silence`);
-      const silentPath = await generateSilentSegment(outputDir, audioFile, seg.durationSeconds);
-      segmentAudioPaths.push(silentPath);
-    }
-  }
-
-  // ─── Step 3: Generate visuals (PARALLEL) ───
-  const aiSettings = getActiveAISettings() as any;
-  const isVideoEnabled = (aiSettings?.enable_video_generation ?? (process.env.ENABLE_VIDEO_GENERATION !== 'false'))
-    && !!process.env.FAL_API_KEY;
-  console.log(`  Video generation: ${isVideoEnabled ? 'ENABLED' : 'DISABLED'} (FAL_API_KEY: ${process.env.FAL_API_KEY ? 'set' : 'NOT SET'})`);
-
-  // Apply generateVideo overrides before parallel dispatch
-  for (let i = 0; i < allSegments.length; i++) {
-    const plan = plans[i];
-    if (isVideoEnabled && !plan.generateVideo) {
-      console.log(`  Segment ${i} — Creative Director set generateVideo=false, overriding to true for reel`);
-      plan.generateVideo = true;
-    }
-    console.log(`  Segment ${i} — model: ${plan.model}, generateVideo: ${plan.generateVideo}, prompt: "${plan.prompt?.slice(0, 80)}..."`);
-  }
-
-  // 3a. Generate ALL still images in parallel
-  console.log(`  Generating ${allSegments.length} stills in parallel...`);
-  const imageStartTime = Date.now();
-  const images = await Promise.all(
-    plans.map((plan, i) => {
-      console.log(`  Segment ${i} — dispatching still image generation...`);
-      return generateImage(plan, briefs[i], outputDir, `still-${i}.png`);
-    })
-  );
-  console.log(`  All ${images.length} stills generated in ${((Date.now() - imageStartTime) / 1000).toFixed(1)}s`);
-
-  // 3b. Generate ALL video clips in parallel (if enabled)
-  let videoClipPaths: string[];
-  if (isVideoEnabled) {
-    console.log(`  Generating ${allSegments.length} Kling video clips in parallel...`);
-    const videoStartTime = Date.now();
-    const videos = await Promise.all(
-      images.map((image, i) => {
-        if (plans[i].generateVideo) {
-          console.log(`  Segment ${i} — dispatching Kling video generation...`);
-          return generateVideo(image.path, plans[i], outputDir, `clip-${i}.mp4`);
-        }
-        return Promise.resolve({ path: image.path, model: 'still-fallback' as const, durationSeconds: 0, fromImage: false });
-      })
-    );
-    videoClipPaths = videos.map((v, i) => {
-      if (v.model === 'still-fallback') {
-        console.log(`  Segment ${i} — using still image (video skipped or fell back)`);
-      } else {
-        console.log(`  Segment ${i} — Kling video generated: ${v.model}, ${v.durationSeconds}s`);
-      }
-      return v.path;
-    });
-    console.log(`  All ${videos.length} video clips generated in ${((Date.now() - videoStartTime) / 1000).toFixed(1)}s`);
-  } else {
-    console.log(`  Video disabled — using still images for all segments`);
-    videoClipPaths = images.map(img => img.path);
-  }
-
-  // ─── Step 4: Render text overlays ───
-  console.log('  Rendering text overlays...');
-  const overlayPaths = await renderTextOverlays(allSegments, renderConfig, outputDir);
-
-  // ─── Step 5: Stitch audio ───
-  console.log('  Stitching audio...');
-  const voiceoverPath = await concatenateAudio(segmentAudioPaths, outputDir);
-
-  // ─── Step 6: Compose final video ───
-  console.log('  Composing video...');
-  const totalDur = allSegments.reduce((s, seg) => s + seg.durationSeconds, 0);
-  console.log(`  Total reel: ${totalDur.toFixed(1)}s across ${allSegments.length} segments`);
-  const outputPath = path.join(outputDir, 'reel.mp4');
-  await composeVideo(videoClipPaths, overlayPaths, allSegments, segmentAudioPaths, voiceoverPath, outputPath, outputDir, isVideoEnabled);
-
-  return outputPath;
-}
-
-// ─── Visual Brief Builder ───
-
-function buildVisualBriefs(
-  segments: ReelSegment[],
-  script: ReelScript,
-  config: RenderConfig
-): VisualBrief[] {
-  const anchor = getStyleAnchor();
-  const sceneStr = script.sceneSetup
-    ? `Scene context: ${script.sceneSetup.plant} in ${script.sceneSetup.pot}, ${script.sceneSetup.setting}, ${script.sceneSetup.lighting}, showing ${script.sceneSetup.condition}. `
-    : '';
-
-  if (sceneStr) {
-    console.log(`  Visual briefs anchored to scene: plant=${script.sceneSetup!.plant}, setting=${script.sceneSetup!.setting}`);
-  }
-
-  return segments.map((seg, i) => ({
-    contentType: 'reel' as const,
-    segmentType: seg.segmentType || 'body',
-    segmentIndex: i,
-    totalSegments: segments.length,
-    onScreenText: seg.text,
-    voiceoverText: seg.voiceoverText || seg.text,
-    originalVisualDescription: sceneStr + (seg.visualDescription || `professional ${CONFIG.app.niche} visual`),
-    brandContext: {
-      niche: CONFIG.app.niche || 'Houseplant ICU',
-      stylePrefix: anchor.imageStylePrefix,
-      colorPalette: [config.brandColors.primary, config.brandColors.secondary, config.brandColors.accent],
-      mood: seg.segmentType === 'hook' ? 'dramatic' : seg.segmentType === 'cta' ? 'warm, inviting' : 'informative',
-    },
-  }));
-}
-
-// ─── Segment Builder ───
-
-function buildSegmentList(script: ReelScript): ReelSegment[] {
-  const segments: ReelSegment[] = [];
-
-  segments.push({
-    text: script.hook,
-    voiceoverText: script.hookVoiceover || script.hook,
-    durationSeconds: script.hookDuration || 3,
-    visualDescription: script.hookVisual || 'attention-grabbing dramatic visual',
-    segmentType: 'hook',
-  });
-
-  for (const seg of script.segments) {
-    segments.push({ ...seg, segmentType: seg.segmentType || 'body' });
-  }
-
-  segments.push({
-    text: script.cta,
-    voiceoverText: script.ctaVoiceover || script.cta,
-    durationSeconds: script.ctaDuration || 4,
-    visualDescription: script.ctaVisual || 'call to action motivational visual',
-    segmentType: 'cta',
-  });
-
-  return segments;
-}
-
-// ─── Audio Helpers ───
 
 function generateSilentSegment(outputDir: string, filename: string, durationSeconds: number): Promise<string> {
   const outputPath = path.join(outputDir, filename);
@@ -273,10 +89,76 @@ function concatenateAudio(audioPaths: string[], outputDir: string): Promise<stri
   });
 }
 
+// ─── Color Fallback Clip ───
+
+async function generateColorFallbackClip(
+  outputDir: string,
+  filename: string,
+  config: RenderConfig,
+  index: number,
+  durationSeconds: number
+): Promise<string> {
+  // Generate a still image with brand colors
+  const imgPath = path.join(outputDir, `fallback-still-${index}.png`);
+  const colors = [config.brandColors.primary, config.brandColors.accent, config.brandColors.secondary];
+  const hex = colors[index % colors.length].replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  await sharp({
+    create: { width: 1080, height: 1920, channels: 3, background: { r, g, b } },
+  }).png().toFile(imgPath);
+
+  // Convert still to video clip at the required duration
+  const videoPath = path.join(outputDir, filename);
+  const frames = Math.ceil(durationSeconds * 25);
+  execSync(
+    `ffmpeg -y -loop 1 -i "${imgPath}" -c:v libx264 -t ${durationSeconds.toFixed(2)} -pix_fmt yuv420p -vf "scale=1080:1920,fps=25" -preset fast "${videoPath}"`,
+    { stdio: 'pipe' }
+  );
+
+  return videoPath;
+}
+
+// ─── Segment Builder (v2) ───
+
+function buildSegmentListV2(script: ReelScriptV2): ReelSegmentV2[] {
+  const segments: ReelSegmentV2[] = [];
+
+  segments.push({
+    onScreenText: script.hook.onScreenText,
+    voiceover: script.hook.voiceover,
+    pexelsSearch: script.hook.pexelsSearch || [],
+    targetDuration: 3,
+    segmentType: 'hook',
+  });
+
+  for (const seg of script.segments) {
+    segments.push({
+      onScreenText: seg.onScreenText,
+      voiceover: seg.voiceover,
+      pexelsSearch: seg.pexelsSearch || [],
+      targetDuration: seg.targetDuration || 4,
+      segmentType: 'body',
+    });
+  }
+
+  segments.push({
+    onScreenText: script.cta.onScreenText,
+    voiceover: script.cta.voiceover,
+    pexelsSearch: script.cta.pexelsSearch || [],
+    targetDuration: 4,
+    segmentType: 'cta',
+  });
+
+  return segments;
+}
+
 // ─── Text Overlay Rendering ───
 
 async function renderTextOverlays(
-  segments: ReelSegment[],
+  segments: ReelSegmentV2[],
   config: RenderConfig,
   outputDir: string
 ): Promise<string[]> {
@@ -289,8 +171,7 @@ async function renderTextOverlays(
   try {
     for (let i = 0; i < segments.length; i++) {
       const seg = segments[i];
-      const segType = seg.segmentType || 'body';
-      const html = reelOverlayHtml(seg.text, config, segType, i, segments.length);
+      const html = reelOverlayHtml(seg.onScreenText, config, seg.segmentType, i, segments.length);
       await page.setContent(html, { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => Promise.race([
         document.fonts.ready,
@@ -310,20 +191,19 @@ async function renderTextOverlays(
 
 // ─── Video Composition ───
 
-function composeVideo(
+function composeVideoV2(
   clipPaths: string[],
   overlayPaths: string[],
-  segments: ReelSegment[],
+  segments: ReelSegmentV2[],
   segmentAudioPaths: string[],
   voiceoverPath: string,
   outputPath: string,
-  outputDir: string,
-  hasVideoClips: boolean
+  outputDir: string
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const segmentCount = segments.length;
 
-    // ─── Match each clip's duration to its corresponding audio segment ───
+    // Match each clip's duration to its corresponding audio segment
     console.log('  Matching clip durations to audio segments...');
     const matchedClips: string[] = [];
     for (let i = 0; i < segmentCount; i++) {
@@ -332,8 +212,7 @@ function composeVideo(
       if (audioPath && existsSync(audioPath) && clipPath.endsWith('.mp4')) {
         const audioDur = getMediaDuration(audioPath);
         if (audioDur > 0) {
-          // Update segment duration to exact audio duration for accurate filter graph timing
-          segments[i] = { ...segments[i], durationSeconds: audioDur };
+          segments[i] = { ...segments[i], actualDuration: audioDur };
           const matchedPath = path.join(outputDir, `clip-${i}-matched.mp4`);
           try {
             matchedClips.push(matchClipToAudioDuration(clipPath, audioDur, matchedPath));
@@ -352,7 +231,7 @@ function composeVideo(
     let filterComplex = '';
     const inputs: string[] = [];
 
-    // Add all video/image inputs (use matched clips)
+    // Add all video inputs (use matched clips)
     for (let i = 0; i < segmentCount; i++) {
       inputs.push(matchedClips[i]);
     }
@@ -365,17 +244,9 @@ function composeVideo(
 
     // Build filter graph
     for (let i = 0; i < segmentCount; i++) {
-      const dur = segments[i].durationSeconds;
-      const frames = dur * 25;
-      const clipIsVideo = hasVideoClips && matchedClips[i].endsWith('.mp4');
-
-      if (clipIsVideo) {
-        // Video clip — already duration-matched; scale, fps-normalize, and trim as safety net
-        filterComplex += `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=25,trim=duration=${dur},setpts=PTS-STARTPTS[bg${i}];`;
-      } else {
-        // Still image — use zoompan (Ken Burns) to generate video frames
-        filterComplex += `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,zoompan=z='min(zoom+0.0005,1.03)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1080x1920:fps=25,setpts=PTS-STARTPTS[bg${i}];`;
-      }
+      const dur = segments[i].actualDuration || segments[i].targetDuration;
+      // Stock video clips — scale, fps-normalize, and trim
+      filterComplex += `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=25,trim=duration=${dur},setpts=PTS-STARTPTS[bg${i}];`;
     }
 
     // Scale overlays
@@ -384,20 +255,20 @@ function composeVideo(
       filterComplex += `[${overlayIdx}:v]scale=1080:1920[ov${i}];`;
     }
 
-    // Overlay text on video/backgrounds
+    // Overlay text on video backgrounds
     for (let i = 0; i < segmentCount; i++) {
       filterComplex += `[bg${i}][ov${i}]overlay=0:0:format=auto[seg${i}];`;
     }
 
     // Apply crossfade transitions (0.3s dissolve)
     if (segmentCount > 1) {
-      let cumulativeDuration = segments[0].durationSeconds;
+      let cumulativeDuration = segments[0].actualDuration || segments[0].targetDuration;
       let prevLabel = 'seg0';
       for (let i = 1; i < segmentCount; i++) {
         const fadeOffset = cumulativeDuration - 0.3;
         const outLabel = i === segmentCount - 1 ? 'outv' : `xf${i}`;
         filterComplex += `[${prevLabel}][seg${i}]xfade=transition=fade:duration=0.3:offset=${fadeOffset.toFixed(2)}[${outLabel}];`;
-        cumulativeDuration += segments[i].durationSeconds - 0.3;
+        cumulativeDuration += (segments[i].actualDuration || segments[i].targetDuration) - 0.3;
         prevLabel = outLabel;
       }
     } else {
@@ -436,29 +307,93 @@ function composeVideo(
   });
 }
 
-// ─── Gradient Fallback ───
+// ─── Main Render Function (v2) ───
 
-async function generateGradientBackground(
-  outputDir: string,
-  filename: string,
-  config: RenderConfig,
-  index: number
+/**
+ * Render a reel using Pexels stock video clips:
+ * 1. Generate per-segment TTS (audio drives timing)
+ * 2. Search & download Pexels video clips per segment
+ * 3. Trim clips to match audio duration
+ * 4. Puppeteer text overlays
+ * 5. ffmpeg crossfade composition + audio
+ */
+export async function renderReelV2(
+  script: ReelScriptV2,
+  renderConfig: RenderConfig,
+  scriptId: number
 ): Promise<string> {
-  const outputPath = path.join(outputDir, filename);
-  const colors = [config.brandColors.primary, config.brandColors.accent, config.brandColors.secondary];
-  const hex = colors[index % colors.length].replace('#', '');
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
+  const outputDir = path.join(CONFIG.paths.assets, `reel-${scriptId}`);
+  if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
 
-  await sharp({
-    create: { width: 1080, height: 1920, channels: 3, background: { r, g, b } },
-  }).png().toFile(outputPath);
+  const allSegments = buildSegmentListV2(script);
+
+  // ─── Step 1: Generate per-segment TTS (audio drives timing) ───
+  console.log('  Generating per-segment voiceover...');
+  const segmentAudioPaths: string[] = [];
+  for (let i = 0; i < allSegments.length; i++) {
+    const seg = allSegments[i];
+    const voText = seg.voiceover || seg.onScreenText;
+    const audioFile = `vo-${i}.mp3`;
+    try {
+      const audioPath = await generateSpeech(voText, outputDir, audioFile);
+      segmentAudioPaths.push(audioPath);
+      const audioDur = getMediaDuration(audioPath);
+      if (audioDur > 0) {
+        allSegments[i] = { ...seg, actualDuration: audioDur + 0.3 };
+      }
+      console.log(`    Segment ${i} (${seg.segmentType}): ${audioDur.toFixed(1)}s audio → ${(allSegments[i].actualDuration || seg.targetDuration).toFixed(1)}s visual`);
+    } catch (err: any) {
+      console.log(`    TTS failed for segment ${i}: ${err.message}, using ${seg.targetDuration}s silence`);
+      const silentPath = await generateSilentSegment(outputDir, audioFile, seg.targetDuration);
+      segmentAudioPaths.push(silentPath);
+    }
+  }
+
+  // ─── Step 2: Search & download Pexels video clips ───
+  console.log('  Downloading Pexels stock video clips...');
+  const clipPaths: string[] = [];
+  for (let i = 0; i < allSegments.length; i++) {
+    const seg = allSegments[i];
+    const clipDuration = seg.actualDuration || seg.targetDuration;
+    const clipFile = `clip-${i}.mp4`;
+
+    try {
+      const result = await findAndDownloadVideoClip(
+        seg.pexelsSearch,
+        outputDir,
+        clipFile,
+        Math.max(2, clipDuration - 2),   // minDuration: allow slightly shorter clips
+        clipDuration + 10,                 // maxDuration: allow longer clips (we'll trim)
+        scriptId,
+        i
+      );
+      clipPaths.push(result.path);
+    } catch (err: any) {
+      console.warn(`    Pexels clip ${i} failed: ${err.message}, generating color fallback`);
+      const fallbackPath = await generateColorFallbackClip(outputDir, clipFile, renderConfig, i, clipDuration);
+      clipPaths.push(fallbackPath);
+    }
+  }
+
+  // ─── Step 3: Render text overlays ───
+  console.log('  Rendering text overlays...');
+  const overlayPaths = await renderTextOverlays(allSegments, renderConfig, outputDir);
+
+  // ─── Step 4: Stitch audio ───
+  console.log('  Stitching audio...');
+  const voiceoverPath = await concatenateAudio(segmentAudioPaths, outputDir);
+
+  // ─── Step 5: Compose final video ───
+  console.log('  Composing video...');
+  const totalDur = allSegments.reduce((s, seg) => s + (seg.actualDuration || seg.targetDuration), 0);
+  console.log(`  Total reel: ${totalDur.toFixed(1)}s across ${allSegments.length} segments`);
+  const outputPath = path.join(outputDir, 'reel.mp4');
+  await composeVideoV2(clipPaths, overlayPaths, allSegments, segmentAudioPaths, voiceoverPath, outputPath, outputDir);
 
   return outputPath;
 }
 
-// ─── Timestamp Parsing ───
+// ─── Script Parser (v2 with v1 backward compat) ───
 
 function parseDurationFromTimestamp(timestamp: string | number): number | null {
   if (typeof timestamp === 'number') return timestamp > 0 ? timestamp : null;
@@ -478,32 +413,90 @@ function parseDurationFromTimestamp(timestamp: string | number): number | null {
 }
 
 /**
- * Parse a content_scripts row's script_json into a ReelScript.
+ * Parse a content_scripts row's script_json into a ReelScriptV2.
+ * Handles both v2 format (with reelFormat + pexelsSearch) and
+ * backward-compatible v1 format (with sceneSetup + visualDescription).
  */
-export function parseReelScript(scriptJson: string): ReelScript {
+export function parseReelScriptV2(scriptJson: string): ReelScriptV2 {
   const parsed = JSON.parse(scriptJson);
   const reel = parsed.reelScript || parsed.reel || parsed;
 
-  if ((reel.body || reel.segments || []).length === 0) {
-    console.warn('  WARNING: No body segments found in reel script! Check script JSON wrapper key. Tried: parsed.reelScript, parsed.reel, parsed');
+  // Detect v2 format: has reelFormat field
+  if (reel.reelFormat) {
+    return parseV2Native(reel);
   }
 
+  // Fall back to v1 conversion
+  return convertV1ToV2(reel);
+}
+
+function parseV2Native(reel: any): ReelScriptV2 {
+  const hookRaw = reel.hook || {};
+  const ctaRaw = reel.cta || {};
+
+  const segments = (reel.segments || reel.body || []).map((s: any) => ({
+    onScreenText: s.onScreenText || s.text || '',
+    voiceover: s.voiceover || s.voiceoverScript || s.text || '',
+    pexelsSearch: Array.isArray(s.pexelsSearch) ? s.pexelsSearch : [],
+    targetDuration: s.targetDuration || s.durationSeconds || 4,
+    segmentType: 'body' as const,
+  }));
+
+  const caption = reel.caption || {};
+
+  return {
+    reelFormat: reel.reelFormat || 'deep_dive',
+    hook: {
+      onScreenText: typeof hookRaw === 'string' ? hookRaw : (hookRaw.onScreenText || hookRaw.text || ''),
+      voiceover: typeof hookRaw === 'string' ? hookRaw : (hookRaw.voiceover || hookRaw.voiceoverScript || hookRaw.onScreenText || ''),
+      pexelsSearch: Array.isArray(hookRaw.pexelsSearch) ? hookRaw.pexelsSearch : [],
+    },
+    segments,
+    cta: {
+      onScreenText: typeof ctaRaw === 'string' ? ctaRaw : (ctaRaw.onScreenText || ctaRaw.text || ''),
+      voiceover: typeof ctaRaw === 'string' ? ctaRaw : (ctaRaw.voiceover || ctaRaw.voiceoverScript || ctaRaw.onScreenText || ''),
+      pexelsSearch: Array.isArray(ctaRaw.pexelsSearch) ? ctaRaw.pexelsSearch : [],
+    },
+    caption: {
+      hookLine: caption.hookLine || '',
+      body: caption.body || '',
+      cta: caption.cta || '',
+      seoKeywords: Array.isArray(caption.seoKeywords) ? caption.seoKeywords : [],
+      hashtags: Array.isArray(caption.hashtags) ? caption.hashtags : [],
+    },
+    dmTrigger: reel.dmTrigger || '',
+    totalLength: reel.totalLength || 28,
+    audioMood: reel.audioMood,
+    voiceoverText: reel.voiceoverText,
+  };
+}
+
+/**
+ * Convert a v1 ReelScript (with visualDescription / sceneSetup) into a v2 format.
+ * Uses the visualDescription as a Pexels search term fallback.
+ */
+function convertV1ToV2(reel: any): ReelScriptV2 {
   const hookRaw = reel.hook;
   const hook = typeof hookRaw === 'string' ? hookRaw : hookRaw?.onScreenText || hookRaw?.text || '';
   const ctaRaw = reel.cta;
   const cta = typeof ctaRaw === 'string' ? ctaRaw : ctaRaw?.onScreenText || ctaRaw?.text || '';
 
-  const hookDuration = (typeof hookRaw === 'object' && hookRaw?.timestamp)
-    ? parseDurationFromTimestamp(hookRaw.timestamp) ?? 3 : 3;
-  const ctaDuration = (typeof ctaRaw === 'object' && ctaRaw?.timestamp)
-    ? parseDurationFromTimestamp(ctaRaw.timestamp) ?? 4 : 4;
-
-  const rawSegments = reel.segments || reel.body || [];
-
   const extractVO = (obj: any): string => {
     const raw = obj?.voiceover || obj?.voiceoverScript || obj?.audio || '';
     return raw.replace(/^[^:]*:\s*['"]?/, '').replace(/['"]?\s*$/, '');
   };
+
+  const hookVoiceover = (typeof hookRaw === 'object') ? (extractVO(hookRaw) || hook) : hook;
+  const ctaVoiceover = (typeof ctaRaw === 'object') ? (extractVO(ctaRaw) || cta) : cta;
+
+  const hookVisual = typeof hookRaw === 'object' ? (hookRaw?.visual || hookRaw?.visualDescription || '') : '';
+  const ctaVisual = typeof ctaRaw === 'object' ? (ctaRaw?.visual || ctaRaw?.visualDescription || '') : '';
+
+  // Extract plant name from sceneSetup for better Pexels searches
+  const plantName = reel.sceneSetup?.plant || '';
+  const plantSearch = plantName ? [plantName, 'houseplant'] : ['houseplant close up'];
+
+  const rawSegments = reel.segments || reel.body || [];
 
   const segments = rawSegments.map((s: any) => {
     const text = s.text || s.onScreenText || s.line || '';
@@ -513,50 +506,43 @@ export function parseReelScript(scriptJson: string): ReelScript {
     if (durationSeconds === null && s.timestamp) {
       durationSeconds = parseDurationFromTimestamp(s.timestamp);
     }
-    const voiceoverText = extractVO(s) || text;
 
     return {
-      text,
-      voiceoverText,
-      durationSeconds: durationSeconds && durationSeconds > 0 ? durationSeconds : 4,
-      visualDescription: s.visualDescription || s.visual || '',
-      segmentType: s.segmentType || 'body',
+      onScreenText: text,
+      voiceover: extractVO(s) || text,
+      pexelsSearch: s.visualDescription ? [s.visualDescription, ...plantSearch] : plantSearch,
+      targetDuration: durationSeconds && durationSeconds > 0 ? durationSeconds : 4,
+      segmentType: 'body' as const,
     };
   });
 
-  const hookVoiceover = (typeof hookRaw === 'object') ? (extractVO(hookRaw) || hook) : hook;
-  const ctaVoiceover = (typeof ctaRaw === 'object') ? (extractVO(ctaRaw) || cta) : cta;
-  const voiceoverParts = [hookVoiceover, ...segments.map((s: any) => s.voiceoverText || s.text), ctaVoiceover];
-  const voiceoverText = reel.voiceoverText || voiceoverParts.join('. ') || '';
+  const caption = reel.caption || {};
 
-  const hookVisual = typeof hookRaw === 'object' ? (hookRaw?.visual || hookRaw?.visualDescription || '') : '';
-  const ctaVisual = typeof ctaRaw === 'object' ? (ctaRaw?.visual || ctaRaw?.visualDescription || '') : '';
-
-  // Extract sceneSetup for visual consistency
-  const sceneSetup = reel.sceneSetup || null;
-  if (sceneSetup) {
-    console.log(`  sceneSetup: plant=${sceneSetup.plant}, setting=${sceneSetup.setting}`);
-  } else {
-    console.warn('  ⚠️ No sceneSetup found in reel script — visual continuity will be degraded');
-  }
-
-  console.log(`  Parsed reel: hook="${hook.substring(0, 40)}...", ${segments.length} body segments, cta="${cta.substring(0, 40)}..."`);
-  if (segments.length === 0) {
-    console.warn('  ⚠️ Zero body segments parsed from reel script!');
-  }
+  console.log(`  Converted v1 reel to v2: hook="${hook.substring(0, 40)}...", ${segments.length} body segments`);
 
   return {
-    hook,
-    hookVisual,
-    hookDuration,
-    hookVoiceover,
+    reelFormat: 'deep_dive',
+    hook: {
+      onScreenText: hook,
+      voiceover: hookVoiceover,
+      pexelsSearch: hookVisual ? [hookVisual, ...plantSearch] : plantSearch,
+    },
     segments,
-    cta,
-    ctaVisual,
-    ctaDuration,
-    ctaVoiceover,
+    cta: {
+      onScreenText: cta,
+      voiceover: ctaVoiceover,
+      pexelsSearch: ctaVisual ? [ctaVisual, ...plantSearch] : plantSearch,
+    },
+    caption: {
+      hookLine: caption.hookLine || '',
+      body: caption.body || '',
+      cta: caption.cta || '',
+      seoKeywords: Array.isArray(caption.seoKeywords) ? caption.seoKeywords : [],
+      hashtags: Array.isArray(caption.hashtags) ? caption.hashtags : [],
+    },
+    dmTrigger: reel.dmTrigger || '',
     totalLength: reel.totalLength || 30,
-    voiceoverText,
-    sceneSetup,
+    audioMood: reel.audioMood,
+    voiceoverText: reel.voiceoverText,
   };
 }

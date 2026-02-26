@@ -168,6 +168,35 @@ const MIGRATIONS: Migration[] = [
       CREATE INDEX IF NOT EXISTS idx_api_costs_project ON api_costs(project_label);
     `,
   },
+  {
+    version: 13,
+    name: 'add_pexels_clips',
+    up: `
+      CREATE TABLE IF NOT EXISTS pexels_clips (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pexels_id INTEGER NOT NULL,
+        media_type TEXT NOT NULL CHECK(media_type IN ('video', 'photo')),
+        search_query TEXT,
+        photographer TEXT,
+        pexels_url TEXT,
+        used_at TEXT DEFAULT (datetime('now')),
+        script_id INTEGER,
+        segment_index INTEGER
+      );
+      CREATE INDEX IF NOT EXISTS idx_pexels_clips_media_type ON pexels_clips(media_type);
+      CREATE INDEX IF NOT EXISTS idx_pexels_clips_used_at ON pexels_clips(used_at);
+      CREATE INDEX IF NOT EXISTS idx_pexels_clips_pexels_id ON pexels_clips(pexels_id);
+    `,
+  },
+  {
+    version: 14,
+    name: 'add_pexels_style_settings',
+    up: `
+      ALTER TABLE ai_settings ADD COLUMN pexels_video_style_terms TEXT;
+      ALTER TABLE ai_settings ADD COLUMN pexels_photo_style_terms TEXT;
+      ALTER TABLE ai_settings ADD COLUMN pexels_exclude_terms TEXT;
+    `,
+  },
 ];
 
 export function runMigrations(): void {

@@ -38,6 +38,10 @@ interface AISettingsForm {
   default_lens: string;
   default_lighting: string;
   default_color_profile: string;
+  // Pexels stock media fields
+  pexels_video_style_terms: string;
+  pexels_photo_style_terms: string;
+  pexels_exclude_terms: string;
 }
 
 interface Defaults {
@@ -69,6 +73,9 @@ const emptyForm: AISettingsForm = {
   default_lens: '100mm f/2.8L Macro IS',
   default_lighting: 'soft north-facing window light with warm fill',
   default_color_profile: 'Kodak Portra 400',
+  pexels_video_style_terms: '',
+  pexels_photo_style_terms: '',
+  pexels_exclude_terms: '',
 };
 
 function parseSettingToForm(s: any): AISettingsForm {
@@ -94,6 +101,9 @@ function parseSettingToForm(s: any): AISettingsForm {
     default_lens: s.default_lens || '100mm f/2.8L Macro IS',
     default_lighting: s.default_lighting || 'soft north-facing window light with warm fill',
     default_color_profile: s.default_color_profile || 'Kodak Portra 400',
+    pexels_video_style_terms: s.pexels_video_style_terms || '',
+    pexels_photo_style_terms: s.pexels_photo_style_terms || '',
+    pexels_exclude_terms: s.pexels_exclude_terms || '',
   };
 }
 
@@ -223,15 +233,27 @@ export default function AISettings() {
                 </p>
               </div>
             )}
+            {(activeSetting as any).pexels_video_style_terms && (
+              <div>
+                <span className="text-gray-500 text-xs uppercase tracking-wide">Video Search Style Terms</span>
+                <p className="text-gray-300 mt-1">{(activeSetting as any).pexels_video_style_terms}</p>
+              </div>
+            )}
+            {(activeSetting as any).pexels_photo_style_terms && (
+              <div>
+                <span className="text-gray-500 text-xs uppercase tracking-wide">Photo Search Style Terms</span>
+                <p className="text-gray-300 mt-1">{(activeSetting as any).pexels_photo_style_terms}</p>
+              </div>
+            )}
             {activeSetting.image_style_prefix && (
               <div>
-                <span className="text-gray-500 text-xs uppercase tracking-wide">Style Prefix</span>
+                <span className="text-gray-500 text-xs uppercase tracking-wide">Style Prefix (Legacy)</span>
                 <p className="text-gray-300 mt-1">{activeSetting.image_style_prefix}</p>
               </div>
             )}
             {activeSetting.image_style_suffix && (
               <div>
-                <span className="text-gray-500 text-xs uppercase tracking-wide">Style Suffix</span>
+                <span className="text-gray-500 text-xs uppercase tracking-wide">Style Suffix (Legacy)</span>
                 <p className="text-gray-300 mt-1">{activeSetting.image_style_suffix}</p>
               </div>
             )}
@@ -489,11 +511,57 @@ export default function AISettings() {
             </div>
           </div>
 
-          {/* Section 4: Image Generation Style */}
+          {/* Section: Pexels Stock Media */}
           <div className="border-t border-gray-800 pt-5">
-            <h4 className="text-sm font-medium text-gray-300 uppercase tracking-wide mb-3">Image Generation Style</h4>
+            <h4 className="text-sm font-medium text-gray-300 uppercase tracking-wide mb-3">Pexels Stock Media</h4>
             <p className="text-gray-600 text-xs mb-4">
-              Style prefix/suffix injected into every image prompt. These wrap around the Creative Director's photographic prompt.
+              Additional search terms appended to every Pexels video/photo query. Use to steer visual style across all content.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Video Search Style Terms</label>
+                <input
+                  type="text"
+                  value={form.pexels_video_style_terms}
+                  onChange={e => setForm({ ...form, pexels_video_style_terms: e.target.value })}
+                  placeholder="cinematic, slow motion, macro, 4k"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
+                />
+                <p className="text-gray-600 text-xs mt-1">Comma-separated terms added to every Pexels video search.</p>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Photo Search Style Terms</label>
+                <input
+                  type="text"
+                  value={form.pexels_photo_style_terms}
+                  onChange={e => setForm({ ...form, pexels_photo_style_terms: e.target.value })}
+                  placeholder="macro photography, warm lighting, earth tones"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
+                />
+                <p className="text-gray-600 text-xs mt-1">Comma-separated terms added to every Pexels photo search.</p>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Exclude Terms</label>
+                <input
+                  type="text"
+                  value={form.pexels_exclude_terms}
+                  onChange={e => setForm({ ...form, pexels_exclude_terms: e.target.value })}
+                  placeholder="people, faces, hands, cartoon"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
+                />
+                <p className="text-gray-600 text-xs mt-1">Terms to avoid in Pexels searches (appended as negative filters).</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Image Generation Style (Legacy) */}
+          <div className="border-t border-gray-800 pt-5">
+            <h4 className="text-sm font-medium text-gray-300 uppercase tracking-wide mb-3">Image Generation Style (Legacy)</h4>
+            <p className="text-gray-600 text-xs mb-4">
+              Style prefix/suffix for AI image generation. These are legacy settings — new content uses Pexels stock media.
             </p>
 
             <div className="space-y-4">

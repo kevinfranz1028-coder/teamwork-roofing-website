@@ -1,3 +1,6 @@
+// LEGACY: This file is no longer used in the active rendering pipeline.
+// Reel and carousel rendering now uses Pexels stock video/photo via pexels-api.ts.
+// Kept for reference and potential future AI image generation needs.
 import { fal } from '@fal-ai/client';
 import { writeFile } from 'fs/promises';
 import path from 'path';
