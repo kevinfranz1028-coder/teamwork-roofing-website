@@ -1,0 +1,62 @@
+{
+  "terminology": {
+    "preferred_terms": {},
+    "program_names": [
+      "TP tools",
+      "Processes Re-engineering",
+      "TP Microservices Platform",
+      "TP Applications"
+    ],
+    "acronyms": {
+      "TP": "Teleperformance",
+      "AI": "Artificial Intelligence"
+    }
+  },
+  "voice_profile": {
+    "tone": "professional",
+    "formality": "Semi-Formal",
+    "vocabulary_level": "Moderate",
+    "key_phrases": [
+      "WE'RE PASSIONATE ABOUT OUR BRAND",
+      "#WeAreTP",
+      "global brand consistency",
+      "We're here to help",
+      "Leading global delivery platform",
+      "powered by TP experts"
+    ],
+    "avoid_phrases": [],
+    "messaging_themes": [
+      "brand consistency",
+      "global support",
+      "expertise and technology",
+      "operational excellence",
+      "customer service"
+    ]
+  },
+  "company_name": "TP",
+  "colors": {
+    "primary": "#ED1E81",
+    "secondary": "#4C3193",
+    "accent": "#918D80",
+    "background": "#FFFFFF",
+    "text": "#000000"
+  },
+  "fonts": {
+    "heading": "Calibri",
+    "body": "Calibri"
+  },
+  "full_palette": {
+    "dk1": "#000000",
+    "lt1": "#FFFFFF",
+    "dk2": "#D4D1CA",
+    "lt2": "#4A4C6A",
+    "accent1": "#ED1E81",
+    "accent2": "#918D80",
+    "accent3": "#4C3193",
+    "accent4": "#706297",
+    "accent5": "#848DAC",
+    "accent6": "#C2C7CC",
+    "hlink": "#0087FF",
+    "folHlink": "#771E95"
+  }
+}
