@@ -480,6 +480,64 @@ else:
 
 
 # ---------------------------------------------------------------------------
+# Agent pipeline details
+# ---------------------------------------------------------------------------
+
+def _render_agent_pipeline_details(response):
+    """Show agent pipeline step details when generate_with_agents was used."""
+    tool_calls = response.tool_calls_made if hasattr(response, "tool_calls_made") else []
+    if not tool_calls:
+        return
+
+    for tc in tool_calls:
+        if tc.get("name") != "generate_with_agents":
+            continue
+
+        # Parse the result to extract step details
+        result_preview = tc.get("result_preview", "")
+        try:
+            # Try full result first, fall back to preview
+            result_data = json.loads(result_preview.rstrip("...") if result_preview.endswith("...") else result_preview)
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+        steps = result_data.get("steps_summary", [])
+        if not steps:
+            continue
+
+        with st.expander("Agent Pipeline Details", expanded=False):
+            # Summary metrics
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                passed = result_data.get("compliance_passed", False)
+                score = result_data.get("compliance_score", 0)
+                st.metric("Compliance", f"{'Pass' if passed else 'Fail'} ({score:.0%})")
+            with col2:
+                st.metric("Cost", f"${result_data.get('total_cost_usd', 0):.4f}")
+            with col3:
+                st.metric("Time", f"{result_data.get('elapsed_seconds', 0):.1f}s")
+            with col4:
+                completed = sum(1 for s in steps if s.get("status") == "COMPLETED")
+                st.metric("Steps", f"{completed}/{len(steps)}")
+
+            # Per-step table
+            st.markdown("**Pipeline Steps:**")
+            for step in steps:
+                status_icon = {
+                    "COMPLETED": "\\u2705",
+                    "FAILED": "\\u274c",
+                    "RUNNING": "\\u23f3",
+                    "PENDING": "\\u23f8\\ufe0f",
+                    "RETRYING": "\\U0001f504",
+                }.get(step.get("status", ""), "\\u2753")
+                step_id = step.get("step_id", "unknown")
+                desc = step.get("description", step_id)
+                status = step.get("status", "UNKNOWN")
+                st.markdown(f"- {status_icon} **{step_id.title()}**: {desc} — *{status}*")
+        break
+
+
+# ---------------------------------------------------------------------------
 # Next-steps guidance
 # ---------------------------------------------------------------------------
 
@@ -498,7 +556,7 @@ def _render_next_steps(response):
                 hints.append(f"Your file is ready: **{os.path.basename(fpath)}** — use the download button above to save it locally.")
         hints.append("You can also click **Save to Library** to store it for future use.")
         hints.append("Ask me to make changes, create a new version, or generate something else.")
-    elif tool_names & {"generate_presentation", "generate_document", "generate_training_package", "generate_visual", "generate_batch", "translate_content"}:
+    elif tool_names & {"generate_presentation", "generate_document", "generate_training_package", "generate_visual", "generate_batch", "generate_with_agents", "generate_image", "translate_content"}:
         hints.append("If you don't see a download button above, the generation may have encountered an issue. Try asking me again or check the error details.")
     elif tool_names & {"search_brand_assets", "search_content_library", "search_brand_knowledge", "get_content_stats", "list_templates"}:
         hints.append("These are your search results. Ask me to generate content using any of these, or refine your search.")
@@ -649,7 +707,9 @@ def _process_user_turn(user_text: str, uploaded_file_paths: list[str] | None = N
         "generate_document": "Generating document",
         "generate_training_package": "Building training package",
         "generate_visual": "Creating visual",
+        "generate_image": "Generating image",
         "generate_batch": "Running batch generation",
+        "generate_with_agents": "Running agent pipeline",
         "translate_content": "Translating content",
         "search_brand_assets": "Searching brand assets",
         "get_brand_config": "Reading brand config",
@@ -660,6 +720,7 @@ def _process_user_turn(user_text: str, uploaded_file_paths: list[str] | None = N
         "list_templates": "Loading templates",
         "search_brand_knowledge": "Searching brand knowledge",
         "web_search": "Searching the web",
+        "check_brand_compliance": "Checking brand compliance",
         "confirm_action": "Preparing action plan",
     }
 
@@ -752,6 +813,9 @@ def _process_user_turn(user_text: str, uploaded_file_paths: list[str] | None = N
             files=response.generated_files,
             tool_calls=response.tool_calls_made,
         )
+
+        # -- Agent pipeline details -----------------------------------------
+        _render_agent_pipeline_details(response)
 
         # -- Next steps guidance --------------------------------------------
         _render_next_steps(response)

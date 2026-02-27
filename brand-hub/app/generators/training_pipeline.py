@@ -219,6 +219,15 @@ class TrainingPipeline:
         self._presentation_gen = None
         self._document_gen = None
 
+        # Research agent for content-library-informed generation
+        self._research_agent = None
+        self._research_context: str = ""  # Cached brief context for this run
+        try:
+            from app.agents.research_agent import ResearchAgent
+            self._research_agent = ResearchAgent(brand_config=self.brand_config)
+        except Exception:
+            pass
+
     # ------------------------------------------------------------------
     # Brand config
     # ------------------------------------------------------------------
@@ -308,6 +317,20 @@ class TrainingPipeline:
 
         # Ensure the output directory exists
         TRAINING_DIR.mkdir(parents=True, exist_ok=True)
+
+        # --- Step 0: Build research brief from content library ------------
+        if self._research_agent is not None:
+            try:
+                # Use the first 200 chars of input as the query
+                query = input_content[:200].strip()
+                brief = self._research_agent.build_brief(
+                    query=query, content_type="training",
+                )
+                self._research_context = brief.to_prompt_context()
+                logger.info("Training research brief: %s", brief.summary())
+            except Exception as exc:
+                logger.debug("Research agent failed for training: %s", exc)
+                self._research_context = ""
 
         # --- Step 1: Parse / generate curriculum --------------------------
         try:
@@ -2476,6 +2499,10 @@ Respond with valid JSON only. No markdown fences."""
     ) -> str:
         """Make a single request to the Anthropic messages API.
 
+        If a research brief was built during ``process_curriculum()``,
+        its context is automatically appended to the system prompt so
+        Claude can reference existing brand content and voice guidance.
+
         Args:
             system_prompt: The system instruction for Claude.
             user_content: The user message content.
@@ -2487,6 +2514,10 @@ Respond with valid JSON only. No markdown fences."""
         Raises:
             Exception: Propagated from the Anthropic SDK on API errors.
         """
+        # Inject research context if available
+        if self._research_context:
+            system_prompt = system_prompt + "\n\n" + self._research_context
+
         logger.debug(
             "Calling Claude (%s) with %d char prompt, max_tokens=%d",
             CLAUDE_MODEL,

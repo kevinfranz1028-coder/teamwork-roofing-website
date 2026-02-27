@@ -210,6 +210,32 @@ class BatchJob(Base):
         return f"<BatchJob id={self.id} name='{self.name}' status='{self.status}'>"
 
 
+class AgentRun(Base):
+    """Audit record for a multi-agent orchestration run."""
+
+    __tablename__ = "agent_runs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    plan_id = Column(String, nullable=False, index=True)
+    request = Column(Text, nullable=False)
+    content_type = Column(String, default="")
+    doc_type = Column(String, default="")
+    title = Column(String, default="")
+    status = Column(String, default="running")  # running / completed / failed
+    output_file = Column(String, default="")
+    steps_json = Column(Text, default="{}")
+    compliance_score = Column(Float, default=0.0)
+    compliance_passed = Column(Boolean, default=False)
+    total_cost_usd = Column(Float, default=0.0)
+    retry_count = Column(Integer, default=0)
+    started_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+    error = Column(Text, default="")
+
+    def __repr__(self):
+        return f"<AgentRun id={self.id} plan='{self.plan_id[:8]}' status='{self.status}'>"
+
+
 class CopilotAuditLog(Base):
     """Audit trail for every Copilot action — tool calls, confirmations, and generations."""
 

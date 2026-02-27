@@ -77,6 +77,8 @@ CONFIRM_REQUIRED_TOOLS = {
     "generate_training_package",
     "generate_visual",
     "generate_batch",
+    "generate_with_agents",
+    "generate_image",
     "update_brand_config",
     "approve_content",
     "translate_content",
@@ -89,6 +91,7 @@ READ_ONLY_TOOLS = {
     "get_content_stats",
     "list_templates",
     "search_brand_knowledge",
+    "check_brand_compliance",
 }
 
 
@@ -553,7 +556,9 @@ class CopilotEngine:
             "generate_document": "Create Document",
             "generate_training_package": "Create Training Package",
             "generate_visual": "Create Visual",
+            "generate_image": "Generate Image",
             "generate_batch": "Batch Generation",
+            "generate_with_agents": "Agent Pipeline Generation",
             "update_brand_config": "Update Brand Config",
             "approve_content": "Approve Content",
             "translate_content": "Translate Content",
@@ -565,7 +570,9 @@ class CopilotEngine:
             "generate_document": "$0.05 - $0.10",
             "generate_training_package": "$0.20 - $0.40",
             "generate_visual": "$0.03 - $0.06",
+            "generate_image": "$0.04 - $0.12",
             "generate_batch": "$0.10 - $0.50",
+            "generate_with_agents": "$0.10 - $0.30",
             "update_brand_config": "Free",
             "approve_content": "Free",
             "translate_content": "$0.02 - $0.08",

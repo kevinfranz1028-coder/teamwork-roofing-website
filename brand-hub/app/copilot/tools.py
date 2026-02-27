@@ -831,6 +831,188 @@ _confirm_action = {
 }
 
 # ---------------------------------------------------------------------------
+# Image Generation (DALL-E 3 / VisualAgent)
+# ---------------------------------------------------------------------------
+
+_generate_image = {
+    "name": "generate_image",
+    "description": (
+        "Generate a custom image using DALL-E 3, a stock photo via Pexels, "
+        "or a diagram via Napkin AI.  The system automatically routes the "
+        "request to the best backend based on the visual type.  Use this "
+        "tool when the user asks for a hero image, illustration, background, "
+        "stock photo, team photo, or any image that is NOT a structured "
+        "diagram (for diagrams use generate_visual instead).  Brand colors "
+        "are automatically injected into DALL-E prompts for consistency."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "prompt": {
+                "type": "string",
+                "description": (
+                    "A detailed natural-language description of the image "
+                    "to generate.  Be specific about subject, mood, "
+                    "composition, and style."
+                ),
+            },
+            "visual_type": {
+                "type": "string",
+                "enum": [
+                    "hero_image",
+                    "illustration",
+                    "background",
+                    "icon_set",
+                    "stock_photo",
+                    "team_photo",
+                    "office_photo",
+                    "auto",
+                ],
+                "description": (
+                    "The kind of image to generate.  Use 'auto' to let the "
+                    "system detect the best type from the prompt.  "
+                    "hero_image/illustration/background/icon_set use DALL-E 3.  "
+                    "stock_photo/team_photo/office_photo use Pexels."
+                ),
+            },
+            "size": {
+                "type": "string",
+                "enum": ["1024x1024", "1792x1024", "1024x1792"],
+                "description": (
+                    "Image dimensions (DALL-E only).  1792x1024 for landscape, "
+                    "1024x1792 for portrait, 1024x1024 for square.  "
+                    "Defaults based on visual_type."
+                ),
+            },
+            "quality": {
+                "type": "string",
+                "enum": ["standard", "hd"],
+                "description": (
+                    "Image quality (DALL-E only).  'hd' produces finer "
+                    "details at higher cost.  Defaults to 'standard'."
+                ),
+            },
+            "style": {
+                "type": "string",
+                "enum": ["natural", "vivid"],
+                "description": (
+                    "Image style (DALL-E only).  'natural' produces "
+                    "realistic images; 'vivid' produces more dramatic, "
+                    "hyper-real images.  Defaults to 'natural'."
+                ),
+            },
+        },
+        "required": ["prompt"],
+    },
+}
+
+# ---------------------------------------------------------------------------
+# Agent Pipeline (Multi-Agent Orchestrated Generation)
+# ---------------------------------------------------------------------------
+
+_generate_with_agents = {
+    "name": "generate_with_agents",
+    "description": (
+        "Generate content using the full multi-agent orchestration pipeline.  "
+        "This is the primary tool for creating presentations and documents.  "
+        "The pipeline automatically: (1) researches brand context, (2) writes "
+        "structured content with brand voice, (3) generates visuals if needed, "
+        "(4) assembles the final file with brand templates, and (5) validates "
+        "against brand compliance guidelines.  If compliance fails, the system "
+        "automatically retries with corrective feedback.  Use this tool for "
+        "any content generation request.  Returns a fully branded, "
+        "compliance-checked output file."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "request": {
+                "type": "string",
+                "description": (
+                    "The user's full content generation request in natural "
+                    "language.  Be as descriptive as possible — include the "
+                    "topic, audience, purpose, and any specific requirements."
+                ),
+            },
+            "content_type": {
+                "type": "string",
+                "enum": ["presentation", "document", "auto"],
+                "description": (
+                    "Type of content to generate.  Use 'auto' to let the "
+                    "orchestrator decide based on the request.  Defaults to 'auto'."
+                ),
+            },
+            "doc_type": {
+                "type": "string",
+                "enum": [
+                    "job_aid", "case_study", "weekly_report", "monthly_report",
+                    "sop", "training_guide", "internal_memo", "battle_card",
+                    "capability_overview", "proposal", "auto",
+                ],
+                "description": (
+                    "For documents only: the specific document type.  Use "
+                    "'auto' to let the orchestrator classify the request."
+                ),
+            },
+            "title": {
+                "type": "string",
+                "description": (
+                    "Optional title for the output.  If omitted, the "
+                    "orchestrator generates one from the request."
+                ),
+            },
+            "include_visuals": {
+                "type": "boolean",
+                "description": (
+                    "Whether to generate visual assets (diagrams, images) "
+                    "for the content.  Defaults to true for presentations, "
+                    "false for documents."
+                ),
+            },
+        },
+        "required": ["request"],
+    },
+}
+
+# ---------------------------------------------------------------------------
+# Brand Compliance
+# ---------------------------------------------------------------------------
+
+_check_brand_compliance = {
+    "name": "check_brand_compliance",
+    "description": (
+        "Run a brand compliance check on a generated file. Validates content "
+        "against the brand guidelines including color palette, voice tone, "
+        "formality, key phrases, avoided phrases, preferred terminology, "
+        "acronym expansion, and style consistency. Supports .pptx, .docx, "
+        ".txt, and .md files. Returns a detailed per-check pass/fail report "
+        "with an overall compliance score."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "file_path": {
+                "type": "string",
+                "description": (
+                    "Absolute or relative path to the file to check. "
+                    "Supports .pptx, .docx, .txt, and .md files."
+                ),
+            },
+            "content_text": {
+                "type": "string",
+                "description": (
+                    "Optional pre-extracted text content to validate "
+                    "instead of parsing the file. Useful for checking "
+                    "content before it is saved to a file."
+                ),
+            },
+        },
+        "required": ["file_path"],
+    },
+}
+
+
+# ---------------------------------------------------------------------------
 # Aggregated Tool List
 # ---------------------------------------------------------------------------
 
@@ -844,7 +1026,10 @@ COPILOT_TOOLS: list[dict] = [
     _generate_document,
     _generate_training_package,
     _generate_visual,
+    _generate_image,
     _generate_batch,
+    # Agent Pipeline
+    _generate_with_agents,
     # Content Library
     _search_content_library,
     _get_content_stats,
@@ -857,6 +1042,8 @@ COPILOT_TOOLS: list[dict] = [
     _search_brand_knowledge,
     # Web Search (Research mode)
     _web_search,
+    # Brand Compliance
+    _check_brand_compliance,
     # Confirmation
     _confirm_action,
 ]

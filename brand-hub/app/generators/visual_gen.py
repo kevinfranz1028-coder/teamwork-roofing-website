@@ -528,6 +528,25 @@ class VisualPipeline:
             filename = f"{visual_type}_{timestamp}_{uuid4().hex[:8]}.{output_format}"
             save_path = str(VISUALS_DIR / filename)
 
+        # Route DALL-E / Pexels types through VisualAgent when available
+        try:
+            from app.agents.visual_agent import VisualAgent, DALLE_TYPES, PEXELS_TYPES
+            if visual_type in DALLE_TYPES or visual_type in PEXELS_TYPES:
+                agent = VisualAgent(brand_config=self.brand_config)
+                result = agent.generate(
+                    request=description,
+                    visual_type=visual_type,
+                    output_format=output_format,
+                )
+                if result.get("success"):
+                    return result
+                logger.warning(
+                    "VisualAgent failed for %s: %s — trying fallback",
+                    visual_type, result.get("error"),
+                )
+        except ImportError:
+            pass
+
         # Attempt Napkin AI first
         if self.napkin.available:
             try:

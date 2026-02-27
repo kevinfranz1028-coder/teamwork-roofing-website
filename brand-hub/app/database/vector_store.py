@@ -152,6 +152,44 @@ class VectorStore:
                 f"Failed to query collection '{collection_name}': {exc}"
             ) from exc
 
+    def search(
+        self,
+        collection_name: str,
+        query_text: str,
+        n_results: int = 5,
+        where: Optional[Dict] = None,
+    ) -> dict:
+        """Unified search interface with optional metadata filtering.
+
+        This is a superset of :meth:`query` that supports ChromaDB
+        ``where`` filters for metadata-based narrowing.
+
+        Args:
+            collection_name: One of the predefined collection names.
+            query_text: Semantic search query string.
+            n_results: Maximum number of results to return.
+            where: Optional ChromaDB ``where`` filter dict, e.g.
+                ``{"asset_type": "collateral"}`` or
+                ``{"$and": [{"status": "approved"}, {"type": "doc"}]}``.
+
+        Returns:
+            Raw ChromaDB query result dict with ``ids``, ``documents``,
+            ``metadatas``, and ``distances`` keys.
+        """
+        collection = self._get_or_create_collection(collection_name)
+        try:
+            kwargs: dict = {
+                "query_texts": [query_text],
+                "n_results": n_results,
+            }
+            if where:
+                kwargs["where"] = where
+            return collection.query(**kwargs)
+        except Exception as exc:
+            raise RuntimeError(
+                f"Failed to search collection '{collection_name}': {exc}"
+            ) from exc
+
     def delete(self, collection_name: str, ids: List[str]) -> None:
         if not ids:
             raise ValueError("ids list must not be empty.")

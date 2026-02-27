@@ -248,6 +248,11 @@ API_KEY_INFO = {
         "description": "Optional. Path to Google OAuth credentials for Workspace export.",
         "required": False,
     },
+    "OPENAI_API_KEY": {
+        "label": "OpenAI API Key",
+        "description": "Optional. Enables DALL-E 3 image generation and GPT-based orchestration.",
+        "required": False,
+    },
 }
 
 SUPPORTED_LANGUAGES = [
@@ -529,13 +534,14 @@ st.markdown("---")
 # ============================================================================
 # Tabs
 # ============================================================================
-tab_api, tab_brand, tab_prompts, tab_docs, tab_output, tab_integrations, tab_backup, tab_diag = st.tabs([
+tab_api, tab_brand, tab_prompts, tab_docs, tab_output, tab_integrations, tab_agents, tab_backup, tab_diag = st.tabs([
     "\U0001f511 API Keys",
     "\U0001f3a8 Brand Config",
     "\U0001f4dd Prompt Templates",
     "\U0001f4c4 Document Templates",
     "\U0001f4e4 Output Settings",
     "\U0001f517 Integrations",
+    "\U0001f916 Agent Config",
     "\U0001f4be Backup & Restore",
     "\U0001f50d System Diagnostics",
 ])
@@ -1603,7 +1609,182 @@ with tab_integrations:
 
 
 # ############################################################################
-# TAB 7: Backup & Restore
+# TAB 7: Agent Configuration
+# ############################################################################
+with tab_agents:
+    st.subheader("Agent Pipeline Configuration")
+    st.caption(
+        "Configure the multi-agent orchestration pipeline that powers "
+        "intelligent content generation with research, writing, visual "
+        "generation, and compliance validation."
+    )
+
+    # Load current .env values
+    _agent_env = {}
+    _env_path = BASE_DIR / ".env"
+    if _env_path.exists():
+        for line in _env_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, _, v = line.partition("=")
+                _agent_env[k.strip()] = v.strip().strip('"').strip("'")
+
+    st.markdown("---")
+
+    # -- Model Selection --
+    st.markdown("#### Model Selection")
+
+    agent_col1, agent_col2 = st.columns(2)
+
+    with agent_col1:
+        _orch_model = st.selectbox(
+            "Orchestrator Model Provider",
+            options=["claude", "openai"],
+            index=0 if _agent_env.get("ORCHESTRATOR_MODEL", "claude") == "claude" else 1,
+            key="agent_orch_model",
+            help="Which AI provider to use for request classification and planning.",
+        )
+
+        _orch_claude = st.text_input(
+            "Orchestrator Claude Model",
+            value=_agent_env.get("ORCHESTRATOR_CLAUDE_MODEL", "claude-sonnet-4-20250514"),
+            key="agent_orch_claude_model",
+            help="Claude model ID used for orchestration when provider is 'claude'.",
+        )
+
+        _orch_openai = st.text_input(
+            "Orchestrator OpenAI Model",
+            value=_agent_env.get("ORCHESTRATOR_OPENAI_MODEL", "gpt-4.1"),
+            key="agent_orch_openai_model",
+            help="OpenAI model ID used for orchestration when provider is 'openai'.",
+        )
+
+    with agent_col2:
+        _writer_model = st.text_input(
+            "Writer Model",
+            value=_agent_env.get("WRITER_MODEL", "claude-sonnet-4-20250514"),
+            key="agent_writer_model",
+            help="Claude model used by the WriterAgent for content generation.",
+        )
+
+        _designer_model = st.text_input(
+            "Designer Model",
+            value=_agent_env.get("DESIGNER_MODEL", "claude-haiku-4-5-20251001"),
+            key="agent_designer_model",
+            help="Model used by the DesignerAgent (lightweight tasks).",
+        )
+
+    st.markdown("---")
+
+    # -- DALL-E Settings --
+    st.markdown("#### DALL-E Image Settings")
+
+    dalle_col1, dalle_col2, dalle_col3 = st.columns(3)
+
+    with dalle_col1:
+        _dalle_size = st.selectbox(
+            "Default Image Size",
+            options=["1024x1024", "1792x1024", "1024x1792"],
+            index=["1024x1024", "1792x1024", "1024x1792"].index(
+                _agent_env.get("DALLE_IMAGE_SIZE", "1024x1024")
+            ) if _agent_env.get("DALLE_IMAGE_SIZE", "1024x1024") in ["1024x1024", "1792x1024", "1024x1792"] else 0,
+            key="agent_dalle_size",
+        )
+
+    with dalle_col2:
+        _dalle_quality = st.selectbox(
+            "Default Quality",
+            options=["standard", "hd"],
+            index=0 if _agent_env.get("DALLE_IMAGE_QUALITY", "standard") == "standard" else 1,
+            key="agent_dalle_quality",
+        )
+
+    with dalle_col3:
+        _dalle_style = st.selectbox(
+            "Default Style",
+            options=["natural", "vivid"],
+            index=0 if _agent_env.get("DALLE_IMAGE_STYLE", "natural") == "natural" else 1,
+            key="agent_dalle_style",
+        )
+
+    st.markdown("---")
+
+    # -- Retry & Timeout --
+    st.markdown("#### Retry & Timeout")
+
+    retry_col1, retry_col2 = st.columns(2)
+
+    with retry_col1:
+        _max_retries = st.number_input(
+            "Max Compliance Retries",
+            min_value=0,
+            max_value=5,
+            value=int(_agent_env.get("AGENT_MAX_RETRIES", "2")),
+            key="agent_max_retries",
+            help="How many times the pipeline retries if compliance validation fails.",
+        )
+
+    with retry_col2:
+        _timeout = st.number_input(
+            "Agent Timeout (seconds)",
+            min_value=60,
+            max_value=900,
+            value=int(_agent_env.get("AGENT_TIMEOUT_SECONDS", "300")),
+            step=30,
+            key="agent_timeout",
+            help="Maximum time in seconds for the entire agent pipeline to complete.",
+        )
+
+    st.markdown("---")
+
+    # -- Save button --
+    if st.button("Save Agent Configuration", type="primary", key="btn_save_agent_config", use_container_width=True):
+        agent_updates = {
+            "ORCHESTRATOR_MODEL": _orch_model,
+            "ORCHESTRATOR_CLAUDE_MODEL": _orch_claude,
+            "ORCHESTRATOR_OPENAI_MODEL": _orch_openai,
+            "WRITER_MODEL": _writer_model,
+            "DESIGNER_MODEL": _designer_model,
+            "DALLE_IMAGE_SIZE": _dalle_size,
+            "DALLE_IMAGE_QUALITY": _dalle_quality,
+            "DALLE_IMAGE_STYLE": _dalle_style,
+            "AGENT_MAX_RETRIES": str(_max_retries),
+            "AGENT_TIMEOUT_SECONDS": str(_timeout),
+        }
+
+        # Read existing .env, update, write back
+        try:
+            env_lines = []
+            existing_keys = set()
+            if _env_path.exists():
+                for line in _env_path.read_text(encoding="utf-8").splitlines():
+                    stripped = line.strip()
+                    if stripped and not stripped.startswith("#") and "=" in stripped:
+                        key = stripped.split("=", 1)[0].strip()
+                        if key in agent_updates:
+                            env_lines.append(f"{key}={agent_updates[key]}")
+                            existing_keys.add(key)
+                            continue
+                    env_lines.append(line)
+
+            # Append any new keys
+            for k, v in agent_updates.items():
+                if k not in existing_keys:
+                    env_lines.append(f"{k}={v}")
+
+            _env_path.write_text("\n".join(env_lines) + "\n", encoding="utf-8")
+
+            # Also set in current process
+            for k, v in agent_updates.items():
+                os.environ[k] = v
+
+            st.success("Agent configuration saved successfully!")
+        except Exception as save_exc:
+            st.error(f"Failed to save agent configuration: {save_exc}")
+
+
+# ############################################################################
+# TAB 8: Backup & Restore
 # ############################################################################
 with tab_backup:
     st.subheader("Backup & Restore")

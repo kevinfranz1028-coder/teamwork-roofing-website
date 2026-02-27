@@ -108,6 +108,25 @@ class BrandedPresentationGenerator:
         self.company_name: str = self.brand_config.get("company_name", "")
         self.logo_path: Optional[str] = self._find_logo()
 
+        # Template engine (falls back gracefully if unavailable)
+        self._template_engine = None
+        try:
+            from app.brand.template_engine import PptxTemplateEngine
+            engine = PptxTemplateEngine()
+            if engine.available:
+                self._template_engine = engine
+                logger.info("Template engine available: %s", engine.template_path)
+        except Exception:
+            pass
+
+        # Research agent for content-library-informed generation
+        self._research_agent = None
+        try:
+            from app.agents.research_agent import ResearchAgent
+            self._research_agent = ResearchAgent(brand_config=self.brand_config)
+        except Exception:
+            pass
+
     # ------------------------------------------------------------------
     # Config helpers
     # ------------------------------------------------------------------
@@ -212,24 +231,53 @@ class BrandedPresentationGenerator:
             The absolute file path of the saved PPTX.
         """
         start_time = time.time()
-
-        # Open template or create blank presentation
-        if template_path and Path(template_path).exists():
-            prs = Presentation(template_path)
-            logger.info("Using template base: %s", template_path)
-        else:
-            prs = Presentation()
-            prs.slide_width = self.SLIDE_WIDTH
-            prs.slide_height = self.SLIDE_HEIGHT
-
-        # Build each slide
         total = len(slides_data)
+
+        # --- Build research brief (stored for callers to inspect) ---
+        self.last_brief = None
+        if self._research_agent is not None:
+            try:
+                self.last_brief = self._research_agent.build_brief(
+                    query=title, content_type="presentation",
+                )
+                logger.info("Presentation research brief: %s", self.last_brief.summary())
+            except Exception:
+                pass
+
+        # --- Resolve layout types for each slide (needed by both paths) ---
         for idx, slide_data in enumerate(slides_data):
-            layout = slide_data.get(
-                "layout",
-                self._auto_select_layout(slide_data, idx, total),
-            )
-            self._add_slide(prs, slide_data, layout)
+            if "layout" not in slide_data:
+                slide_data["layout"] = self._auto_select_layout(
+                    slide_data, idx, total,
+                )
+
+        # --- Try template engine first ---
+        prs = None
+
+        # Explicit template_path: create a one-off engine
+        if template_path and Path(template_path).exists():
+            try:
+                from app.brand.template_engine import PptxTemplateEngine
+                one_off = PptxTemplateEngine(template_path=template_path)
+                if one_off.available:
+                    prs = one_off.create_from_template(slides_data, title)
+                    logger.info("Generated via one-off template engine: %s", template_path)
+            except Exception as exc:
+                logger.warning("One-off template engine failed, falling back: %s", exc)
+                prs = None
+
+        # Default template engine
+        if prs is None and self._template_engine is not None:
+            try:
+                prs = self._template_engine.create_from_template(slides_data, title)
+                logger.info("Generated via default template engine")
+            except Exception as exc:
+                logger.warning("Template engine failed, falling back: %s", exc)
+                prs = None
+
+        # --- Fallback: build from scratch ---
+        if prs is None:
+            prs = self._generate_fallback(slides_data)
 
         # Core properties / metadata
         prs.core_properties.title = title
@@ -256,6 +304,25 @@ class BrandedPresentationGenerator:
             save_path,
         )
         return save_path
+
+    # ------------------------------------------------------------------
+    # Fallback: from-scratch generation
+    # ------------------------------------------------------------------
+
+    def _generate_fallback(self, slides_data: list[dict]) -> Presentation:
+        """Create a presentation from scratch (no template).
+
+        This is the original generation logic extracted as a fallback.
+        """
+        prs = Presentation()
+        prs.slide_width = self.SLIDE_WIDTH
+        prs.slide_height = self.SLIDE_HEIGHT
+
+        for slide_data in slides_data:
+            layout = slide_data.get("layout", "content")
+            self._add_slide(prs, slide_data, layout)
+
+        return prs
 
     # ------------------------------------------------------------------
     # Layout auto-selection

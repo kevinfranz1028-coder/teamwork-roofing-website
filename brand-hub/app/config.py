@@ -80,6 +80,19 @@ OPTIONAL_ENV_KEYS = {
     "PEXELS_API_KEY": "",
     "GOOGLE_SERVICE_ACCOUNT_JSON": "",
     "GOOGLE_OAUTH_CREDENTIALS_JSON": "",
+    # Multi-agent orchestrator
+    "ORCHESTRATOR_MODEL": "claude",
+    "ORCHESTRATOR_CLAUDE_MODEL": "claude-sonnet-4-20250514",
+    "ORCHESTRATOR_OPENAI_MODEL": "gpt-4.1",
+    "WRITER_MODEL": "claude-sonnet-4-20250514",
+    "DESIGNER_MODEL": "claude-haiku-4-5-20251001",
+    "AGENT_MAX_RETRIES": "2",
+    "AGENT_TIMEOUT_SECONDS": "300",
+    "OPENAI_API_KEY": "",
+    # DALL-E / Visual Agent
+    "DALLE_IMAGE_SIZE": "1024x1024",
+    "DALLE_IMAGE_QUALITY": "standard",
+    "DALLE_IMAGE_STYLE": "natural",
 }
 
 

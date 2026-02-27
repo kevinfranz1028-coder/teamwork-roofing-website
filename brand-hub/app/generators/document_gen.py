@@ -422,6 +422,69 @@ class BrandedDocumentStyles:
         ln.paragraph_format.left_indent = Inches(0.5)
 
     # ------------------------------------------------------------------
+    # Incremental style setup (for template-based documents)
+    # ------------------------------------------------------------------
+
+    def setup_styles_incremental(self, style_catalog: list[str]) -> None:
+        """Only create custom styles that don't already exist in the template.
+
+        Template styles (Title, Heading 1-4, Normal, Quote, etc.) are left
+        untouched so the template's font/colour theme is preserved.  Custom
+        styles like "Callout", "List Bullet", and "List Number" are added
+        only when absent.
+        """
+        from docx.enum.style import WD_STYLE_TYPE
+
+        styles = self.doc.styles
+
+        def _has_style(name: str) -> bool:
+            try:
+                _ = styles[name]
+                return True
+            except KeyError:
+                return False
+
+        # "Callout" — custom paragraph style
+        if not _has_style("Callout"):
+            callout_style = styles.add_style("Callout", WD_STYLE_TYPE.PARAGRAPH)
+            callout_style.font.name = self.body_font
+            callout_style.font.size = Pt(10)
+            callout_style.font.color.rgb = self.text_color
+            callout_style.paragraph_format.left_indent = Inches(0.3)
+            callout_style.paragraph_format.space_before = Pt(8)
+            callout_style.paragraph_format.space_after = Pt(8)
+            callout_ppr = callout_style.paragraph_format.element
+            shading_xml = (
+                f'<w:shd {nsdecls("w")} w:val="clear" w:color="auto" '
+                f'w:fill="{self.primary_light_hex}"/>'
+            )
+            callout_ppr.append(parse_xml(shading_xml))
+            callout_borders_xml = (
+                f'<w:pBdr {nsdecls("w")}>'
+                f'  <w:left w:val="single" w:sz="18" w:space="8" w:color="{self.accent_hex}"/>'
+                f'</w:pBdr>'
+            )
+            callout_ppr.append(parse_xml(callout_borders_xml))
+
+        # "List Bullet" — standard list style
+        if not _has_style("List Bullet"):
+            lb = styles.add_style("List Bullet", WD_STYLE_TYPE.PARAGRAPH)
+            lb.font.name = self.body_font
+            lb.font.size = Pt(11)
+            lb.font.color.rgb = self.text_color
+            lb.paragraph_format.space_after = Pt(3)
+            lb.paragraph_format.left_indent = Inches(0.5)
+
+        # "List Number" — standard numbered list style
+        if not _has_style("List Number"):
+            ln = styles.add_style("List Number", WD_STYLE_TYPE.PARAGRAPH)
+            ln.font.name = self.body_font
+            ln.font.size = Pt(11)
+            ln.font.color.rgb = self.text_color
+            ln.paragraph_format.space_after = Pt(3)
+            ln.paragraph_format.left_indent = Inches(0.5)
+
+    # ------------------------------------------------------------------
     # Header / footer
     # ------------------------------------------------------------------
 
@@ -872,6 +935,25 @@ class BrandedDocumentGenerator:
         self.company_name: str = self.brand_config.get("company_name", "")
         self.logo_path: Optional[str] = self._find_logo()
 
+        # Template engine (falls back gracefully if unavailable)
+        self._template_engine = None
+        try:
+            from app.brand.template_engine import DocxTemplateEngine
+            engine = DocxTemplateEngine()
+            if engine.available:
+                self._template_engine = engine
+                logger.info("DOCX template engine available: %s", engine.template_path)
+        except Exception:
+            pass
+
+        # Research agent for content-library-informed generation
+        self._research_agent = None
+        try:
+            from app.agents.research_agent import ResearchAgent
+            self._research_agent = ResearchAgent(brand_config=self.brand_config)
+        except Exception:
+            pass
+
     def _load_brand_config(self) -> dict:
         """Load brand configuration from ``brand_assets/brand_config.json``.
 
@@ -906,9 +988,25 @@ class BrandedDocumentGenerator:
     def _init_document(self) -> tuple[Document, BrandedDocumentStyles]:
         """Create a new Document and apply brand styles.
 
+        Tries the corporate DOCX template first (preserving its margins,
+        headers/footers, and style definitions).  Falls back to a blank
+        Document with from-scratch styling when the template is unavailable.
+
         Returns:
             Tuple of (Document, BrandedDocumentStyles).
         """
+        # --- Try template engine first ---
+        if self._template_engine is not None:
+            try:
+                doc, style_catalog = self._template_engine.create_from_template()
+                styler = BrandedDocumentStyles(doc, self.brand_config)
+                styler.setup_styles_incremental(style_catalog)
+                logger.info("Document initialised from template")
+                return doc, styler
+            except Exception as exc:
+                logger.warning("DOCX template engine failed, falling back: %s", exc)
+
+        # --- Fallback: blank document ---
         doc = Document()
         styler = BrandedDocumentStyles(doc, self.brand_config)
         styler.setup_styles()
@@ -958,6 +1056,17 @@ class BrandedDocumentGenerator:
 
         logger.info("Generating %s document: %s", doc_type, title)
         start_time = time.time()
+
+        # Build research brief (stored for callers to inspect)
+        self.last_brief = None
+        if self._research_agent is not None:
+            try:
+                self.last_brief = self._research_agent.build_brief(
+                    query=f"{title} {doc_type}", content_type="document",
+                )
+                logger.info("Document research brief: %s", self.last_brief.summary())
+            except Exception:
+                pass
 
         # Route to the template builder
         builder_map = {

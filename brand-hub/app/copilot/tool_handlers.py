@@ -80,6 +80,25 @@ except ImportError:
     VectorStore = None  # type: ignore[assignment,misc]
 
 try:
+    from app.agents.research_agent import ResearchAgent
+except ImportError:
+    ResearchAgent = None  # type: ignore[assignment,misc]
+
+try:
+    from app.agents.visual_agent import VisualAgent
+except ImportError:
+    VisualAgent = None  # type: ignore[assignment,misc]
+
+try:
+    from app.agents.orchestrator import OrchestratorAgent
+    from app.agents.agent_router import AgentRouter
+    AGENT_PIPELINE_AVAILABLE = True
+except ImportError:
+    OrchestratorAgent = None  # type: ignore[assignment,misc]
+    AgentRouter = None  # type: ignore[assignment,misc]
+    AGENT_PIPELINE_AVAILABLE = False
+
+try:
     from app.utils.analytics import AnalyticsEngine
 except ImportError:
     AnalyticsEngine = None  # type: ignore[assignment,misc]
@@ -333,6 +352,7 @@ def execute_tool(tool_name: str, tool_input: dict, **context) -> str:
         "generate_document": _handle_generate_document,
         "generate_training_package": _handle_generate_training_package,
         "generate_visual": _handle_generate_visual,
+        "generate_image": _handle_generate_image,
         "generate_batch": _handle_generate_batch,
         "search_content_library": _handle_search_content_library,
         "get_content_stats": _handle_get_content_stats,
@@ -342,6 +362,8 @@ def execute_tool(tool_name: str, tool_input: dict, **context) -> str:
         "search_brand_knowledge": _handle_search_brand_knowledge,
         "web_search": _handle_web_search,
         "confirm_action": _handle_confirm_action,
+        "check_brand_compliance": _handle_check_brand_compliance,
+        "generate_with_agents": _handle_generate_with_agents,
     }
 
     handler = handler_map.get(tool_name)
@@ -1086,72 +1108,34 @@ def _handle_generate_presentation(tool_input: dict) -> str:
         # Step 0: Ensure brand_config.json exists on disk
         brand_config = _ensure_brand_config_on_disk()
 
-        # Step 0b: Search brand knowledge base for relevant content
-        #   Strategy: first try vector store, then fall back to direct DB
-        #   search + source file reading for items with empty content_text.
+        # Step 0b: Research agent — query all knowledge sources
         reference_content = ""
         try:
-            knowledge_result = _handle_search_brand_knowledge({
-                "query": f"{title} {presentation_type}",
-                "n_results": 5,
-            })
-            kr = json.loads(knowledge_result)
-            if kr.get("results"):
-                chunks = []
-                for r in kr["results"][:5]:
-                    doc = r.get("document", "")
-                    if doc:
-                        chunks.append(doc[:600])
-                reference_content = "\n---\n".join(chunks)
-        except Exception:
-            pass
-
-        # Step 0c: Direct DB search — find ContentLibraryItems by title/tags
-        #   This catches items that were never indexed (empty content_text).
-        #   Uses weighted scoring: longer/rarer words count more, stopwords ignored.
-        try:
-            _STOP = {"a","an","the","in","on","of","to","for","and","or","is","it","at","by","with","from","as","every"}
-            session = get_session()
-            search_terms = [t.strip(",:;!?.") for t in title.lower().split() if t.strip(",:;!?.") not in _STOP and len(t) > 1]
-            db_items = session.query(ContentLibraryItem).all()
-            matched_items = []
-            for item in db_items:
-                item_text = f"{item.title or ''} {item.tags or ''} {item.description or ''}".lower()
-                # Weight: longer terms count more (e.g. "facts"=5, "sales"=5)
-                score = sum(len(term) for term in search_terms if term in item_text)
-                if score > 0:
-                    matched_items.append((score, item))
-            matched_items.sort(key=lambda x: x[0], reverse=True)
-            session.close()
-
-            for _score, item in matched_items[:3]:
-                if len(reference_content) >= 12000:
-                    break
-                # Prefer reading the full source file for richer content
-                if item.source_path and Path(item.source_path).exists():
-                    try:
-                        file_text = _read_source_file(item.source_path)
-                        if file_text and len(file_text) > 50:
-                            reference_content += f"\n---\n{file_text[:8000]}"
-                            # Also backfill content_text in the DB if empty
-                            if not item.content_text:
-                                try:
-                                    s2 = get_session()
-                                    db_item = s2.query(ContentLibraryItem).filter_by(id=item.id).first()
-                                    if db_item:
-                                        db_item.content_text = file_text[:5000]
-                                        s2.commit()
-                                    s2.close()
-                                except Exception:
-                                    pass
-                            continue
-                    except Exception as read_exc:
-                        logger.debug("Could not read source file %s: %s", item.source_path, read_exc)
-                # Fallback: use content_text from DB
-                if item.content_text and len(item.content_text) > 50:
-                    reference_content += f"\n---\n{item.content_text[:4000]}"
-        except Exception as db_exc:
-            logger.debug("Direct DB search failed: %s", db_exc)
+            if ResearchAgent is not None:
+                agent = ResearchAgent(brand_config=brand_config)
+                brief = agent.build_brief(
+                    query=f"{title} {presentation_type}",
+                    content_type="presentation",
+                )
+                reference_content = brief.to_prompt_context()
+                logger.info("Research brief: %s", brief.summary())
+                agent.close()
+            else:
+                # Fallback: basic vector store search
+                knowledge_result = _handle_search_brand_knowledge({
+                    "query": f"{title} {presentation_type}",
+                    "n_results": 5,
+                })
+                kr = json.loads(knowledge_result)
+                if kr.get("results"):
+                    chunks = []
+                    for r in kr["results"][:5]:
+                        doc = r.get("document", "")
+                        if doc:
+                            chunks.append(doc[:600])
+                    reference_content = "\n---\n".join(chunks)
+        except Exception as research_exc:
+            logger.debug("Research agent failed: %s", research_exc)
 
         # Build brand context for slide generation
         brand_context = {
@@ -1286,54 +1270,34 @@ def _handle_generate_document(tool_input: dict) -> str:
         # Step 0: Ensure brand_config.json exists on disk
         brand_config = _ensure_brand_config_on_disk()
 
-        # Step 0b: Search content library for relevant reference material
-        reference_content = ""
+        # Step 0b: Research agent — query all knowledge sources
         try:
-            knowledge_result = _handle_search_brand_knowledge({
-                "query": f"{title} {document_type}",
-                "n_results": 5,
-            })
-            kr = json.loads(knowledge_result)
-            if kr.get("results"):
-                chunks = []
-                for r in kr["results"][:5]:
-                    doc = r.get("document", "")
-                    if doc:
-                        chunks.append(doc[:600])
-                reference_content = "\n---\n".join(chunks)
-        except Exception:
-            pass
-
-        # Step 0c: Direct DB search fallback (same as presentation handler)
-        try:
-            _STOP = {"a","an","the","in","on","of","to","for","and","or","is","it","at","by","with","from","as","every"}
-            session = get_session()
-            search_terms = [t.strip(",:;!?.") for t in title.lower().split() if t.strip(",:;!?.") not in _STOP and len(t) > 1]
-            db_items = session.query(ContentLibraryItem).all()
-            matched_items = []
-            for item in db_items:
-                item_text = f"{item.title or ''} {item.tags or ''} {item.description or ''}".lower()
-                score = sum(len(term) for term in search_terms if term in item_text)
-                if score > 0:
-                    matched_items.append((score, item))
-            matched_items.sort(key=lambda x: x[0], reverse=True)
-            session.close()
-
-            for _score, item in matched_items[:3]:
-                if len(reference_content) >= 12000:
-                    break
-                if item.source_path and Path(item.source_path).exists():
-                    try:
-                        file_text = _read_source_file(item.source_path)
-                        if file_text and len(file_text) > 50:
-                            reference_content += f"\n---\n{file_text[:8000]}"
-                            continue
-                    except Exception:
-                        pass
-                if item.content_text and len(item.content_text) > 50:
-                    reference_content += f"\n---\n{item.content_text[:4000]}"
-        except Exception:
-            pass
+            if ResearchAgent is not None:
+                agent = ResearchAgent(brand_config=brand_config)
+                brief = agent.build_brief(
+                    query=f"{title} {document_type}",
+                    content_type="document",
+                )
+                reference_content = brief.to_prompt_context()
+                logger.info("Research brief: %s", brief.summary())
+                agent.close()
+            else:
+                reference_content = ""
+                knowledge_result = _handle_search_brand_knowledge({
+                    "query": f"{title} {document_type}",
+                    "n_results": 5,
+                })
+                kr = json.loads(knowledge_result)
+                if kr.get("results"):
+                    chunks = []
+                    for r in kr["results"][:5]:
+                        doc = r.get("document", "")
+                        if doc:
+                            chunks.append(doc[:600])
+                    reference_content = "\n---\n".join(chunks)
+        except Exception as research_exc:
+            reference_content = ""
+            logger.debug("Research agent failed: %s", research_exc)
 
         # Enrich content_source with reference material
         if reference_content:
@@ -1622,6 +1586,90 @@ def _handle_generate_visual(tool_input: dict) -> str:
 
     except Exception as exc:
         logger.exception("generate_visual failed")
+        return json.dumps({"error": str(exc), "success": False})
+
+
+def _handle_generate_image(tool_input: dict) -> str:
+    """Generate an image via VisualAgent (DALL-E 3, Pexels, or Napkin AI).
+
+    Parameters
+    ----------
+    tool_input : dict
+        Expected keys: ``prompt`` (str), ``visual_type`` (str, optional),
+        ``size`` (str, optional), ``quality`` (str, optional),
+        ``style`` (str, optional).
+
+    Returns
+    -------
+    str
+        JSON object with file path and metadata.
+    """
+    try:
+        if VisualAgent is None:
+            return json.dumps({
+                "error": "VisualAgent not available. Check dependencies.",
+                "success": False,
+            })
+
+        prompt = tool_input.get("prompt", "")
+        visual_type = tool_input.get("visual_type", "auto")
+        size = tool_input.get("size")
+        quality = tool_input.get("quality", "standard")
+        style = tool_input.get("style", "natural")
+
+        if not prompt:
+            return json.dumps({
+                "error": "No prompt provided for image generation.",
+                "success": False,
+            })
+
+        start = time.time()
+
+        agent = VisualAgent()
+        result = agent.generate(
+            request=prompt,
+            visual_type=visual_type if visual_type != "auto" else None,
+            size=size,
+            quality=quality,
+            style=style,
+        )
+
+        elapsed = time.time() - start
+
+        if not result.get("success"):
+            return json.dumps({
+                "error": result.get("error", "Image generation failed."),
+                "success": False,
+                "method": result.get("method"),
+                "visual_type": result.get("visual_type"),
+            })
+
+        file_path = result.get("file_path", "")
+
+        # Record in GeneratedContent
+        record_id = _record_generation(
+            title=f"Image: {result.get('visual_type', 'custom')}",
+            content_type="visual",
+            output_path=str(file_path),
+            fmt="png",
+            generation_time=elapsed,
+            input_summary=prompt[:300],
+        )
+
+        return json.dumps({
+            "success": True,
+            "file_path": str(file_path),
+            "visual_type": result.get("visual_type", ""),
+            "method": result.get("method", "unknown"),
+            "revised_prompt": result.get("revised_prompt"),
+            "photographer": result.get("photographer"),
+            "file_size": _file_size_str(str(file_path)),
+            "generation_time_seconds": round(elapsed, 2),
+            "record_id": record_id,
+        })
+
+    except Exception as exc:
+        logger.exception("generate_image failed")
         return json.dumps({"error": str(exc), "success": False})
 
 
@@ -2333,3 +2381,188 @@ def _handle_confirm_action(tool_input: dict) -> str:
         "action_summary": tool_input.get("action_summary", ""),
         "status": "pending_confirmation",
     })
+
+
+# =========================================================================
+# Brand compliance
+# =========================================================================
+
+
+def _handle_check_brand_compliance(tool_input: dict) -> str:
+    """Run a brand compliance check on a generated file.
+
+    Parameters
+    ----------
+    tool_input : dict
+        Required: ``file_path`` (str).
+        Optional: ``content_text`` (str) — pre-extracted text to check
+        instead of parsing the file.
+
+    Returns
+    -------
+    str
+        JSON object with ``overall_score``, ``overall_passed``, ``checks``
+        (list of per-check results), and ``summary``.
+    """
+    file_path = tool_input.get("file_path", "")
+    content_text = tool_input.get("content_text")
+
+    if not file_path:
+        return json.dumps({"error": "file_path is required"})
+
+    # Resolve relative paths against OUTPUT_DIR
+    p = Path(file_path)
+    if not p.is_absolute():
+        p = OUTPUT_DIR / file_path
+    file_path = str(p)
+
+    if not p.exists():
+        return json.dumps({"error": f"File not found: {file_path}"})
+
+    try:
+        from app.agents.compliance_agent import ComplianceAgent
+
+        agent = ComplianceAgent()
+        result = agent.validate(file_path=file_path, content_text=content_text)
+        return json.dumps(result, default=str)
+    except Exception as exc:
+        logger.exception("Brand compliance check failed")
+        return json.dumps({"error": f"Compliance check failed: {exc}"})
+
+
+# =========================================================================
+# Agent Pipeline handler
+# =========================================================================
+
+
+def _handle_generate_with_agents(tool_input: dict) -> str:
+    """Run the full multi-agent orchestration pipeline.
+
+    Parameters
+    ----------
+    tool_input : dict
+        Required: ``request`` (str).
+        Optional: ``content_type``, ``doc_type``, ``title``, ``include_visuals``.
+
+    Returns
+    -------
+    str
+        JSON object with file path, compliance result, cost, and step summary.
+    """
+    if not AGENT_PIPELINE_AVAILABLE:
+        return json.dumps({
+            "error": "Agent pipeline is not available. Check that "
+                     "app/agents/orchestrator.py and app/agents/agent_router.py exist.",
+            "success": False,
+        })
+
+    request = tool_input.get("request", "").strip()
+    if not request:
+        return json.dumps({"error": "A 'request' description is required.", "success": False})
+
+    content_type = tool_input.get("content_type", "auto")
+    doc_type = tool_input.get("doc_type", "auto")
+    title = tool_input.get("title", "")
+    include_visuals = tool_input.get("include_visuals")
+
+    start = time.time()
+
+    try:
+        # Ensure brand config exists
+        brand_config = _ensure_brand_config_on_disk()
+
+        # Step 1: Orchestrator — plan the generation
+        orchestrator = OrchestratorAgent()
+        plan = orchestrator.plan(request)
+
+        # Override fields if user specified them
+        if content_type and content_type != "auto":
+            plan.content_type = content_type
+            plan.output_format = "pptx" if content_type == "presentation" else "docx"
+        if doc_type and doc_type != "auto":
+            plan.doc_type = doc_type
+        if title:
+            plan.title = title
+
+        # Handle include_visuals override
+        if include_visuals is False:
+            # Remove VISUAL step if user explicitly disabled visuals
+            plan.steps = [s for s in plan.steps if s.agent_type.value != "VISUAL"]
+            # Fix dependencies — designer should not depend on visual
+            for step in plan.steps:
+                step.depends_on = [
+                    d for d in step.depends_on if d != "visual"
+                ]
+        elif include_visuals is True and not any(
+            s.step_id == "visual" for s in plan.steps
+        ):
+            # Add visual step if user explicitly wants visuals but orchestrator didn't include it
+            from app.agents.task_plan import TaskStep, AgentType, TaskStatus
+            visual_step = TaskStep(
+                step_id="visual",
+                agent_type=AgentType.VISUAL,
+                description="Generate visual assets",
+                depends_on=["research"],
+            )
+            # Insert before designer step
+            insert_idx = next(
+                (i for i, s in enumerate(plan.steps) if s.step_id == "design"),
+                len(plan.steps),
+            )
+            plan.steps.insert(insert_idx, visual_step)
+            # Make designer depend on visual
+            for step in plan.steps:
+                if step.step_id == "design" and "visual" not in step.depends_on:
+                    step.depends_on.append("visual")
+
+        logger.info("Agent plan created: %s", plan.to_summary())
+
+        # Step 2: Router — execute all steps
+        router = AgentRouter(brand_config=brand_config)
+        completed_plan = router.execute(plan)
+
+        # Step 3: Assemble final result
+        result = orchestrator.assemble(completed_plan)
+
+        elapsed = time.time() - start
+
+        # Record generation in database
+        output_file = result.get("output_file", "")
+        if output_file:
+            fmt = "pptx" if output_file.endswith(".pptx") else "docx"
+            _record_generation(
+                title=result.get("title", plan.title or "Agent Generated"),
+                content_type=result.get("content_type", plan.content_type),
+                output_path=output_file,
+                fmt=fmt,
+                generation_time=elapsed,
+                input_summary=f"Agent pipeline: {request[:200]}",
+            )
+
+        # Build response
+        response = {
+            "success": not completed_plan.has_failed(),
+            "file_path": output_file,
+            "title": result.get("title", plan.title),
+            "content_type": result.get("content_type", plan.content_type),
+            "format": plan.output_format,
+            "compliance_passed": result.get("compliance_passed", False),
+            "compliance_score": result.get("compliance_score", 0.0),
+            "total_cost_usd": result.get("total_cost", plan.total_cost()),
+            "elapsed_seconds": round(elapsed, 2),
+            "steps_summary": result.get("steps_summary", []),
+            "plan_id": plan.plan_id,
+        }
+
+        if output_file:
+            response["file_size"] = _file_size_str(output_file)
+
+        return json.dumps(response, default=str)
+
+    except Exception as exc:
+        logger.exception("Agent pipeline failed")
+        return json.dumps({
+            "error": f"Agent pipeline failed: {exc}",
+            "success": False,
+            "elapsed_seconds": round(time.time() - start, 2),
+        })

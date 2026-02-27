@@ -390,6 +390,83 @@ else:
 st.markdown("---")
 
 # ---------------------------------------------------------------------------
+# Agent Pipeline Metrics
+# ---------------------------------------------------------------------------
+st.subheader("Agent Pipeline")
+
+try:
+    from app.database.models import AgentRun
+    _agent_session = get_session()
+    _total_runs = _agent_session.query(AgentRun).count()
+
+    if _total_runs > 0:
+        _completed_runs = _agent_session.query(AgentRun).filter(
+            AgentRun.status == "completed"
+        ).count()
+        _compliance_passed = _agent_session.query(AgentRun).filter(
+            AgentRun.compliance_passed.is_(True)
+        ).count()
+        _total_cost = sum(
+            r.total_cost_usd or 0
+            for r in _agent_session.query(AgentRun).all()
+        )
+        _avg_retries = sum(
+            r.retry_count or 0
+            for r in _agent_session.query(AgentRun).all()
+        ) / max(_total_runs, 1)
+
+        ap1, ap2, ap3, ap4 = st.columns(4)
+        ap1.metric("Total Runs", _total_runs)
+        ap2.metric(
+            "Compliance Pass Rate",
+            f"{(_compliance_passed / max(_total_runs, 1)) * 100:.0f}%",
+        )
+        ap3.metric("Total Cost", f"${_total_cost:.4f}")
+        ap4.metric("Avg Retries", f"{_avg_retries:.1f}")
+
+        # Recent agent runs table
+        _recent_runs = (
+            _agent_session.query(AgentRun)
+            .order_by(AgentRun.started_at.desc())
+            .limit(5)
+            .all()
+        )
+        if _recent_runs:
+            import pandas as pd
+
+            _run_data = []
+            for r in _recent_runs:
+                _run_data.append({
+                    "Title": r.title or "Untitled",
+                    "Type": r.content_type or "N/A",
+                    "Status": r.status or "N/A",
+                    "Compliance": "Pass" if r.compliance_passed else "Fail",
+                    "Score": f"{(r.compliance_score or 0):.0%}",
+                    "Cost": f"${r.total_cost_usd or 0:.4f}",
+                    "Retries": r.retry_count or 0,
+                })
+            st.dataframe(
+                pd.DataFrame(_run_data),
+                use_container_width=True,
+                hide_index=True,
+            )
+    else:
+        st.info(
+            "No agent pipeline runs yet. Use the Copilot to generate content "
+            "with the multi-agent pipeline."
+        )
+    _agent_session.close()
+except ImportError:
+    st.info(
+        "Agent pipeline metrics will appear here once the agent "
+        "pipeline has been used."
+    )
+except Exception as _agent_exc:
+    st.warning(f"Could not load agent pipeline metrics: {_agent_exc}")
+
+st.markdown("---")
+
+# ---------------------------------------------------------------------------
 # Analytics Overview
 # ---------------------------------------------------------------------------
 if ANALYTICS_AVAILABLE:
