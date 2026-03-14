@@ -33,7 +33,7 @@ export default function MobileBottomBar() {
 
         <Link
           href="/book/"
-          className="flex flex-col items-center justify-center py-3 bg-teamwork-green text-text-primary"
+          className="flex flex-col items-center justify-center py-3 bg-teamwork-green text-white"
         >
           <FiCalendar className="w-5 h-5 mb-1" />
           <span className="text-xs">Book</span>

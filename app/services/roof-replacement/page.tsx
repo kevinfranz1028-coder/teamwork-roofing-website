@@ -146,7 +146,7 @@ export default function RoofReplacementPage() {
                   </div>
                   {/* Back */}
                   <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                    <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-6 shadow-xl flex flex-col justify-between">
+                    <div className="h-full bg-gradient-to-br from-teamwork-green to-teamwork-green-dark text-white rounded-lg p-6 shadow-xl flex flex-col justify-between">
                       <div>
                         <h3 className="text-2xl font-bold mb-3">{tier.name}</h3>
                         <p className="text-white/90 mb-6">{tier.description}</p>

@@ -155,7 +155,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Link
                   href="/book/"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-[#0094CC] transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
                   Schedule Free Inspection
                   <FiArrowRight className="ml-2 w-5 h-5" />
@@ -260,7 +260,7 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <Link href="/service-areas/" className="inline-flex items-center text-teamwork-green hover:text-[#0094CC] font-medium">
+            <Link href="/service-areas/" className="inline-flex items-center text-teamwork-green hover:text-teamwork-green-dark font-medium">
               View All Service Areas <FiArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </div>
@@ -312,7 +312,7 @@ export default function Home() {
 
                         {/* Back */}
                         <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                          <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 shadow-xl flex flex-col justify-between">
+                          <div className="h-full bg-gradient-to-br from-teamwork-green to-teamwork-green-dark text-white rounded-lg p-4 shadow-xl flex flex-col justify-between">
                             <div>
                               <div className="flex items-center gap-2 mb-2">
                                 <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">

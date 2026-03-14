@@ -65,7 +65,7 @@ export default function LeawoodPage() {
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
-              Roofing & Exteriors in <span className="text-teamwork-green">{cityData.cityName}, {cityData.state}</span> — Done The Teamwork Way
+              Roofing & Exteriors in <span className="text-teamwork-green">{cityData.cityName}, {cityData.state}</span> — Built on Teamwork. Backed by Trust.
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               {cityData.hub.intro}

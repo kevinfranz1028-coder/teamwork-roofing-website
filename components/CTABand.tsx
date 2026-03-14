@@ -10,7 +10,7 @@ export default function CTABand({
   subtitle = "Book your same-week inspection or get a quick estimate today"
 }: CTABandProps) {
   return (
-    <section className="bg-gradient-to-r from-teamwork-green to-[#0094CC]">
+    <section className="bg-gradient-to-r from-teamwork-green to-teamwork-green-dark">
       <div className="container-custom py-16">
         <div className="text-center mb-8">
           <h2 className="heading-2 mb-4 text-white">{title}</h2>

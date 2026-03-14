@@ -54,7 +54,7 @@ export default function AboutPage() {
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-teamwork-green-dark text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiShield className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Teamwork Warranty</h4>
                         <p className="text-xs text-white/90">Backed by our partnership commitment and workmanship guarantee</p>
@@ -73,7 +73,7 @@ export default function AboutPage() {
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-teamwork-green-dark text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiClock className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Same-Week Inspection</h4>
                         <p className="text-xs text-white/90">Fast response guaranteed — inspections scheduled within the same week</p>
@@ -92,7 +92,7 @@ export default function AboutPage() {
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-teamwork-green-dark text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiCheckCircle className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Clean Site Guarantee</h4>
                         <p className="text-xs text-white/90">Your property protected with tarps, careful handling, and thorough cleanup</p>
@@ -111,7 +111,7 @@ export default function AboutPage() {
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-teamwork-green-dark text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiCamera className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Photo-Proof Inspection</h4>
                         <p className="text-xs text-white/90">Complete documentation so you can see exactly what we see</p>
@@ -130,7 +130,7 @@ export default function AboutPage() {
                       </div>
                     </div>
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-teamwork-green-dark text-white rounded-lg p-4 flex flex-col items-center justify-center text-center">
                         <FiDollarSign className="w-10 h-10 mb-3 opacity-90" />
                         <h4 className="font-bold mb-2 text-sm">Teamwork Financing</h4>
                         <p className="text-xs text-white/90">Flexible payment options to make quality work affordable</p>

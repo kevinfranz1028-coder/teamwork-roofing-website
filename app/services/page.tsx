@@ -83,7 +83,7 @@ export default function ServicesPage() {
                     </div>
                     {/* Back */}
                     <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <div className="h-full bg-gradient-to-br from-teamwork-green to-[#0094CC] text-white rounded-lg p-6 shadow-xl flex flex-col justify-between">
+                      <div className="h-full bg-gradient-to-br from-teamwork-green to-teamwork-green-dark text-white rounded-lg p-6 shadow-xl flex flex-col justify-between">
                         <div>
                           <Icon className="w-12 h-12 mb-4 opacity-90" />
                           <h3 className="text-xl font-bold mb-3">{service.title}</h3>

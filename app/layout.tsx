@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Open_Sans, Oswald } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import Header from '@/components/Header'
@@ -8,16 +8,17 @@ import MobileBottomBar from '@/components/MobileBottomBar'
 import SchemaMarkup from '@/components/SchemaMarkup'
 import HubSpotTracking from '@/components/HubSpotTracking'
 
-const inter = Inter({ subsets: ['latin'] })
+const openSans = Open_Sans({ subsets: ['latin'] })
+const oswald = Oswald({ subsets: ['latin'], variable: '--font-heading' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://teamworkroofingkc.com'),
   title: 'Teamwork Roofing Services LLC | Kansas City Roofing & Exteriors',
-  description: 'Roofing & Exteriors — Done The Teamwork Way. Serving Kansas City Metro with premium roofing, gutters, siding, and windows. Same-week inspections, photo-proof documentation, clean site guarantee.',
+  description: 'Built on Teamwork. Backed by Trust. Serving Kansas City Metro with premium roofing, gutters, siding, and windows. Same-week inspections, photo-proof documentation, clean site guarantee.',
   keywords: 'roofing Kansas City, roof replacement, roof repair, gutters, siding, windows, storm damage, insurance claims, Kansas City Metro, KCK, KCMO, Johnson County',
   openGraph: {
     title: 'Teamwork Roofing Services LLC | Kansas City Roofing & Exteriors',
-    description: 'Roofing & Exteriors — Done The Teamwork Way. Same-week inspections, photo-proof documentation, clean site guarantee.',
+    description: 'Built on Teamwork. Backed by Trust. Same-week inspections, photo-proof documentation, clean site guarantee.',
     url: 'https://teamworkroofingkc.com',
     siteName: 'Teamwork Roofing Services LLC',
     locale: 'en_US',
@@ -35,7 +36,7 @@ export default function RootLayout({
       <head>
         <SchemaMarkup />
       </head>
-      <body className={inter.className}>
+      <body className={`${openSans.className} ${oswald.variable}`}>
         {/* HubSpot Tracking Code - Site-Wide Analytics */}
         <Script
           id="hubspot-tracking"

@@ -149,7 +149,7 @@ export default function OverlandParkPage() {
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="heading-1 mb-6">
-              Roofing & Exteriors in <span className="text-teamwork-green">Overland Park, KS</span> — Done The Teamwork Way
+              Roofing & Exteriors in <span className="text-teamwork-green">Overland Park, KS</span> — Built on Teamwork. Backed by Trust.
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               A partnership from day one. Teamwork is a local roofing company in Overland Park, KS providing roof repair, roof replacement, and storm inspections—backed by photo-proof documentation, clean site practices, flexible financing, and a Teamwork Warranty.

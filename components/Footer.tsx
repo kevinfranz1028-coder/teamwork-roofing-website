@@ -11,7 +11,7 @@ export default function Footer() {
           <div>
             <Link href="/" className="inline-block mb-4">
               <Image
-                src="/brands/Teamwork Roofing Logo- Transparent.png"
+                src="/teamwork-roofing-logo.png"
                 alt="Teamwork Roofing Services"
                 width={250}
                 height={194}
@@ -19,7 +19,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-text-secondary mb-4">
-              Roofing & Exteriors — Done The Teamwork Way
+              Built on Teamwork. Backed by Trust.
             </p>
             <div className="space-y-2 text-text-secondary">
               <p>Kansas City Metro Area</p>
