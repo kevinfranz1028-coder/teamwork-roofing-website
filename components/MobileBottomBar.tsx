@@ -8,7 +8,7 @@ export default function MobileBottomBar() {
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-light-border shadow-2xl z-40">
       <div className="grid grid-cols-4 gap-1">
         <a
-          href="tel:9133963717"
+          href="tel:9132779925"
           className="flex flex-col items-center justify-center py-3 text-text-secondary hover:text-teamwork-green transition-colors"
         >
           <FiPhone className="w-5 h-5 mb-1" />
@@ -16,7 +16,7 @@ export default function MobileBottomBar() {
         </a>
 
         <a
-          href="sms:9133963717"
+          href="sms:9132779925"
           className="flex flex-col items-center justify-center py-3 text-text-secondary hover:text-teamwork-green transition-colors"
         >
           <FiMessageSquare className="w-5 h-5 mb-1" />

@@ -123,7 +123,7 @@ export default function OverlandParkPage() {
             image: 'https://teamworkroofing.com/logo.png',
             '@id': 'https://teamworkroofing.com/overland-park-ks/',
             url: 'https://teamworkroofing.com/overland-park-ks/',
-            telephone: '+1-913-396-3717',
+            telephone: '+1-913-277-9925',
             address: {
               '@type': 'PostalAddress',
               addressLocality: 'Overland Park',
@@ -177,12 +177,12 @@ export default function OverlandParkPage() {
             </div>
 
             <div className="flex items-center justify-center gap-6 text-text-secondary">
-              <a href="tel:9133963717" className="hover:text-teamwork-green transition-colors">
+              <a href="tel:9132779925" className="hover:text-teamwork-green transition-colors">
                 <FiCheckCircle className="inline w-5 h-5 mr-2" />
-                Call: 913-396-3717
+                Call: 913-277-9925
               </a>
-              <a href="sms:9133963717" className="hover:text-teamwork-green transition-colors">
-                Text: 913-396-3717
+              <a href="sms:9132779925" className="hover:text-teamwork-green transition-colors">
+                Text: 913-277-9925
               </a>
             </div>
           </div>

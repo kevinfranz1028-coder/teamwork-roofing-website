@@ -8,7 +8,7 @@ import { cities } from '@/content/cities'
 
 export const metadata = {
   title: 'Roof Repair Leawood, KS | Same-Week Inspections | Teamwork',
-  description: 'Fast, professional roof repair in Leawood. Same-week inspections, photo-proof documentation, honest repair vs replace guidance. Call 913-396-3717',
+  description: 'Fast, professional roof repair in Leawood. Same-week inspections, photo-proof documentation, honest repair vs replace guidance. Call 913-277-9925',
 }
 
 const cityData = cities['leawood-ks']

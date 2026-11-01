@@ -24,8 +24,8 @@ export default function Footer() {
             <div className="space-y-2 text-text-secondary">
               <p>Kansas City Metro Area</p>
               <p>
-                <a href="tel:9133963717" className="hover:text-teamwork-green transition-colors">
-                  913-396-3717
+                <a href="tel:9132779925" className="hover:text-teamwork-green transition-colors">
+                  913-277-9925
                 </a>
               </p>
             </div>

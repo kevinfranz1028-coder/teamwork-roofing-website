@@ -6,7 +6,7 @@ export default function SchemaMarkup() {
     name: 'Teamwork Roofing Services LLC',
     image: 'https://teamworkroofing.com/logo.png',
     url: 'https://teamworkroofing.com',
-    telephone: '+1-913-396-3717',
+    telephone: '+1-913-277-9925',
     priceRange: '$$',
     address: {
       '@type': 'PostalAddress',

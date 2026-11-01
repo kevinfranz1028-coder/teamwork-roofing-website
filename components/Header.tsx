@@ -113,13 +113,13 @@ export default function Header() {
           {/* Desktop CTAs */}
           <div className="hidden lg:flex items-center gap-3">
             <a
-              href="tel:9133963717"
+              href="tel:9132779925"
               className="flex items-center gap-2 px-4 py-2.5 text-teamwork-green hover:bg-green-50 rounded-lg transition-all font-semibold group"
             >
               <div className="w-9 h-9 rounded-lg bg-teamwork-green/10 flex items-center justify-center group-hover:bg-teamwork-green/20 transition-colors">
                 <FiPhone className="w-4 h-4" />
               </div>
-              <span className="hidden xl:inline">(913) 396-3717</span>
+              <span className="hidden xl:inline">(913) 277-9925</span>
             </a>
             <Link
               href="/book/"
@@ -188,11 +188,11 @@ export default function Header() {
               {/* Mobile CTAs */}
               <div className="pt-4 px-4 space-y-3 border-t border-gray-200 mt-4">
                 <a
-                  href="tel:9133963717"
+                  href="tel:9132779925"
                   className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-teamwork-green rounded-lg font-semibold hover:bg-gray-200 transition-colors"
                 >
                   <FiPhone className="w-4 h-4" />
-                  (913) 396-3717
+                  (913) 277-9925
                 </a>
                 <Link
                   href="/book/"

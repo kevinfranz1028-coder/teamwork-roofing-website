@@ -24,7 +24,7 @@ export default function ContactPage() {
                 <h3 className="heading-4 mb-6">Fastest Response</h3>
                 <div className="space-y-4">
                   <a
-                    href="tel:9133963717"
+                    href="tel:9132779925"
                     className="flex items-center space-x-4 p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
                   >
                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
@@ -32,12 +32,12 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-semibold">Call Us</p>
-                      <p className="text-green-100">913-396-3717</p>
+                      <p className="text-green-100">913-277-9925</p>
                     </div>
                   </a>
 
                   <a
-                    href="sms:9133963717"
+                    href="sms:9132779925"
                     className="flex items-center space-x-4 p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
                   >
                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
@@ -45,7 +45,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-semibold">Text Us</p>
-                      <p className="text-green-100">913-396-3717</p>
+                      <p className="text-green-100">913-277-9925</p>
                     </div>
                   </a>
                 </div>

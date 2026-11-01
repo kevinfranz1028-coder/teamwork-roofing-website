@@ -161,11 +161,11 @@ export default function Home() {
                   <FiArrowRight className="ml-2 w-5 h-5" />
                 </Link>
                 <a
-                  href="tel:9133963717"
+                  href="tel:9132779925"
                   className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-all shadow-lg"
                 >
                   <FiPhone className="mr-2 w-5 h-5 text-teamwork-green" />
-                  (913) 396-3717
+                  (913) 277-9925
                 </a>
               </div>
 

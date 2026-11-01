@@ -6,7 +6,7 @@ import { cities } from '@/content/cities'
 
 export const metadata = {
   title: 'Emergency Roof Repair Leawood | Call/Text Now | Teamwork',
-  description: 'Emergency roof repair in Leawood, KS. Active leaks, storm damage, urgent repairs. Same-day response. Call or text 913-396-3717 now.',
+  description: 'Emergency roof repair in Leawood, KS. Active leaks, storm damage, urgent repairs. Same-day response. Call or text 913-277-9925 now.',
 }
 
 const cityData = cities['leawood-ks']

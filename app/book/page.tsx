@@ -81,8 +81,8 @@ export default function BookPage() {
                 <p className="text-green-100 text-sm mb-4">
                   Active leak or emergency? Call us now.
                 </p>
-                <a href="tel:9133963717" className="btn-primary bg-white text-teamwork-green hover:bg-gray-100 w-full text-center block">
-                  Call 913-396-3717
+                <a href="tel:9132779925" className="btn-primary bg-white text-teamwork-green hover:bg-gray-100 w-full text-center block">
+                  Call 913-277-9925
                 </a>
               </div>
 
@@ -93,7 +93,7 @@ export default function BookPage() {
                   Have photos?
                 </h4>
                 <p className="text-sm text-text-secondary">
-                  Text photos to <a href="sms:9133963717" className="text-teamwork-green hover:underline">913-396-3717</a> or email them after booking
+                  Text photos to <a href="sms:9132779925" className="text-teamwork-green hover:underline">913-277-9925</a> or email them after booking
                 </p>
               </div>
             </div>

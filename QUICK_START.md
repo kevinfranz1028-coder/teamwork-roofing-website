@@ -19,7 +19,7 @@ Visit http://localhost:3000 to see your site.
 ## Step 3: Customize Your Branding
 
 ### Update Phone Number
-Search and replace `913-396-3717` with your actual phone number throughout the project.
+Search and replace `913-277-9925` with your actual phone number throughout the project.
 
 ### Add Your Logo
 1. Add your logo to `public/logo.png`

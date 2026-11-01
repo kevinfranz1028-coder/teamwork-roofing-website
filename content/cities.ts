@@ -34,7 +34,7 @@ export const cities: Record<string, CityData> = {
     slug: 'leawood-ks',
     cityName: 'Leawood',
     state: 'KS',
-    phone: '913-396-3717',
+    phone: '913-277-9925',
     hub: {
       h1: 'Roofing & Exteriors in Leawood, KS — Done The Teamwork Way',
       intro: 'A partnership from day one. Teamwork provides roof repair, roof replacement, and storm inspections in Leawood — backed by photo-proof documentation, clean site practices, flexible financing, and a Teamwork Warranty.'
@@ -133,7 +133,7 @@ export const cities: Record<string, CityData> = {
     slug: 'lenexa-ks',
     cityName: 'Lenexa',
     state: 'KS',
-    phone: '913-396-3717',
+    phone: '913-277-9925',
     hub: {
       h1: 'Roofing & Exteriors in Lenexa, KS — Done The Teamwork Way',
       intro: 'A partnership from day one. Teamwork provides roof repair, roof replacement, and storm inspections in Lenexa — backed by photo-proof documentation, clean site practices, flexible financing, and a Teamwork Warranty.'
