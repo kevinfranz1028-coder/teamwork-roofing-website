@@ -5,7 +5,7 @@ import CTABand from '@/components/CTABand'
 
 export const metadata = {
   title: 'Emergency Roof Repair Overland Park | Call/Text Now | Teamwork',
-  description: 'Emergency roof repair in Overland Park, KS. Active leaks, storm damage, urgent repairs. Same-day response. Call or text 913-396-3717 now.',
+  description: 'Emergency roof repair in Overland Park, KS. Active leaks, storm damage, urgent repairs. Same-day response. Call or text 913-277-9925 now.',
 }
 
 export default function EmergencyRoofRepairPage() {
@@ -36,13 +36,13 @@ export default function EmergencyRoofRepairPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <a href="tel:9133963717" className="btn-primary text-lg">
+              <a href="tel:9132779925" className="btn-primary text-lg">
                 <FiPhone className="inline mr-2" />
-                Call Now: 913-396-3717
+                Call Now: 913-277-9925
               </a>
-              <a href="sms:9133963717" className="btn-primary bg-green-600 hover:bg-green-700 text-lg">
+              <a href="sms:9132779925" className="btn-primary bg-green-600 hover:bg-green-700 text-lg">
                 <FiMessageSquare className="inline mr-2" />
-                Text: 913-396-3717
+                Text: 913-277-9925
               </a>
             </div>
 
@@ -79,7 +79,7 @@ export default function EmergencyRoofRepairPage() {
               </li>
               <li className="flex items-start space-x-3">
                 <span className="font-bold text-yellow-500">5.</span>
-                <span className="text-text-secondary">Call or text us immediately: 913-396-3717</span>
+                <span className="text-text-secondary">Call or text us immediately: 913-277-9925</span>
               </li>
             </ol>
             <p className="text-text-secondary text-sm text-center mt-6">
@@ -93,7 +93,7 @@ export default function EmergencyRoofRepairPage() {
         <div className="container-custom">
           <h2 className="heading-2 mb-12 text-center">Text Us Photos</h2>
           <div className="max-w-3xl mx-auto">
-            <p className="text-text-secondary mb-6 text-center">Text photos to 913-396-3717. Include:</p>
+            <p className="text-text-secondary mb-6 text-center">Text photos to 913-277-9925. Include:</p>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="card">
                 <h4 className="font-semibold mb-3">Interior Photos</h4>
@@ -144,7 +144,7 @@ export default function EmergencyRoofRepairPage() {
 
       <CTABand
         title="Emergency Roof Repair in Overland Park"
-        subtitle="Call or text now: 913-396-3717"
+        subtitle="Call or text now: 913-277-9925"
       />
     </>
   )

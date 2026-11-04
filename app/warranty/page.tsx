@@ -95,7 +95,7 @@ export default function WarrantyPage() {
                 <ol className="space-y-3">
                   <li className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
                     <span className="font-bold text-teamwork-green group-hover/item:scale-110 transition-transform">1.</span>
-                    <span className="text-text-secondary">Call us at <a href="tel:9133963717" className="text-teamwork-green hover:underline">913-396-3717</a> or use our contact form</span>
+                    <span className="text-text-secondary">Call us at <a href="tel:9132779925" className="text-teamwork-green hover:underline">913-277-9925</a> or use our contact form</span>
                   </li>
                   <li className="flex items-start space-x-3 group/item hover:translate-x-1 transition-transform duration-200">
                     <span className="font-bold text-teamwork-green group-hover/item:scale-110 transition-transform">2.</span>

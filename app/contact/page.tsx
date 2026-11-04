@@ -24,7 +24,7 @@ export default function ContactPage() {
                 <h3 className="heading-4 mb-6">Fastest Response</h3>
                 <div className="space-y-4">
                   <a
-                    href="tel:9133963717"
+                    href="tel:9132779925"
                     className="flex items-center space-x-4 p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
                   >
                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
@@ -32,12 +32,12 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-semibold">Call Us</p>
-                      <p className="text-green-100">913-396-3717</p>
+                      <p className="text-green-100">913-277-9925</p>
                     </div>
                   </a>
 
                   <a
-                    href="sms:9133963717"
+                    href="sms:9132779925"
                     className="flex items-center space-x-4 p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
                   >
                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
@@ -45,9 +45,21 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-semibold">Text Us</p>
-                      <p className="text-green-100">913-396-3717</p>
+                      <p className="text-green-100">913-277-9925</p>
                     </div>
                   </a>
+                </div>
+              </div>
+
+              <div className="group card hover:border-teamwork-green transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                <h3 className="heading-4 mb-4 group-hover:text-teamwork-green transition-colors">Office Location</h3>
+                <div className="flex items-start space-x-3">
+                  <FiMapPin className="w-5 h-5 text-teamwork-green mt-1 flex-shrink-0" />
+                  <div className="text-text-secondary">
+                    <p>8595 College Blvd</p>
+                    <p>Suite 150-J</p>
+                    <p>Overland Park, KS 66210</p>
+                  </div>
                 </div>
               </div>
 

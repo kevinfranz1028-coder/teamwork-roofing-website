@@ -6,7 +6,7 @@ import BrandsWeInstall from '@/components/BrandsWeInstall'
 
 export const metadata = {
   title: 'Roof Repair Kansas City | Fast Professional Service',
-  description: 'Fast roof repair in Kansas City Metro. Same-week service, photo documentation, honest repair vs replace guidance. Call 913-396-3717',
+  description: 'Fast roof repair in Kansas City Metro. Same-week service, photo documentation, honest repair vs replace guidance. Call 913-277-9925',
 }
 
 export default function RoofRepairPage() {
@@ -45,11 +45,11 @@ export default function RoofRepairPage() {
               </Link>
             </p>
             <div className="flex flex-wrap gap-4">
-              <a href="tel:9133963717" className="btn-primary">
+              <a href="tel:9132779925" className="btn-primary">
                 <FiPhone className="inline mr-2" />
-                Call 913-396-3717
+                Call 913-277-9925
               </a>
-              <a href="sms:9133963717" className="btn-secondary">
+              <a href="sms:9132779925" className="btn-secondary">
                 <FiMessageSquare className="inline mr-2" />
                 Text Us
               </a>

@@ -7,7 +7,7 @@ import NeighborhoodsSection from '@/components/NeighborhoodsSection'
 
 export const metadata = {
   title: 'Roof Repair Overland Park, KS | Same-Week Inspections | Teamwork',
-  description: 'Fast, professional roof repair in Overland Park. Same-week inspections, photo-proof documentation, honest repair vs replace guidance. Call 913-396-3717',
+  description: 'Fast, professional roof repair in Overland Park. Same-week inspections, photo-proof documentation, honest repair vs replace guidance. Call 913-277-9925',
 }
 
 export default function OverlandParkRoofRepairPage() {
@@ -99,11 +99,11 @@ export default function OverlandParkRoofRepairPage() {
             </p>
 
             <div className="flex flex-wrap gap-4 mb-6">
-              <a href="tel:9133963717" className="btn-primary">
+              <a href="tel:9132779925" className="btn-primary">
                 <FiPhone className="inline mr-2" />
-                Call 913-396-3717
+                Call 913-277-9925
               </a>
-              <a href="sms:9133963717" className="btn-secondary">
+              <a href="sms:9132779925" className="btn-secondary">
                 <FiMessageSquare className="inline mr-2" />
                 Text Us
               </a>
