@@ -5,4 +5,6 @@
 /estimate/ /inspect/ 301
 /estimate /inspect/ 301
 
-# Future: Add /projects -> /gallery redirect once gallery is built
+# Projects page redirected to Gallery
+/projects/ /gallery/ 301
+/projects /gallery/ 301

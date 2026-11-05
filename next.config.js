@@ -27,6 +27,16 @@ const nextConfig = {
         destination: '/inspect/',
         permanent: true,
       },
+      {
+        source: '/projects',
+        destination: '/gallery',
+        permanent: true,
+      },
+      {
+        source: '/projects/',
+        destination: '/gallery/',
+        permanent: true,
+      },
     ]
   },
 }

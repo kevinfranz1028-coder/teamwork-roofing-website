@@ -96,8 +96,8 @@ export default function Header() {
             <Link href="/warranty/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Warranty
             </Link>
-            <Link href="/projects/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
-              Projects
+            <Link href="/gallery/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
+              Gallery
             </Link>
             <Link href="/reviews/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Reviews
@@ -169,8 +169,8 @@ export default function Header() {
               <Link href="/warranty/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Warranty
               </Link>
-              <Link href="/projects/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
-                Projects
+              <Link href="/gallery/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
+                Gallery
               </Link>
               <Link href="/reviews/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Reviews
