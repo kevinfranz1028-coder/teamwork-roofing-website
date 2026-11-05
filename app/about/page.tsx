@@ -1,4 +1,4 @@
-import { FiShield, FiClock, FiCheckCircle, FiCamera, FiDollarSign } from 'react-icons/fi'
+import { FiShield, FiClock, FiCheckCircle, FiCamera, FiDollarSign, FiUsers } from 'react-icons/fi'
 import CTABand from '@/components/CTABand'
 
 export const metadata = {
@@ -137,6 +137,37 @@ export default function AboutPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Team */}
+            <div className="card bg-white">
+              <div className="flex items-center gap-3 mb-6">
+                <FiUsers className="w-6 h-6 text-teamwork-green" />
+                <h2 className="heading-3">Our Team</h2>
+              </div>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-teamwork-green/10 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-teamwork-green">KF</span>
+                  </div>
+                  <h3 className="font-semibold text-lg">Kevin Franz</h3>
+                  <p className="text-teamwork-green text-sm">Owner</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-teamwork-green/10 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-teamwork-green">M</span>
+                  </div>
+                  <h3 className="font-semibold text-lg">Megan</h3>
+                  <p className="text-teamwork-green text-sm">General Manager</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-teamwork-green/10 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-teamwork-green">R</span>
+                  </div>
+                  <h3 className="font-semibold text-lg">Rick</h3>
+                  <p className="text-teamwork-green text-sm">Inspector</p>
                 </div>
               </div>
             </div>

@@ -74,8 +74,8 @@ export default function RoofingCompaniesPage() {
               Not all roofing companies operate the same way. Learn how to compare quotes apples-to-apples, spot red flags, and select the right partner for your {cityData.cityName} home.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/book/" className="btn-primary">Book Inspection</Link>
-              <Link href="/estimate/" className="btn-secondary">Get Estimate</Link>
+              <Link href="/inspect/" className="btn-primary">Book Inspection</Link>
+              <Link href="/inspect/" className="btn-secondary">Get Estimate</Link>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function RoofingCompaniesPage() {
               Compare us to any {cityData.cityName} roofing company - we welcome the opportunity to earn your trust.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/book/" className="btn-primary">Book Inspection</Link>
+              <Link href="/inspect/" className="btn-primary">Book Inspection</Link>
               <a href={`tel:${cityData.phone}`} className="btn-secondary">Call {cityData.phone}</a>
             </div>
           </div>

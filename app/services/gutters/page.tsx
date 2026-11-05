@@ -22,8 +22,8 @@ export default function GuttersPage() {
               Protect your home with professional gutter services. Seamless installation, guard options, and expert repairs.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/book/" className="btn-primary">Book Inspection</Link>
-              <Link href="/estimate/" className="btn-secondary">Get Estimate</Link>
+              <Link href="/inspect/" className="btn-primary">Book Inspection</Link>
+              <Link href="/inspect/" className="btn-secondary">Get Estimate</Link>
             </div>
           </div>
         </div>

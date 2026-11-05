@@ -55,8 +55,8 @@ export default function RoofReplacementPage() {
               Professional roof replacement with photo-proof documentation, clean site practices, and Teamwork Warranty backing. Serving all {cityData.cityName} neighborhoods with same-week inspections.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/book/" className="btn-primary">Book Inspection</Link>
-              <Link href="/estimate/" className="btn-secondary">Get Estimate</Link>
+              <Link href="/inspect/" className="btn-primary">Book Inspection</Link>
+              <Link href="/inspect/" className="btn-secondary">Get Estimate</Link>
             </div>
           </div>
         </div>

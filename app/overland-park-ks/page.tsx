@@ -136,10 +136,10 @@ export default function OverlandParkPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-              <Link href="/book/" className="btn-primary">
+              <Link href="/inspect/" className="btn-primary">
                 Book Same-Week Inspection
               </Link>
-              <Link href="/estimate/" className="btn-secondary">
+              <Link href="/inspect/" className="btn-secondary">
                 Start Teamwork Estimate
               </Link>
             </div>

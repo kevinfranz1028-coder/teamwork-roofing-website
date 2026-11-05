@@ -107,7 +107,7 @@ export default function OverlandParkRoofRepairPage() {
                 <FiMessageSquare className="inline mr-2" />
                 Text Us
               </a>
-              <Link href="/book/" className="btn-secondary">
+              <Link href="/inspect/" className="btn-secondary">
                 Book Inspection
               </Link>
             </div>

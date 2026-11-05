@@ -50,8 +50,8 @@ export default function EmergencyRoofRepairPage() {
             </div>
 
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/book/" className="btn-secondary">Book Inspection</Link>
-              <Link href="/estimate/" className="btn-secondary">Get Estimate</Link>
+              <Link href="/inspect/" className="btn-secondary">Book Inspection</Link>
+              <Link href="/inspect/" className="btn-secondary">Get Estimate</Link>
             </div>
           </div>
         </div>

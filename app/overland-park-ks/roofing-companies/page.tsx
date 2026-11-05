@@ -82,8 +82,8 @@ export default function RoofingCompaniesPage() {
               Your roof is a major investment. Use this checklist to make an informed decision and avoid common pitfalls when hiring a roofing company in Overland Park.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/book/" className="btn-primary">Book Inspection</Link>
-              <Link href="/estimate/" className="btn-secondary">Get Estimate</Link>
+              <Link href="/inspect/" className="btn-primary">Book Inspection</Link>
+              <Link href="/inspect/" className="btn-secondary">Get Estimate</Link>
             </div>
           </div>
         </div>
