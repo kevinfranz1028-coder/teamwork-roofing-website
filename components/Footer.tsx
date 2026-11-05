@@ -128,13 +128,8 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Get Started</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/book/" className="text-text-secondary hover:text-teamwork-green transition-colors">
-                  Book Same-Week Inspection
-                </Link>
-              </li>
-              <li>
-                <Link href="/estimate/" className="text-text-secondary hover:text-teamwork-green transition-colors">
-                  Start Teamwork Estimate
+                <Link href="/inspect/" className="text-text-secondary hover:text-teamwork-green transition-colors">
+                  Book Free Inspection
                 </Link>
               </li>
               <li>

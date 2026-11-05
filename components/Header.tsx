@@ -122,7 +122,7 @@ export default function Header() {
               <span className="hidden xl:inline">(913) 277-9925</span>
             </a>
             <Link
-              href="/book/"
+              href="/inspect/"
               className="px-6 py-2.5 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-all shadow-md hover:shadow-lg transform hover:scale-[1.02]"
             >
               Book Inspection
@@ -195,7 +195,7 @@ export default function Header() {
                   (913) 277-9925
                 </a>
                 <Link
-                  href="/book/"
+                  href="/inspect/"
                   className="flex items-center justify-center px-6 py-3 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-colors"
                 >
                   Book Inspection

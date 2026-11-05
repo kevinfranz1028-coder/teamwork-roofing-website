@@ -1,0 +1,8 @@
+# Cloudflare Pages redirects
+# Consolidate booking pages to /inspect
+/book/ /inspect/ 301
+/book /inspect/ 301
+/estimate/ /inspect/ 301
+/estimate /inspect/ 301
+
+# Future: Add /projects -> /gallery redirect once gallery is built

@@ -5,6 +5,30 @@ const nextConfig = {
     unoptimized: true,
   },
   trailingSlash: true,
+  async redirects() {
+    return [
+      {
+        source: '/book',
+        destination: '/inspect',
+        permanent: true,
+      },
+      {
+        source: '/book/',
+        destination: '/inspect/',
+        permanent: true,
+      },
+      {
+        source: '/estimate',
+        destination: '/inspect',
+        permanent: true,
+      },
+      {
+        source: '/estimate/',
+        destination: '/inspect/',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

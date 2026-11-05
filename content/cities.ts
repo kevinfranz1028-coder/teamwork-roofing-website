@@ -13,12 +13,6 @@ export interface CityData {
     bullets: string[]
     disclaimer: string
   }
-  reviews: Array<{
-    name: string
-    city: string
-    rating: number
-    text: string
-  }>
   faqs: Array<{
     q: string
     a: string
@@ -62,26 +56,6 @@ export const cities: Record<string, CityData> = {
       ],
       disclaimer: 'Requirements vary by project; we\'ll confirm what applies during inspection.'
     },
-    reviews: [
-      {
-        name: 'Michael T.',
-        city: 'Leawood',
-        rating: 5,
-        text: 'Outstanding service from start to finish. They handled our HOA requirements seamlessly and the cleanup was impeccable.'
-      },
-      {
-        name: 'Patricia S.',
-        city: 'Leawood',
-        rating: 5,
-        text: 'Professional team that respected our property. Photo documentation made the entire process transparent and easy to follow.'
-      },
-      {
-        name: 'James W.',
-        city: 'Leawood',
-        rating: 5,
-        text: 'Same-week inspection delivered as promised. Clear pricing, expert installation, and beautiful results on our Hallbrook home.'
-      }
-    ],
     faqs: [
       {
         q: 'Do you serve all of Leawood?',
@@ -161,26 +135,6 @@ export const cities: Record<string, CityData> = {
       ],
       disclaimer: 'Requirements vary by project; we\'ll confirm what applies during inspection.'
     },
-    reviews: [
-      {
-        name: 'Karen L.',
-        city: 'Lenexa',
-        rating: 5,
-        text: 'Excellent communication throughout. They arrived on time, worked efficiently, and left our property spotless.'
-      },
-      {
-        name: 'Robert D.',
-        city: 'Lenexa',
-        rating: 5,
-        text: 'True professionals. The photo documentation helped us make an informed decision, and the installation was flawless.'
-      },
-      {
-        name: 'Linda M.',
-        city: 'Lenexa',
-        rating: 5,
-        text: 'Same-week inspection made all the difference. Fair pricing, quality work, and they honored every commitment.'
-      }
-    ],
     faqs: [
       {
         q: 'Do you serve all of Lenexa?',

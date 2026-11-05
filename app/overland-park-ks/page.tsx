@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { FiHome, FiTool, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiStar } from 'react-icons/fi'
+import { FiHome, FiTool, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
 import LocalProjectsSection from '@/components/LocalProjectsSection'
 import NeighborhoodsSection from '@/components/NeighborhoodsSection'
+import TrustBlock from '@/components/TrustBlock'
 
 export const metadata = {
   title: 'Overland Park Roofing Company | Teamwork Roofing Services',
@@ -50,27 +51,6 @@ export default function OverlandParkPage() {
     'LionsGate',
     'Red Fox',
     'Indian Creek'
-  ]
-
-  const reviews = [
-    {
-      name: 'Sarah M.',
-      city: 'Overland Park',
-      rating: 5,
-      text: 'True to their name — real teamwork. They kept us informed every step, left the property spotless, and the roof looks incredible.'
-    },
-    {
-      name: 'David R.',
-      city: 'Overland Park',
-      rating: 5,
-      text: 'Same-week inspection promise delivered! Professional crew, clear communication, and beautiful results.'
-    },
-    {
-      name: 'Jennifer K.',
-      city: 'Overland Park',
-      rating: 5,
-      text: 'The photo documentation was so helpful. Clean site guarantee is real - you would never know they were here except for the beautiful new roof.'
-    }
   ]
 
   const faqs: FAQ[] = [
@@ -251,33 +231,11 @@ export default function OverlandParkPage() {
         </div>
       </section>
 
-      {/* Reviews */}
+      {/* Trust & Quality */}
       <section className="section-padding bg-white">
         <div className="container-custom">
-          <h2 className="heading-2 mb-12 text-center">What Overland Park Customers Say</h2>
-
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            {reviews.map((review, index) => (
-              <div key={index} className="card">
-                <div className="flex mb-3">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <p className="text-text-secondary mb-4">{review.text}</p>
-                <div className="border-t border-light-border pt-4">
-                  <p className="font-semibold">{review.name}</p>
-                  <p className="text-sm text-text-secondary">{review.city}, KS</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link href="/reviews/" className="btn-secondary">
-              Read All Reviews
-            </Link>
-          </div>
+          <h2 className="heading-2 mb-12 text-center">Why Choose Teamwork Roofing in Overland Park</h2>
+          <TrustBlock />
         </div>
       </section>
 
