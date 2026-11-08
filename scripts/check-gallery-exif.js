@@ -21,16 +21,33 @@
 const fs = require('fs')
 const path = require('path')
 
-let exifParser
-try {
-  exifParser = require('exif-parser')
-} catch (e) {
-  console.error('❌ Error: exif-parser not installed')
-  console.error('   Run: npm install exif-parser')
-  process.exit(1)
+const galleryDir = path.join(__dirname, '..', 'public', 'gallery')
+
+// Check if gallery directory exists and has actual image files (not just placeholder)
+function hasActualImages(dir) {
+  if (!fs.existsSync(dir)) return false
+
+  const entries = fs.readdirSync(dir, { withFileTypes: true })
+  for (const entry of entries) {
+    if (entry.isDirectory() && entry.name !== 'placeholder') {
+      return true // Found a project directory (not placeholder)
+    }
+  }
+  return false
 }
 
-const galleryDir = path.join(__dirname, '..', 'public', 'gallery')
+// Only require exif-parser if we have actual images to check
+let exifParser
+if (hasActualImages(galleryDir)) {
+  try {
+    exifParser = require('exif-parser')
+  } catch (e) {
+    console.error('❌ Error: exif-parser not installed')
+    console.error('   Gallery contains images but exif-parser is missing')
+    console.error('   Run: npm install exif-parser')
+    process.exit(1)
+  }
+}
 
 function checkImageForExif(filePath) {
   try {
@@ -63,6 +80,11 @@ function scanDirectory(dir) {
     return violations
   }
 
+  if (!hasActualImages(dir)) {
+    console.log('✓ No gallery images to check (only placeholder files)')
+    return violations
+  }
+
   function scan(currentDir) {
     const entries = fs.readdirSync(currentDir, { withFileTypes: true })
 
@@ -70,6 +92,8 @@ function scanDirectory(dir) {
       const fullPath = path.join(currentDir, entry.name)
 
       if (entry.isDirectory()) {
+        // Skip placeholder directory
+        if (entry.name === 'placeholder') continue
         scan(fullPath)
       } else if (entry.isFile()) {
         // Check image files

@@ -5,6 +5,7 @@ import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
 import BrandsWeInstall from '@/components/BrandsWeInstall'
 import TrustBlock from '@/components/TrustBlock'
+import RecentWorkStrip from '@/components/RecentWorkStrip'
 
 export default function Home() {
   const services = [
@@ -28,8 +29,8 @@ export default function Home() {
       icon: FiCloudRain,
       title: 'Storm Damage',
       shortDesc: 'Full inspection',
-      frontDesc: 'Thorough inspection and insurance assistance',
-      backDesc: 'Complete storm damage assessment with detailed photo reports. We handle insurance claims and work directly with adjusters.',
+      frontDesc: 'Thorough inspection and documentation',
+      backDesc: 'Complete storm damage assessment with detailed photo reports. We document damage for your insurance claim and can be on-site during adjuster visits.',
       href: '/storm/'
     },
     {
@@ -339,6 +340,8 @@ export default function Home() {
       </section>
 
       <BrandsWeInstall variant="full" />
+
+      <RecentWorkStrip />
 
       <CTABand title="Ready to Protect Your Home?" subtitle="Same-week inspections available. Book online or call now." />
     </>
