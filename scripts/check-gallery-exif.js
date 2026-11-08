@@ -32,6 +32,16 @@ try {
   process.exit(1)
 }
 
+// Load exifr for decoding EXIF bytes
+let exifr
+try {
+  exifr = require('exifr')
+} catch (e) {
+  console.error('❌ Error: exifr not installed')
+  console.error('   Run: npm install exifr')
+  process.exit(1)
+}
+
 const galleryDir = path.join(__dirname, '..', 'public', 'gallery')
 
 // ALLOWED image extensions (fail-closed: anything else fails)
@@ -84,12 +94,11 @@ async function checkImageForExif(filePath) {
     // Read metadata using sharp (supports JPEG, PNG, WebP, HEIC)
     const metadata = await sharp(filePath).metadata()
 
-    // Extract all metadata fields
-    const data = {
-      ...metadata.exif,
-      ...metadata.iptc,
-      ...metadata.xmp,
-      ...metadata.icc
+    // Decode EXIF bytes if present using exifr
+    let data = {}
+    if (metadata.exif && Buffer.isBuffer(metadata.exif)) {
+      // Parse the raw EXIF buffer with exifr to get decoded fields including GPS
+      data = await exifr.parse(metadata.exif) || {}
     }
 
     // Check for GPS data specifically

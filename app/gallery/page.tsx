@@ -129,12 +129,18 @@ export default function GalleryPage() {
                 // Special handling for inspection projects (afterPending)
                 const isInspection = project.afterPending === true
 
-                // For olathe-002: show specific images first, rest in lightbox
-                const featuredImages = isInspection && project.id === 'olathe-002' && project.additionalImages
-                  ? ['before-1', 'before-2', 'before-3', 'detail-3', 'detail-5'].map(name =>
-                      project.additionalImages?.find(img => img.includes(name))
-                    ).filter(Boolean) as string[]
+                // For olathe-002: show beforeImage (main photo) + specific supporting photos
+                const olatheFeatures = isInspection && project.id === 'olathe-002'
+                  ? [
+                      project.beforeImage, // Main photo (before-1) shown first
+                      project.additionalImages?.find(img => /-before-2\.jpg$/.test(img)),
+                      project.additionalImages?.find(img => /-before-3\.jpg$/.test(img)),
+                      project.additionalImages?.find(img => /-detail-3\.jpg$/.test(img)),
+                      project.additionalImages?.find(img => /-detail-5\.jpg$/.test(img))
+                    ].filter(Boolean) as string[]
                   : []
+
+                const featuredImages = olatheFeatures
 
                 const lightboxOnlyImages = isInspection && project.id === 'olathe-002' && project.additionalImages
                   ? project.additionalImages.filter(img => !featuredImages.includes(img))
@@ -153,18 +159,28 @@ export default function GalleryPage() {
                         {/* Featured inspection images grid */}
                         {featuredImages.length > 0 && (
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                            {featuredImages.map((img, idx) => (
-                              <div key={idx} className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
-                                <Image
-                                  src={img}
-                                  alt={`Inspection detail ${idx + 1} - ${project.city}`}
-                                  fill
-                                  className="object-cover"
-                                  loading="lazy"
-                                  sizes="(max-width: 768px) 50vw, 33vw"
-                                />
-                              </div>
-                            ))}
+                            {featuredImages.map((img, idx) => {
+                              // Generate specific alt text for olathe-002 inspection photos
+                              const altTexts = [
+                                `Hail damage inspection overview, ${project.city}`,
+                                `Roof damage close-up view, ${project.city} inspection`,
+                                `Shingle impact detail, ${project.city} inspection`,
+                                `Granule loss from hail, ${project.city} inspection`,
+                                `Asphalt shingle damage assessment, ${project.city} inspection`
+                              ]
+                              return (
+                                <div key={idx} className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
+                                  <Image
+                                    src={img}
+                                    alt={altTexts[idx] || `Inspection detail ${idx + 1}, ${project.city}`}
+                                    fill
+                                    className="object-cover"
+                                    loading="lazy"
+                                    sizes="(max-width: 768px) 50vw, 33vw"
+                                  />
+                                </div>
+                              )
+                            })}
                           </div>
                         )}
 
@@ -196,19 +212,20 @@ export default function GalleryPage() {
                     ) : (
                       /* Standard Before/After Layout */
                       <>
-                        <div className={`grid gap-6 ${project.afterImage ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
+                        <div className={`grid gap-6 ${project.afterImage ? 'md:grid-cols-2' : 'md:grid-cols-1'} ${project.id === 'kansas-city-ks-002' ? 'max-w-[600px] mx-auto' : ''}`}>
                           {/* Before Image */}
                           <div>
-                            <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
+                            <div className={`relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100 ${project.id === 'kansas-city-ks-002' ? 'max-w-full' : ''}`}>
                               <Image
                                 src={project.beforeImage}
                                 alt={project.beforeAlt}
                                 fill
-                                className="object-cover"
+                                className={`${project.id === 'kansas-city-ks-002' ? 'object-contain' : 'object-cover'}`}
                                 loading="lazy"
                                 sizes="(max-width: 768px) 100vw, 50vw"
+                                style={project.id === 'kansas-city-ks-002' ? { maxWidth: '600px' } : undefined}
                               />
-                              <div className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold">
+                              <div className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold z-10">
                                 {project.beforeCaption || 'Before'}
                               </div>
                             </div>
@@ -217,16 +234,17 @@ export default function GalleryPage() {
                           {/* After Image (only if exists) */}
                           {project.afterImage && (
                             <div>
-                              <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
+                              <div className={`relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100 ${project.id === 'kansas-city-ks-002' ? 'max-w-full' : ''}`}>
                                 <Image
                                   src={project.afterImage}
                                   alt={project.afterAlt || ''}
                                   fill
-                                  className="object-cover"
+                                  className={`${project.id === 'kansas-city-ks-002' ? 'object-contain' : 'object-cover'}`}
                                   loading="lazy"
                                   sizes="(max-width: 768px) 100vw, 50vw"
+                                  style={project.id === 'kansas-city-ks-002' ? { maxWidth: '600px' } : undefined}
                                 />
-                                <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold">
+                                <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold z-10">
                                   {project.afterCaption || 'After'}
                                 </div>
                               </div>

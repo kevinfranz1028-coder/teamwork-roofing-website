@@ -14,10 +14,16 @@ interface LightboxProps {
 
 export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev }: LightboxProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const prevButtonRef = useRef<HTMLButtonElement>(null)
+  const nextButtonRef = useRef<HTMLButtonElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
+  const lastFocusedElement = useRef<HTMLElement | null>(null)
 
   // Focus trap and keyboard navigation
   useEffect(() => {
+    // Store the element that opened the lightbox
+    lastFocusedElement.current = document.activeElement as HTMLElement
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose()
@@ -25,6 +31,28 @@ export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev
         onPrev()
       } else if (e.key === 'ArrowRight') {
         onNext()
+      } else if (e.key === 'Tab') {
+        // Focus trap: cycle through close/prev/next buttons
+        const focusableElements = [
+          closeButtonRef.current,
+          prevButtonRef.current,
+          nextButtonRef.current
+        ].filter(Boolean) as HTMLButtonElement[]
+
+        if (focusableElements.length === 0) return
+
+        const currentIndex = focusableElements.indexOf(document.activeElement as HTMLButtonElement)
+        e.preventDefault()
+
+        if (e.shiftKey) {
+          // Shift+Tab: go backwards
+          const prevIndex = currentIndex <= 0 ? focusableElements.length - 1 : currentIndex - 1
+          focusableElements[prevIndex]?.focus()
+        } else {
+          // Tab: go forwards
+          const nextIndex = currentIndex >= focusableElements.length - 1 ? 0 : currentIndex + 1
+          focusableElements[nextIndex]?.focus()
+        }
       }
     }
 
@@ -37,6 +65,11 @@ export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
+
+      // Return focus to the opening element
+      if (lastFocusedElement.current) {
+        lastFocusedElement.current.focus()
+      }
     }
   }, [onClose, onNext, onPrev])
 
@@ -45,6 +78,9 @@ export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev
   return (
     <div
       ref={overlayRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image lightbox"
       className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
       onClick={(e) => {
         if (e.target === overlayRef.current) {
@@ -66,6 +102,7 @@ export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev
       {images.length > 1 && (
         <>
           <button
+            ref={prevButtonRef}
             onClick={onPrev}
             className="absolute left-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white"
             aria-label="Previous image"
@@ -73,8 +110,9 @@ export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev
             <FiChevronLeft className="w-6 h-6 text-white" />
           </button>
           <button
+            ref={nextButtonRef}
             onClick={onNext}
-            className="absolute right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white"
+            className="absolute right-4 md:right-20 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white"
             aria-label="Next image"
           >
             <FiChevronRight className="w-6 h-6 text-white" />
