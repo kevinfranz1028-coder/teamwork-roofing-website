@@ -322,6 +322,113 @@ Projects marked `featured: true` in `gallery.ts` AND `approved: true` in `galler
 
 The "Recent Work" strip only renders when at least 1 approved project exists. Currently it is **hidden** (no approved projects yet).
 
+## Inspection-Only Projects (afterPending Flag)
+
+Some projects document damage inspections where repair/replacement photos will be added later. These use the `afterPending: true` flag.
+
+### When to Use afterPending
+
+Use `afterPending: true` for:
+- Hail/storm damage inspections (before work is scheduled)
+- Projects awaiting insurance approval
+- Jobs where "after" photos will be available later
+
+### How afterPending Works
+
+When `afterPending: true`:
+1. **No "Before" badge** is shown (avoids implying work is complete)
+2. **The "After" image slot stays hidden** (even if afterImage is undefined)
+3. **Featured display images** show first (e.g., olathe-002 shows before-1, before-2, before-3, detail-3, detail-5)
+4. **Remaining additionalImages** go in a lightbox accessible via "View More Photos" button
+5. **Gallery page renders as inspection layout** instead of before/after columns
+
+### Example: olathe-002
+
+```typescript
+{
+  id: "olathe-002",
+  city: "Olathe",
+  jobType: "inspection",
+  beforeImage: "/gallery/olathe-002/olathe-002-before-1.jpg",
+  // NO afterImage field (undefined)
+  beforeAlt: "Hail damage inspection - Olathe, Kansas",
+  // NO afterAlt (undefined)
+  description: "Hail damage inspection",
+  date: "2026-11",
+  featured: true,
+  afterPending: true, // <-- Key flag
+  additionalImages: [
+    "/gallery/olathe-002/olathe-002-before-1.jpg",
+    "/gallery/olathe-002/olathe-002-before-2.jpg",
+    // ... 18 total photos
+  ]
+}
+```
+
+### Converting to Full Before/After (Adding After Photos)
+
+When the project is complete and you have after photos:
+
+1. **Add after photos** to the project folder:
+   ```bash
+   public/gallery/olathe-002/
+     olathe-002-after-1.jpg
+     olathe-002-after-2.jpg
+   ```
+
+2. **Update gallery.ts**:
+   ```typescript
+   {
+     id: "olathe-002",
+     city: "Olathe",
+     jobType: "full-replacement", // Changed from "inspection"
+     beforeImage: "/gallery/olathe-002/olathe-002-before-1.jpg",
+     afterImage: "/gallery/olathe-002/olathe-002-after-1.jpg", // ✅ Added
+     beforeAlt: "Olathe home with hail damage before roof replacement",
+     afterAlt: "Same Olathe home after full roof replacement", // ✅ Added
+     description: "Full roof replacement after hail damage",
+     date: "2026-11",
+     featured: true,
+     afterPending: false, // ✅ Changed to false (or remove field entirely)
+     additionalImages: [ /* keep existing detail shots */ ]
+   }
+   ```
+
+3. **Update HomeHero** (if this becomes the homepage hero):
+   - Edit `components/HomeHero.tsx`
+   - Change `kansas-city-ks-001` references to `olathe-002`
+   - Update captions to match the project
+   - Update alt text to describe the Olathe project
+
+4. **Verify and commit**:
+   ```bash
+   npm run check:gallery  # Verify EXIF stripped
+   npm run build          # Verify build passes
+   git add public/gallery/olathe-002/ content/gallery.ts components/HomeHero.tsx
+   git commit -m "Complete olathe-002: add after photos"
+   ```
+
+### Featured Hero Swap
+
+To make olathe-002 the homepage hero once after photos are added:
+
+1. Complete the steps above (add after photos, set afterPending: false)
+2. Edit `components/HomeHero.tsx`:
+   ```tsx
+   // Replace kansas-city-ks-001 with olathe-002
+   <Image
+     src="/gallery/olathe-002/olathe-002-before-1.jpg"
+     alt="Olathe home with hail damage before roof replacement"
+     // ... rest of props
+   />
+   ```
+3. Update captions:
+   - Before: "Before roof replacement" or custom caption
+   - After: "Completed roof" or custom caption
+4. Test locally, commit, and push
+
+This makes olathe-002 the featured hero while keeping kansas-city-ks-001 in the gallery.
+
 ## Questions
 
 Contact Kevin or Megan for:

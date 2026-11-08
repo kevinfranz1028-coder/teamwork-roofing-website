@@ -6,16 +6,20 @@ import Link from 'next/link'
 import { FiFilter, FiPhone } from 'react-icons/fi'
 import { galleryProjects, type GalleryProject } from '@/content/gallery'
 import CTABand from '@/components/CTABand'
+import Lightbox from '@/components/Lightbox'
 
 export default function GalleryPage() {
   const [cityFilter, setCityFilter] = useState<string>('All')
   const [jobTypeFilter, setJobTypeFilter] = useState<string>('All')
+  const [lightboxImages, setLightboxImages] = useState<{ src: string; alt: string }[]>([])
+  const [lightboxIndex, setLightboxIndex] = useState(0)
 
   const cities = ['All', 'Overland Park', 'Leawood', 'Lenexa', 'Kansas City', 'Olathe', 'Other']
   const jobTypes = [
     { value: 'All', label: 'All Projects' },
     { value: 'full-replacement', label: 'Full Replacement' },
     { value: 'storm-hail', label: 'Storm/Hail Damage' },
+    { value: 'inspection', label: 'Inspection' },
     { value: 'repair', label: 'Repair' },
     { value: 'gutter', label: 'Gutter Work' },
     { value: 'siding', label: 'Siding' }
@@ -121,61 +125,178 @@ export default function GalleryPage() {
           ) : (
             /* Gallery Grid - With Projects */
             <div className="space-y-8">
-              {filteredProjects.map(project => (
-                <div key={project.id} className="card bg-white hover:border-teamwork-green transition-all duration-300 hover:shadow-lg">
-                  <div className={`grid gap-6 ${project.afterImage ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
-                    {/* Before Image */}
-                    <div>
-                      <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
-                        <Image
-                          src={project.beforeImage}
-                          alt={project.beforeAlt}
-                          fill
-                          className="object-cover"
-                          loading="lazy"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                        <div className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold">
-                          {project.beforeCaption || 'Before'}
-                        </div>
-                      </div>
-                    </div>
+              {filteredProjects.map(project => {
+                // Special handling for inspection projects (afterPending)
+                const isInspection = project.afterPending === true
 
-                    {/* After Image (only if exists) */}
-                    {project.afterImage && (
+                // For olathe-002: show specific images first, rest in lightbox
+                const featuredImages = isInspection && project.id === 'olathe-002' && project.additionalImages
+                  ? ['before-1', 'before-2', 'before-3', 'detail-3', 'detail-5'].map(name =>
+                      project.additionalImages?.find(img => img.includes(name))
+                    ).filter(Boolean) as string[]
+                  : []
+
+                const lightboxOnlyImages = isInspection && project.id === 'olathe-002' && project.additionalImages
+                  ? project.additionalImages.filter(img => !featuredImages.includes(img))
+                  : []
+
+                // Cap kansas-city-ks-002 at 600px max-width
+                const maxWidthClass = project.id === 'kansas-city-ks-002' ? 'max-w-[600px] mx-auto' : ''
+
+                return (
+                  <div key={project.id} className={`card bg-white hover:border-teamwork-green transition-all duration-300 hover:shadow-lg ${maxWidthClass}`}>
+                    {/* Inspection Layout */}
+                    {isInspection ? (
                       <div>
-                        <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
-                          <Image
-                            src={project.afterImage}
-                            alt={project.afterAlt || ''}
-                            fill
-                            className="object-cover"
-                            loading="lazy"
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                          />
-                          <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold">
-                            {project.afterCaption || 'After'}
+                        <h2 className="text-2xl font-bold mb-4">{project.description}</h2>
+
+                        {/* Featured inspection images grid */}
+                        {featuredImages.length > 0 && (
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                            {featuredImages.map((img, idx) => (
+                              <div key={idx} className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
+                                <Image
+                                  src={img}
+                                  alt={`Inspection detail ${idx + 1} - ${project.city}`}
+                                  fill
+                                  className="object-cover"
+                                  loading="lazy"
+                                  sizes="(max-width: 768px) 50vw, 33vw"
+                                />
+                              </div>
+                            ))}
                           </div>
+                        )}
+
+                        {/* Lightbox trigger for remaining images */}
+                        {lightboxOnlyImages.length > 0 && (
+                          <button
+                            onClick={() => {
+                              setLightboxImages(lightboxOnlyImages.map((src, idx) => ({
+                                src,
+                                alt: `Additional inspection photo ${idx + 1} - ${project.city}`
+                              })))
+                              setLightboxIndex(0)
+                            }}
+                            className="btn-secondary w-full mb-4"
+                          >
+                            View {lightboxOnlyImages.length} More Photos
+                          </button>
+                        )}
+
+                        {/* Project details */}
+                        <div className="pt-4 border-t border-light-border">
+                          <p className="text-sm text-text-secondary">
+                            <span className="font-medium">{project.city}</span>
+                            {' • '}
+                            <span className="capitalize">{project.jobType.replace('-', ' ')}</span>
+                          </p>
                         </div>
                       </div>
+                    ) : (
+                      /* Standard Before/After Layout */
+                      <>
+                        <div className={`grid gap-6 ${project.afterImage ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
+                          {/* Before Image */}
+                          <div>
+                            <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
+                              <Image
+                                src={project.beforeImage}
+                                alt={project.beforeAlt}
+                                fill
+                                className="object-cover"
+                                loading="lazy"
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                              />
+                              <div className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold">
+                                {project.beforeCaption || 'Before'}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* After Image (only if exists) */}
+                          {project.afterImage && (
+                            <div>
+                              <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
+                                <Image
+                                  src={project.afterImage}
+                                  alt={project.afterAlt || ''}
+                                  fill
+                                  className="object-cover"
+                                  loading="lazy"
+                                  sizes="(max-width: 768px) 100vw, 50vw"
+                                />
+                                <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold">
+                                  {project.afterCaption || 'After'}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Additional images for standard projects */}
+                        {project.additionalImages && project.additionalImages.length > 0 && (
+                          <div className="mt-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              {project.additionalImages.slice(0, 4).map((img, idx) => (
+                                <div key={idx} className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
+                                  <Image
+                                    src={img}
+                                    alt={`Additional detail ${idx + 1} - ${project.city}`}
+                                    fill
+                                    className="object-cover"
+                                    loading="lazy"
+                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                            {project.additionalImages.length > 4 && (
+                              <button
+                                onClick={() => {
+                                  setLightboxImages(project.additionalImages!.map((src, idx) => ({
+                                    src,
+                                    alt: `Additional photo ${idx + 1} - ${project.city}`
+                                  })))
+                                  setLightboxIndex(0)
+                                }}
+                                className="btn-secondary w-full mt-4"
+                              >
+                                View All {project.additionalImages.length} Photos
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Project Details */}
+                        <div className="mt-4 pt-4 border-t border-light-border">
+                          <p className="font-semibold text-lg mb-2">{project.description}</p>
+                          <p className="text-sm text-text-secondary">
+                            <span className="font-medium">{project.city}</span>
+                            {' • '}
+                            <span className="capitalize">{project.jobType.replace('-', ' ')}</span>
+                          </p>
+                        </div>
+                      </>
                     )}
                   </div>
-
-                  {/* Project Details */}
-                  <div className="mt-4 pt-4 border-t border-light-border">
-                    <p className="font-semibold text-lg mb-2">{project.description}</p>
-                    <p className="text-sm text-text-secondary">
-                      <span className="font-medium">{project.city}</span>
-                      {' • '}
-                      <span className="capitalize">{project.jobType.replace('-', ' ')}</span>
-                    </p>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
       </section>
+
+      {/* Lightbox */}
+      {lightboxImages.length > 0 && (
+        <Lightbox
+          images={lightboxImages}
+          currentIndex={lightboxIndex}
+          onClose={() => setLightboxImages([])}
+          onNext={() => setLightboxIndex((lightboxIndex + 1) % lightboxImages.length)}
+          onPrev={() => setLightboxIndex((lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length)}
+        />
+      )}
 
       <CTABand title="Ready for Your Own Transformation?" subtitle="Same-week inspections available. Book online or call now." />
     </>

@@ -2,33 +2,33 @@
 
 /**
  * Gallery EXIF/GPS Check Script (Fail-Closed)
- * 
+ *
  * Scans ALL files in public/gallery/ for privacy-sensitive EXIF/GPS metadata.
  * FAILS the build if:
  * - Any GPS data is found
  * - Any sensitive EXIF data is found (dates, camera info, maker notes, etc.)
  * - Any file is unreadable/corrupted
  * - Any file has an extension not in the allowed list
- * 
+ *
  * Benign JFIF metadata (resolution, version) is allowed.
- * 
+ *
  * USAGE:
  *   npm run check:gallery
- *   
+ *
  * REQUIREMENTS:
- *   npm install exifr  (supports JPEG, PNG, WebP, HEIC)
+ *   npm install sharp  (supports JPEG, PNG, WebP, HEIC)
  */
 
 const fs = require('fs')
 const path = require('path')
 
-// Load exifr (supports JPEG, PNG, WebP, HEIC)
-let exifr
+// Load sharp (supports JPEG, PNG, WebP, HEIC)
+let sharp
 try {
-  exifr = require('exifr')
+  sharp = require('sharp')
 } catch (e) {
-  console.error('❌ Error: exifr not installed')
-  console.error('   Run: npm install exifr')
+  console.error('❌ Error: sharp not installed')
+  console.error('   Run: npm install sharp')
   process.exit(1)
 }
 
@@ -76,22 +76,22 @@ function isBenignMetadata(data) {
 }
 
 /**
- * Check image for EXIF/GPS data using exifr
+ * Check image for EXIF/GPS data using sharp
  * Returns: { readable, hasExif, hasGPS, tags, error }
  */
 async function checkImageForExif(filePath) {
   try {
-    // Parse all available metadata
-    const data = await exifr.parse(filePath, {
-      tiff: true,
-      exif: true,
-      gps: true,
-      xmp: true,
-      icc: true,
-      iptc: true,
-      jfif: true
-    })
-    
+    // Read metadata using sharp (supports JPEG, PNG, WebP, HEIC)
+    const metadata = await sharp(filePath).metadata()
+
+    // Extract all metadata fields
+    const data = {
+      ...metadata.exif,
+      ...metadata.iptc,
+      ...metadata.xmp,
+      ...metadata.icc
+    }
+
     // Check for GPS data specifically
     const hasGPS = data && (
       data.latitude !== undefined ||
@@ -100,10 +100,10 @@ async function checkImageForExif(filePath) {
       data.GPSLongitude !== undefined ||
       data.GPSAltitude !== undefined
     )
-    
+
     // Check for sensitive EXIF data (excluding benign JFIF fields)
-    const hasSensitiveExif = data && !isBenignMetadata(data)
-    
+    const hasSensitiveExif = data && Object.keys(data).length > 0 && !isBenignMetadata(data)
+
     return {
       readable: true,
       hasExif: hasSensitiveExif,
