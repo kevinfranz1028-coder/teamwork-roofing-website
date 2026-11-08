@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { FiFilter, FiPhone } from 'react-icons/fi'
 import { galleryProjects, type GalleryProject } from '@/content/gallery'
 import CTABand from '@/components/CTABand'
 import Lightbox from '@/components/Lightbox'
+import ResponsiveImage from '@/components/ResponsiveImage'
 
 export default function GalleryPage() {
   const [cityFilter, setCityFilter] = useState<string>('All')
@@ -170,13 +170,9 @@ export default function GalleryPage() {
                               ]
                               return (
                                 <div key={idx} className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
-                                  <Image
+                                  <ResponsiveImage
                                     src={img}
                                     alt={altTexts[idx] || `Inspection detail ${idx + 1}, ${project.city}`}
-                                    fill
-                                    className="object-cover"
-                                    loading="lazy"
-                                    sizes="(max-width: 768px) 50vw, 33vw"
                                   />
                                 </div>
                               )
@@ -188,9 +184,25 @@ export default function GalleryPage() {
                         {lightboxOnlyImages.length > 0 && (
                           <button
                             onClick={() => {
+                              // Specific city-only alt text for the 13 lightbox photos
+                              const lightboxAltTexts = [
+                                `Roof shingle damage from hail impact, ${project.city}`,
+                                `Close-up of asphalt granule displacement, ${project.city}`,
+                                `Hail dent pattern on roof surface, ${project.city}`,
+                                `Wind-lifted shingle edges, ${project.city} inspection`,
+                                `Missing granules exposing mat, ${project.city}`,
+                                `Impact crater in shingle, ${project.city} damage assessment`,
+                                `Multiple hailstone strikes on roof deck, ${project.city}`,
+                                `Shingle bruising from storm, ${project.city}`,
+                                `Damaged drip edge and flashing, ${project.city}`,
+                                `Granule accumulation in gutter, ${project.city} inspection`,
+                                `Storm damage to ridge cap, ${project.city}`,
+                                `Compromised seal strips, ${project.city} roof inspection`,
+                                `Overall roof condition assessment, ${project.city}`
+                              ]
                               setLightboxImages(lightboxOnlyImages.map((src, idx) => ({
                                 src,
-                                alt: `Additional inspection photo ${idx + 1} - ${project.city}`
+                                alt: lightboxAltTexts[idx] || `Roof inspection detail, ${project.city}`
                               })))
                               setLightboxIndex(0)
                             }}
@@ -216,14 +228,10 @@ export default function GalleryPage() {
                           {/* Before Image */}
                           <div>
                             <div className={`relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100 ${project.id === 'kansas-city-ks-002' ? 'max-w-full' : ''}`}>
-                              <Image
+                              <ResponsiveImage
                                 src={project.beforeImage}
                                 alt={project.beforeAlt}
-                                fill
-                                className={`${project.id === 'kansas-city-ks-002' ? 'object-contain' : 'object-cover'}`}
-                                loading="lazy"
-                                sizes="(max-width: 768px) 100vw, 50vw"
-                                style={project.id === 'kansas-city-ks-002' ? { maxWidth: '600px' } : undefined}
+                                className={project.id === 'kansas-city-ks-002' ? 'object-contain' : ''}
                               />
                               <div className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold z-10">
                                 {project.beforeCaption || 'Before'}
@@ -235,14 +243,10 @@ export default function GalleryPage() {
                           {project.afterImage && (
                             <div>
                               <div className={`relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100 ${project.id === 'kansas-city-ks-002' ? 'max-w-full' : ''}`}>
-                                <Image
+                                <ResponsiveImage
                                   src={project.afterImage}
                                   alt={project.afterAlt || ''}
-                                  fill
-                                  className={`${project.id === 'kansas-city-ks-002' ? 'object-contain' : 'object-cover'}`}
-                                  loading="lazy"
-                                  sizes="(max-width: 768px) 100vw, 50vw"
-                                  style={project.id === 'kansas-city-ks-002' ? { maxWidth: '600px' } : undefined}
+                                  className={project.id === 'kansas-city-ks-002' ? 'object-contain' : ''}
                                 />
                                 <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold z-10">
                                   {project.afterCaption || 'After'}
@@ -258,13 +262,9 @@ export default function GalleryPage() {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                               {project.additionalImages.slice(0, 4).map((img, idx) => (
                                 <div key={idx} className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
-                                  <Image
+                                  <ResponsiveImage
                                     src={img}
-                                    alt={`Additional detail ${idx + 1} - ${project.city}`}
-                                    fill
-                                    className="object-cover"
-                                    loading="lazy"
-                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                    alt={`Additional detail ${idx + 1}, ${project.city}`}
                                   />
                                 </div>
                               ))}

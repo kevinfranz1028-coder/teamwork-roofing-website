@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import Image from 'next/image'
 import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import ResponsiveImage from './ResponsiveImage'
 
 interface LightboxProps {
   images: { src: string; alt: string }[]
@@ -18,11 +18,15 @@ export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev
   const nextButtonRef = useRef<HTMLButtonElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const lastFocusedElement = useRef<HTMLElement | null>(null)
+  const initialized = useRef(false)
 
   // Focus trap and keyboard navigation
   useEffect(() => {
-    // Store the element that opened the lightbox
-    lastFocusedElement.current = document.activeElement as HTMLElement
+    // Store the element that opened the lightbox (only once, on first mount)
+    if (!initialized.current) {
+      lastFocusedElement.current = document.activeElement as HTMLElement
+      initialized.current = true
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -123,12 +127,10 @@ export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev
       {/* Image */}
       <div className="relative max-w-6xl w-full h-full flex flex-col items-center justify-center">
         <div className="relative w-full max-h-[80vh] aspect-[4/3]">
-          <Image
+          <ResponsiveImage
             src={current.src}
             alt={current.alt}
-            fill
             className="object-contain"
-            sizes="100vw"
             priority
           />
         </div>
