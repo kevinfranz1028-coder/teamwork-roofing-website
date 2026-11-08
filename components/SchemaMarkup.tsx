@@ -1,11 +1,11 @@
 export default function SchemaMarkup() {
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    '@id': 'https://teamworkroofing.com',
+    '@type': ['LocalBusiness', 'RoofingContractor'],
+    '@id': 'https://teamworkroofingkc.com',
     name: 'Teamwork Roofing Services LLC',
-    image: 'https://teamworkroofing.com/logo.png',
-    url: 'https://teamworkroofing.com',
+    image: 'https://teamworkroofingkc.com/teamwork-roofing-logo.png',
+    url: 'https://teamworkroofingkc.com',
     telephone: '+1-913-277-9925',
     priceRange: '$$',
     address: {

@@ -11,7 +11,7 @@ export default function GalleryPage() {
   const [cityFilter, setCityFilter] = useState<string>('All')
   const [jobTypeFilter, setJobTypeFilter] = useState<string>('All')
 
-  const cities = ['All', 'Overland Park', 'Leawood', 'Lenexa', 'Kansas City', 'Other']
+  const cities = ['All', 'Overland Park', 'Leawood', 'Lenexa', 'Kansas City', 'Olathe', 'Other']
   const jobTypes = [
     { value: 'All', label: 'All Projects' },
     { value: 'full-replacement', label: 'Full Replacement' },
