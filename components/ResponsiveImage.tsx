@@ -14,9 +14,19 @@ export default function ResponsiveImage({ src, alt, className = '', priority = f
   // Extract base path and filename
   const basePath = src.replace(/\.(jpg|jpeg|webp)$/i, '')
 
-  // Determine which sizes exist based on source image dimensions
-  // 640w exists for all, 1280w exists for images >= 1280px wide
-  const has1280 = !src.includes('kansas-city-ks-002') && !src.includes('after-1') && !src.includes('after-2')
+  // Determine which sizes exist based on actual source dimensions
+  // kansas-city-ks-002: all sources < 900px (only 640w exists)
+  // kansas-city-ks-001 after-1/after-2: 1200px sources (only 640w exists)
+  // Most others: >= 1500px sources (640w + 1280w exist)
+
+  const filename = src.split('/').pop() || ''
+
+  // Files that only have 640w (source < 1280px)
+  const only640w =
+    src.includes('kansas-city-ks-002') || // All sources 800-900px
+    (filename.match(/-after-[12]\.jpg$/) && src.includes('kansas-city-ks-001')) // 1200px sources
+
+  const has1280 = !only640w
 
   return (
     <picture>

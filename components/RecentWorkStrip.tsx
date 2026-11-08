@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { FiArrowRight } from 'react-icons/fi'
 import { galleryProjects } from '@/content/gallery'
+import ResponsiveImage from './ResponsiveImage'
 
 /**
  * Homepage Recent Work Strip
@@ -41,15 +41,11 @@ export default function RecentWorkStrip() {
               {/* After Image (primary) */}
               {project.afterImage && (
                 <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden bg-gray-100">
-                  <Image
+                  <ResponsiveImage
                     src={project.afterImage}
                     alt={project.afterAlt || ''}
-                    fill
-                    className="object-cover"
-                    loading="lazy"
-                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
-                  <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold">
+                  <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold z-10">
                     {project.afterCaption || 'After'}
                   </div>
                 </div>
