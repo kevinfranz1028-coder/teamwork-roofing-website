@@ -65,10 +65,15 @@ function checkImageForExif(filePath) {
       result.tags.GPSLongitudeRef !== undefined
     )
 
-    return { hasExif, hasGPS, tags: result.tags }
+    return { hasExif, hasGPS, tags: result.tags, readable: true }
   } catch (e) {
-    // Not a JPEG or no EXIF data (which is good)
-    return { hasExif: false, hasGPS: false, tags: {} }
+    // FAIL CLOSED: Any image that cannot be parsed is a failure
+    // This includes:
+    // - Corrupted files
+    // - Unsupported formats
+    // - Files that cannot be read
+    // Only explicitly allowlisted SVG placeholders are exempt (handled in scan)
+    return { hasExif: false, hasGPS: false, tags: {}, readable: false, error: e.message }
   }
 }
 
@@ -96,13 +101,20 @@ function scanDirectory(dir) {
         if (entry.name === 'placeholder') continue
         scan(fullPath)
       } else if (entry.isFile()) {
-        // Check image files
+        // Check image files (skip SVG placeholders)
         const ext = path.extname(entry.name).toLowerCase()
         if (['.jpg', '.jpeg', '.webp', '.png', '.heic'].includes(ext)) {
           const result = checkImageForExif(fullPath)
           const relativePath = path.relative(galleryDir, fullPath)
 
-          if (result.hasGPS) {
+          // FAIL CLOSED: Unreadable images are violations
+          if (!result.readable) {
+            violations.push({
+              file: relativePath,
+              type: 'UNREADABLE',
+              error: result.error
+            })
+          } else if (result.hasGPS) {
             violations.push({
               file: relativePath,
               type: 'GPS',
@@ -134,8 +146,17 @@ if (violations.length === 0) {
   console.log('   All images are safe to publish (privacy protected)')
   process.exit(0)
 } else {
-  console.error('❌ FAIL: Found EXIF/GPS data in gallery images\n')
-  console.error('PRIVACY VIOLATION: The following images contain metadata:\n')
+  console.error('❌ FAIL: Found violations in gallery images\n')
+
+  const hasUnreadable = violations.some(v => v.type === 'UNREADABLE')
+  const hasPrivacy = violations.some(v => v.type === 'GPS' || v.type === 'EXIF')
+
+  if (hasPrivacy) {
+    console.error('PRIVACY VIOLATION: The following images contain metadata:\n')
+  }
+  if (hasUnreadable) {
+    console.error('UNREADABLE IMAGES: The following images cannot be parsed (FAIL CLOSED):\n')
+  }
 
   violations.forEach(v => {
     console.error(`  ⚠️  ${v.file}`)
@@ -144,14 +165,25 @@ if (violations.length === 0) {
       console.error('      ** GPS COORDINATES FOUND **')
       if (v.tags.GPSLatitude) console.error(`      Latitude: ${v.tags.GPSLatitude}`)
       if (v.tags.GPSLongitude) console.error(`      Longitude: ${v.tags.GPSLongitude}`)
+    } else if (v.type === 'UNREADABLE') {
+      console.error(`      Error: ${v.error}`)
+      console.error('      ** IMAGE CANNOT BE VERIFIED **')
     }
     console.error('')
   })
 
   console.error('REQUIRED ACTIONS:')
-  console.error('1. Re-process images with scripts/process-gallery-images.js')
-  console.error('2. Verify images are stripped: npm run check:gallery')
-  console.error('3. Do NOT commit images with EXIF/GPS data\n')
+  if (hasPrivacy) {
+    console.error('- Re-process images with scripts/process-gallery-images.js')
+    console.error('- Verify images are stripped: npm run check:gallery')
+    console.error('- Do NOT commit images with EXIF/GPS data')
+  }
+  if (hasUnreadable) {
+    console.error('- Unreadable images must be replaced or removed')
+    console.error('- Only valid JPEG/PNG/WebP files are allowed')
+    console.error('- Corrupted or unsupported files are rejected (fail-closed policy)')
+  }
+  console.error('')
 
   process.exit(1)
 }

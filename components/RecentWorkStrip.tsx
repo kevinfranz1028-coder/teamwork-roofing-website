@@ -18,8 +18,10 @@ export default function RecentWorkStrip() {
     return null
   }
 
-  // Get up to 3 most recent approved projects (sorted by date desc)
+  // Get up to 3 most recent approved projects with after images (sorted by date desc)
+  // Filter out inspection-only projects (no after image)
   const recentProjects = [...galleryProjects]
+    .filter(p => p.afterImage) // Only show projects with completed after photos
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 3)
 
@@ -37,19 +39,21 @@ export default function RecentWorkStrip() {
           {recentProjects.map(project => (
             <div key={project.id} className="card bg-white hover:border-teamwork-green transition-all duration-300 hover:shadow-lg">
               {/* After Image (primary) */}
-              <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden bg-gray-100">
-                <Image
-                  src={project.afterImage}
-                  alt={project.afterAlt}
-                  fill
-                  className="object-cover"
-                  loading="lazy"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold">
-                  After
+              {project.afterImage && (
+                <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden bg-gray-100">
+                  <Image
+                    src={project.afterImage}
+                    alt={project.afterAlt || ''}
+                    fill
+                    className="object-cover"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                  <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold">
+                    {project.afterCaption || 'After'}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Project Details */}
               <p className="font-semibold mb-2 line-clamp-2">{project.description}</p>

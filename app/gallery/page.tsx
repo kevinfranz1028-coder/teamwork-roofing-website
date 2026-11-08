@@ -123,7 +123,7 @@ export default function GalleryPage() {
             <div className="space-y-8">
               {filteredProjects.map(project => (
                 <div key={project.id} className="card bg-white hover:border-teamwork-green transition-all duration-300 hover:shadow-lg">
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className={`grid gap-6 ${project.afterImage ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
                     {/* Before Image */}
                     <div>
                       <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
@@ -136,27 +136,29 @@ export default function GalleryPage() {
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />
                         <div className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold">
-                          Before
+                          {project.beforeCaption || 'Before'}
                         </div>
                       </div>
                     </div>
 
-                    {/* After Image */}
-                    <div>
-                      <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
-                        <Image
-                          src={project.afterImage}
-                          alt={project.afterAlt}
-                          fill
-                          className="object-cover"
-                          loading="lazy"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                        <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold">
-                          After
+                    {/* After Image (only if exists) */}
+                    {project.afterImage && (
+                      <div>
+                        <div className="relative aspect-[4/3] mb-3 rounded-lg overflow-hidden bg-gray-100">
+                          <Image
+                            src={project.afterImage}
+                            alt={project.afterAlt || ''}
+                            fill
+                            className="object-cover"
+                            loading="lazy"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                          />
+                          <div className="absolute top-3 left-3 bg-teamwork-green text-white px-3 py-1 rounded-md text-sm font-semibold">
+                            {project.afterCaption || 'After'}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Project Details */}
