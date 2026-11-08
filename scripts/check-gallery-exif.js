@@ -1,112 +1,179 @@
 #!/usr/bin/env node
 
 /**
- * Gallery EXIF/GPS Check Script
- *
- * Scans all images in public/gallery/ for EXIF/GPS metadata.
- * FAILS the build if any EXIF/GPS data is found (privacy violation).
- *
+ * Gallery EXIF/GPS Check Script (Fail-Closed)
+ * 
+ * Scans ALL files in public/gallery/ for privacy-sensitive EXIF/GPS metadata.
+ * FAILS the build if:
+ * - Any GPS data is found
+ * - Any sensitive EXIF data is found (dates, camera info, maker notes, etc.)
+ * - Any file is unreadable/corrupted
+ * - Any file has an extension not in the allowed list
+ * 
+ * Benign JFIF metadata (resolution, version) is allowed.
+ * 
  * USAGE:
  *   npm run check:gallery
- *
- * This should be run:
- * - Before every commit that adds gallery images
- * - As part of the build process
- * - After running process-gallery-images.js (which strips EXIF)
- *
+ *   
  * REQUIREMENTS:
- *   npm install exif-parser
+ *   npm install exifr  (supports JPEG, PNG, WebP, HEIC)
  */
 
 const fs = require('fs')
 const path = require('path')
 
+// Load exifr (supports JPEG, PNG, WebP, HEIC)
+let exifr
+try {
+  exifr = require('exifr')
+} catch (e) {
+  console.error('❌ Error: exifr not installed')
+  console.error('   Run: npm install exifr')
+  process.exit(1)
+}
+
 const galleryDir = path.join(__dirname, '..', 'public', 'gallery')
 
-// Check if gallery directory exists and has actual image files (not just placeholder)
-function hasActualImages(dir) {
-  if (!fs.existsSync(dir)) return false
+// ALLOWED image extensions (fail-closed: anything else fails)
+const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.webp', '.png', '.heic']
 
-  const entries = fs.readdirSync(dir, { withFileTypes: true })
-  for (const entry of entries) {
-    if (entry.isDirectory() && entry.name !== 'placeholder') {
-      return true // Found a project directory (not placeholder)
+// SPECIFIC allowlisted placeholder paths (fail-closed: only these exact paths are exempt)
+const ALLOWLISTED_PLACEHOLDERS = [
+  'placeholder/placeholder.svg'
+]
+
+// BENIGN metadata fields that are NOT privacy violations
+const BENIGN_FIELDS = new Set([
+  'JFIFVersion',
+  'ResolutionUnit',
+  'XResolution',
+  'YResolution',
+  'ThumbnailWidth',
+  'ThumbnailHeight',
+  'ColorSpace',
+  'ColorComponents',
+  'Subsampling'
+])
+
+/**
+ * Check if a path is an allowlisted placeholder
+ */
+function isAllowlistedPlaceholder(relativePath) {
+  return ALLOWLISTED_PLACEHOLDERS.some(allowed => relativePath === allowed)
+}
+
+/**
+ * Check if metadata contains only benign fields
+ */
+function isBenignMetadata(data) {
+  if (!data || Object.keys(data).length === 0) {
+    return true // No metadata is fine
+  }
+  
+  // Check if all fields are benign
+  const fields = Object.keys(data)
+  return fields.every(field => BENIGN_FIELDS.has(field))
+}
+
+/**
+ * Check image for EXIF/GPS data using exifr
+ * Returns: { readable, hasExif, hasGPS, tags, error }
+ */
+async function checkImageForExif(filePath) {
+  try {
+    // Parse all available metadata
+    const data = await exifr.parse(filePath, {
+      tiff: true,
+      exif: true,
+      gps: true,
+      xmp: true,
+      icc: true,
+      iptc: true,
+      jfif: true
+    })
+    
+    // Check for GPS data specifically
+    const hasGPS = data && (
+      data.latitude !== undefined ||
+      data.longitude !== undefined ||
+      data.GPSLatitude !== undefined ||
+      data.GPSLongitude !== undefined ||
+      data.GPSAltitude !== undefined
+    )
+    
+    // Check for sensitive EXIF data (excluding benign JFIF fields)
+    const hasSensitiveExif = data && !isBenignMetadata(data)
+    
+    return {
+      readable: true,
+      hasExif: hasSensitiveExif,
+      hasGPS,
+      tags: data || {}
+    }
+  } catch (e) {
+    // FAIL CLOSED: unreadable images are violations
+    return {
+      readable: false,
+      hasExif: false,
+      hasGPS: false,
+      tags: {},
+      error: e.message
     }
   }
-  return false
 }
 
-// Only require exif-parser if we have actual images to check
-let exifParser
-if (hasActualImages(galleryDir)) {
-  try {
-    exifParser = require('exif-parser')
-  } catch (e) {
-    console.error('❌ Error: exif-parser not installed')
-    console.error('   Gallery contains images but exif-parser is missing')
-    console.error('   Run: npm install exif-parser')
-    process.exit(1)
-  }
-}
-
-function checkImageForExif(filePath) {
-  try {
-    const buffer = fs.readFileSync(filePath)
-    const parser = exifParser.create(buffer)
-    const result = parser.parse()
-
-    // Check for ANY EXIF data
-    const hasExif = result.tags && Object.keys(result.tags).length > 0
-    const hasGPS = result.tags && (
-      result.tags.GPSLatitude !== undefined ||
-      result.tags.GPSLongitude !== undefined ||
-      result.tags.GPSAltitude !== undefined ||
-      result.tags.GPSLatitudeRef !== undefined ||
-      result.tags.GPSLongitudeRef !== undefined
-    )
-
-    return { hasExif, hasGPS, tags: result.tags, readable: true }
-  } catch (e) {
-    // FAIL CLOSED: Any image that cannot be parsed is a failure
-    // This includes:
-    // - Corrupted files
-    // - Unsupported formats
-    // - Files that cannot be read
-    // Only explicitly allowlisted SVG placeholders are exempt (handled in scan)
-    return { hasExif: false, hasGPS: false, tags: {}, readable: false, error: e.message }
-  }
-}
-
-function scanDirectory(dir) {
+/**
+ * Scan directory for violations
+ */
+async function scanDirectory(dir) {
   const violations = []
-
+  
   if (!fs.existsSync(dir)) {
     console.log('✓ No gallery directory found (no images to check)')
     return violations
   }
-
-  if (!hasActualImages(dir)) {
-    console.log('✓ No gallery images to check (only placeholder files)')
-    return violations
-  }
-
-  function scan(currentDir) {
+  
+  async function scan(currentDir) {
     const entries = fs.readdirSync(currentDir, { withFileTypes: true })
-
+    
     for (const entry of entries) {
       const fullPath = path.join(currentDir, entry.name)
-
+      const relativePath = path.relative(galleryDir, fullPath)
+      
       if (entry.isDirectory()) {
-        // Skip placeholder directory
-        if (entry.name === 'placeholder') continue
-        scan(fullPath)
+        await scan(fullPath)
       } else if (entry.isFile()) {
-        // Check image files (skip SVG placeholders)
         const ext = path.extname(entry.name).toLowerCase()
-        if (['.jpg', '.jpeg', '.webp', '.png', '.heic'].includes(ext)) {
-          const result = checkImageForExif(fullPath)
-          const relativePath = path.relative(galleryDir, fullPath)
-
+        
+        // Check if this is an allowlisted placeholder
+        if (isAllowlistedPlaceholder(relativePath)) {
+          continue // Skip allowlisted placeholders
+        }
+        
+        // FAIL CLOSED: Any file with extension not in allowed list fails
+        if (!ALLOWED_EXTENSIONS.includes(ext) && ext !== '.svg') {
+          violations.push({
+            file: relativePath,
+            type: 'DISALLOWED_EXTENSION',
+            extension: ext
+          })
+          continue
+        }
+        
+        // SVGs that aren't allowlisted fail
+        if (ext === '.svg') {
+          violations.push({
+            file: relativePath,
+            type: 'DISALLOWED_SVG',
+            message: 'Only specific allowlisted placeholder SVGs are permitted'
+          })
+          continue
+        }
+        
+        // Check images for EXIF/GPS
+        if (ALLOWED_EXTENSIONS.includes(ext)) {
+          const result = await checkImageForExif(fullPath)
+          
           // FAIL CLOSED: Unreadable images are violations
           if (!result.readable) {
             violations.push({
@@ -131,59 +198,85 @@ function scanDirectory(dir) {
       }
     }
   }
-
-  scan(dir)
+  
+  await scan(dir)
   return violations
 }
 
 // Main
-console.log('🔍 Checking gallery images for EXIF/GPS metadata...\n')
-
-const violations = scanDirectory(galleryDir)
-
-if (violations.length === 0) {
-  console.log('✅ PASS: No EXIF/GPS data found in gallery images')
-  console.log('   All images are safe to publish (privacy protected)')
-  process.exit(0)
-} else {
-  console.error('❌ FAIL: Found violations in gallery images\n')
-
-  const hasUnreadable = violations.some(v => v.type === 'UNREADABLE')
-  const hasPrivacy = violations.some(v => v.type === 'GPS' || v.type === 'EXIF')
-
-  if (hasPrivacy) {
-    console.error('PRIVACY VIOLATION: The following images contain metadata:\n')
-  }
-  if (hasUnreadable) {
-    console.error('UNREADABLE IMAGES: The following images cannot be parsed (FAIL CLOSED):\n')
-  }
-
-  violations.forEach(v => {
-    console.error(`  ⚠️  ${v.file}`)
-    console.error(`      Type: ${v.type}`)
-    if (v.type === 'GPS') {
-      console.error('      ** GPS COORDINATES FOUND **')
-      if (v.tags.GPSLatitude) console.error(`      Latitude: ${v.tags.GPSLatitude}`)
-      if (v.tags.GPSLongitude) console.error(`      Longitude: ${v.tags.GPSLongitude}`)
-    } else if (v.type === 'UNREADABLE') {
-      console.error(`      Error: ${v.error}`)
-      console.error('      ** IMAGE CANNOT BE VERIFIED **')
+async function main() {
+  console.log('🔍 Checking gallery images for EXIF/GPS metadata...\n')
+  
+  const violations = await scanDirectory(galleryDir)
+  
+  if (violations.length === 0) {
+    console.log('✅ PASS: No EXIF/GPS data found in gallery images')
+    console.log('   All images are safe to publish (privacy protected)')
+    process.exit(0)
+  } else {
+    console.error('❌ FAIL: Found violations in gallery images\n')
+    
+    const hasPrivacy = violations.some(v => v.type === 'GPS' || v.type === 'EXIF')
+    const hasUnreadable = violations.some(v => v.type === 'UNREADABLE')
+    const hasDisallowed = violations.some(v => v.type === 'DISALLOWED_EXTENSION' || v.type === 'DISALLOWED_SVG')
+    
+    if (hasPrivacy) {
+      console.error('PRIVACY VIOLATION: The following images contain metadata:\n')
+    }
+    if (hasUnreadable) {
+      console.error('UNREADABLE IMAGES: The following images cannot be parsed (FAIL CLOSED):\n')
+    }
+    if (hasDisallowed) {
+      console.error('DISALLOWED FILES: The following files are not permitted:\n')
+    }
+    
+    violations.forEach(v => {
+      console.error(`  ⚠️  ${v.file}`)
+      console.error(`      Type: ${v.type}`)
+      if (v.type === 'GPS') {
+        console.error('      ** GPS COORDINATES FOUND **')
+        if (v.tags.latitude) console.error(`      Latitude: ${v.tags.latitude}`)
+        if (v.tags.longitude) console.error(`      Longitude: ${v.tags.longitude}`)
+        if (v.tags.GPSLatitude) console.error(`      GPSLatitude: ${v.tags.GPSLatitude}`)
+        if (v.tags.GPSLongitude) console.error(`      GPSLongitude: ${v.tags.GPSLongitude}`)
+      } else if (v.type === 'UNREADABLE') {
+        console.error(`      Error: ${v.error}`)
+        console.error('      ** IMAGE CANNOT BE VERIFIED **')
+      } else if (v.type === 'DISALLOWED_EXTENSION') {
+        console.error(`      Extension: ${v.extension}`)
+        console.error('      ** FILE TYPE NOT ALLOWED **')
+      } else if (v.type === 'DISALLOWED_SVG') {
+        console.error(`      ${v.message}`)
+      } else if (v.type === 'EXIF') {
+        console.error('      ** SENSITIVE EXIF METADATA FOUND **')
+        console.error(`      Fields: ${Object.keys(v.tags).join(', ')}`)
+      }
+      console.error('')
+    })
+    
+    console.error('REQUIRED ACTIONS:')
+    if (hasPrivacy) {
+      console.error('- Re-process images to remove EXIF/GPS metadata')
+      console.error('- Verify images are stripped: npm run check:gallery')
+      console.error('- Do NOT commit images with EXIF/GPS data')
+    }
+    if (hasUnreadable) {
+      console.error('- Unreadable images must be replaced or removed')
+      console.error('- Only valid JPEG/PNG/WebP files are allowed')
+      console.error('- Corrupted or unsupported files are rejected (fail-closed policy)')
+    }
+    if (hasDisallowed) {
+      console.error('- Remove files with disallowed extensions')
+      console.error('- Only .jpg, .jpeg, .webp, .png, .heic are permitted')
+      console.error('- SVG files must be explicitly allowlisted in the script')
     }
     console.error('')
-  })
-
-  console.error('REQUIRED ACTIONS:')
-  if (hasPrivacy) {
-    console.error('- Re-process images with scripts/process-gallery-images.js')
-    console.error('- Verify images are stripped: npm run check:gallery')
-    console.error('- Do NOT commit images with EXIF/GPS data')
+    
+    process.exit(1)
   }
-  if (hasUnreadable) {
-    console.error('- Unreadable images must be replaced or removed')
-    console.error('- Only valid JPEG/PNG/WebP files are allowed')
-    console.error('- Corrupted or unsupported files are rejected (fail-closed policy)')
-  }
-  console.error('')
-
-  process.exit(1)
 }
+
+main().catch(err => {
+  console.error('Fatal error:', err)
+  process.exit(1)
+})

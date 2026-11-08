@@ -6,6 +6,7 @@ import CTABand from '@/components/CTABand'
 import BrandsWeInstall from '@/components/BrandsWeInstall'
 import TrustBlock from '@/components/TrustBlock'
 import RecentWorkStrip from '@/components/RecentWorkStrip'
+import HomeHero from '@/components/HomeHero'
 
 export default function Home() {
   const services = [
@@ -104,8 +105,10 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Section - Clean Modern Design */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
+      <HomeHero />
+
+      {/* Old Hero Section - Clean Modern Design (REPLACED) */}
+      <section className="hidden relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
