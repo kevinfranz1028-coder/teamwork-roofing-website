@@ -96,8 +96,8 @@ export default function Header() {
             <Link href="/warranty/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Warranty
             </Link>
-            <Link href="/projects/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
-              Projects
+            <Link href="/gallery/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
+              Gallery
             </Link>
             <Link href="/reviews/" className="px-3 py-2 text-text-secondary hover:text-teamwork-green transition-colors font-medium rounded-lg hover:bg-gray-50">
               Reviews
@@ -122,7 +122,7 @@ export default function Header() {
               <span className="hidden xl:inline">(913) 277-9925</span>
             </a>
             <Link
-              href="/book/"
+              href="/inspect/"
               className="px-6 py-2.5 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-all shadow-md hover:shadow-lg transform hover:scale-[1.02]"
             >
               Book Inspection
@@ -169,8 +169,8 @@ export default function Header() {
               <Link href="/warranty/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Warranty
               </Link>
-              <Link href="/projects/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
-                Projects
+              <Link href="/gallery/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
+                Gallery
               </Link>
               <Link href="/reviews/" className="px-4 py-3 text-text-secondary hover:text-teamwork-green hover:bg-gray-50 rounded-lg transition-colors font-medium">
                 Reviews
@@ -195,7 +195,7 @@ export default function Header() {
                   (913) 277-9925
                 </a>
                 <Link
-                  href="/book/"
+                  href="/inspect/"
                   className="flex items-center justify-center px-6 py-3 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-colors"
                 >
                   Book Inspection

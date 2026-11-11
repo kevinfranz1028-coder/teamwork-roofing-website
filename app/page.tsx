@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiHome, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiStar, FiPhone, FiAward, FiShield, FiClock, FiCamera, FiArrowRight, FiTool, FiUsers, FiFileText } from 'react-icons/fi'
+import { FiHome, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiPhone, FiAward, FiShield, FiClock, FiCamera, FiArrowRight, FiTool, FiUsers, FiFileText } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
 import BrandsWeInstall from '@/components/BrandsWeInstall'
+import TrustBlock from '@/components/TrustBlock'
 
 export default function Home() {
   const services = [
@@ -72,7 +73,7 @@ export default function Home() {
       title: 'Same-Week Inspection',
       shortDesc: 'We arrive fast',
       frontDesc: 'Professional assessment',
-      backDesc: 'Our certified team arrives within the week with all necessary equipment. We conduct a thorough inspection of your roof and exterior.'
+      backDesc: 'Our bonded team arrives within the week with all necessary equipment. We conduct a thorough inspection of your roof and exterior.'
     },
     {
       number: '03',
@@ -97,27 +98,6 @@ export default function Home() {
       shortDesc: 'Warranty backed',
       frontDesc: 'Professional execution',
       backDesc: 'Skilled installation with daily cleanup and magnetic sweeps. Site left spotless with full warranty protection.'
-    }
-  ]
-
-  const reviews = [
-    {
-      name: 'Sarah M.',
-      city: 'Overland Park',
-      rating: 5,
-      text: 'True to their name — real teamwork. They kept us informed every step, left the property spotless, and the roof looks incredible.'
-    },
-    {
-      name: 'Mike T.',
-      city: 'Lenexa',
-      rating: 5,
-      text: 'After storm damage, they helped with documentation and made the insurance process so much easier. Highly recommend.'
-    },
-    {
-      name: 'Jennifer K.',
-      city: 'Olathe',
-      rating: 5,
-      text: 'Same-week inspection promise delivered! Professional crew, clear communication, and beautiful results.'
     }
   ]
 
@@ -154,10 +134,10 @@ export default function Home() {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Link
-                  href="/book/"
+                  href="/inspect/"
                   className="inline-flex items-center justify-center px-8 py-4 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
-                  Schedule Free Inspection
+                  Book Free Inspection
                   <FiArrowRight className="ml-2 w-5 h-5" />
                 </Link>
                 <a
@@ -346,41 +326,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Reviews */}
+      {/* Trust & Quality */}
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="heading-2 mb-4">What Kansas City Homeowners Say</h2>
-            <p className="text-lg text-text-secondary">Real partnerships, real results</p>
+            <h2 className="heading-2 mb-4">Why Choose Teamwork Roofing</h2>
+            <p className="text-lg text-text-secondary">Bonded, warranted, and local</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {reviews.map((review, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl hover:border-teamwork-green transition-all">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <FiStar key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-text-secondary mb-6 leading-relaxed italic">"{review.text}"</p>
-                <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
-                  <div className="w-12 h-12 rounded-full bg-teamwork-green/10 flex items-center justify-center font-bold text-teamwork-green">
-                    {review.name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="font-semibold">{review.name}</div>
-                    <div className="text-sm text-text-secondary">{review.city}, KS</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link href="/reviews/" className="inline-flex items-center btn-secondary">
-              Read All Reviews <FiArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-          </div>
+          <TrustBlock />
         </div>
       </section>
 

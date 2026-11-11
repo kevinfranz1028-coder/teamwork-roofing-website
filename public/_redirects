@@ -1,0 +1,10 @@
+# Cloudflare Pages redirects
+# Consolidate booking pages to /inspect
+/book/ /inspect/ 301
+/book /inspect/ 301
+/estimate/ /inspect/ 301
+/estimate /inspect/ 301
+
+# Projects page redirected to Gallery
+/projects/ /gallery/ 301
+/projects /gallery/ 301

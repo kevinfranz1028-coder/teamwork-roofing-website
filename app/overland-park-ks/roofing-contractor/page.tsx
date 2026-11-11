@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { FiShield, FiClock, FiCamera, FiDollarSign, FiCheckCircle, FiStar } from 'react-icons/fi'
+import { FiShield, FiClock, FiCamera, FiDollarSign, FiCheckCircle } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
 import LocalProjectsSection from '@/components/LocalProjectsSection'
+import TrustBlock from '@/components/TrustBlock'
 
 export const metadata = {
   title: 'Roofing Contractor Overland Park, KS | Warranty + Financing | Teamwork',
@@ -35,19 +36,6 @@ export default function RoofingContractorPage() {
       icon: FiDollarSign,
       title: 'Teamwork Financing Options',
       description: 'Flexible payment plans with multiple options. Make your roofing project affordable.'
-    }
-  ]
-
-  const reviews = [
-    {
-      name: 'Sarah M.',
-      rating: 5,
-      text: 'True to their name - real teamwork. Kept us informed every step, left the property spotless.'
-    },
-    {
-      name: 'David R.',
-      rating: 5,
-      text: 'Professional crew, clear communication, beautiful results. Highly recommend.'
     }
   ]
 
@@ -152,21 +140,8 @@ export default function RoofingContractorPage() {
 
       <section className="section-padding bg-light-bg">
         <div className="container-custom">
-          <h2 className="heading-2 mb-12 text-center">What Overland Park Customers Say</h2>
-          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {reviews.map((review, index) => (
-              <div key={index} className="card">
-                <div className="flex mb-3">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <p className="text-text-secondary mb-4">{review.text}</p>
-                <p className="font-semibold">{review.name}</p>
-                <p className="text-sm text-text-secondary">Overland Park, KS</p>
-              </div>
-            ))}
-          </div>
+          <h2 className="heading-2 mb-12 text-center">Why Choose Teamwork Roofing in Overland Park</h2>
+          <TrustBlock />
         </div>
       </section>
 

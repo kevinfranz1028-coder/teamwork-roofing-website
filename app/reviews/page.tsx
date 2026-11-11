@@ -1,5 +1,6 @@
-import { FiStar, FiCheckCircle } from 'react-icons/fi'
+import { FiCheckCircle } from 'react-icons/fi'
 import CTABand from '@/components/CTABand'
+import TrustBlock from '@/components/TrustBlock'
 
 export const metadata = {
   title: 'Customer Reviews | Teamwork Roofing Kansas City',
@@ -7,72 +8,6 @@ export const metadata = {
 }
 
 export default function ReviewsPage() {
-  const reviews = [
-    {
-      name: 'Sarah M.',
-      city: 'Overland Park',
-      rating: 5,
-      date: '2 weeks ago',
-      text: 'True to their name — real teamwork. They kept us informed every step, left the property spotless, and the roof looks incredible. The photo documentation was so helpful for our records.'
-    },
-    {
-      name: 'Mike T.',
-      city: 'Lenexa',
-      rating: 5,
-      date: '1 month ago',
-      text: 'After storm damage, they helped with documentation and made the insurance process so much easier. Highly recommend their full exterior inspection.'
-    },
-    {
-      name: 'Jennifer K.',
-      city: 'Olathe',
-      rating: 5,
-      date: '3 weeks ago',
-      text: 'Same-week inspection promise delivered! Professional crew, clear communication, and beautiful results on our new gutters and siding.'
-    },
-    {
-      name: 'David R.',
-      city: 'Shawnee',
-      rating: 5,
-      date: '2 months ago',
-      text: 'They replaced our roof and it was a flawless experience. Clean site guarantee is real — you would never know they were here except for the beautiful new roof.'
-    },
-    {
-      name: 'Lisa P.',
-      city: 'Leawood',
-      rating: 5,
-      date: '1 month ago',
-      text: 'Financing options made our window replacement possible. No pressure sales, just clear options and professional installation.'
-    },
-    {
-      name: 'Tom H.',
-      city: 'Prairie Village',
-      rating: 5,
-      date: '3 months ago',
-      text: 'Repaired our roof leak fast. Honest assessment, fair price, and they actually showed us photos of the problem and the fix. That is real partnership.'
-    },
-    {
-      name: 'Amanda S.',
-      city: 'Mission',
-      rating: 5,
-      date: '2 weeks ago',
-      text: 'From estimate to final walkthrough, everything was professional. Our new siding transformed the house and the crew was respectful and efficient.'
-    },
-    {
-      name: 'Kevin J.',
-      city: 'Gardner',
-      rating: 5,
-      date: '1 month ago',
-      text: 'Best roofing company we have worked with. Photo proof inspection gave us confidence, and the warranty backing shows they stand behind their work.'
-    },
-    {
-      name: 'Michelle W.',
-      city: 'Spring Hill',
-      rating: 5,
-      date: '3 weeks ago',
-      text: 'They handled our storm damage claim with professionalism. Detailed documentation helped our insurance process go smoothly.'
-    }
-  ]
-
   const topMentions = [
     'Clean site practices',
     'Clear communication',
@@ -91,15 +26,6 @@ export default function ReviewsPage() {
             <p className="text-xl text-text-secondary mb-8">
               Real experiences from real partnerships across Kansas City Metro
             </p>
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar key={i} className="w-8 h-8 text-yellow-500 fill-current" />
-                ))}
-              </div>
-              <span className="text-3xl font-bold">5.0</span>
-            </div>
-            <p className="text-text-muted">Based on {reviews.length}+ verified reviews</p>
           </div>
 
           {/* Top Mentions */}
@@ -115,23 +41,10 @@ export default function ReviewsPage() {
             </div>
           </div>
 
-          {/* Reviews Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reviews.map((review, index) => (
-              <div key={index} className="group card hover:border-teamwork-green transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                <div className="flex mb-3 space-x-1">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current group-hover:scale-110 transition-transform duration-300" style={{transitionDelay: `${i * 50}ms`}} />
-                  ))}
-                </div>
-                <p className="text-text-secondary mb-4 group-hover:text-text-primary transition-colors duration-300">{review.text}</p>
-                <div className="border-t border-light-border group-hover:border-teamwork-green/30 transition-colors duration-300 pt-4">
-                  <p className="font-semibold group-hover:text-teamwork-green transition-colors duration-300">{review.name}</p>
-                  <p className="text-sm text-text-secondary">{review.city}, KS</p>
-                  <p className="text-xs text-text-muted mt-1">{review.date}</p>
-                </div>
-              </div>
-            ))}
+          {/* Trust Block */}
+          <div className="mb-12">
+            <h2 className="heading-3 mb-8 text-center">Why Choose Teamwork Roofing</h2>
+            <TrustBlock />
           </div>
         </div>
       </section>

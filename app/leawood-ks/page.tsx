@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { FiHome, FiTool, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle, FiStar } from 'react-icons/fi'
+import { FiHome, FiTool, FiCloudRain, FiDroplet, FiLayers, FiSquare, FiCheckCircle } from 'react-icons/fi'
 import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
 import LocalProjectsSection from '@/components/LocalProjectsSection'
 import NeighborhoodsSection from '@/components/NeighborhoodsSection'
+import TrustBlock from '@/components/TrustBlock'
 import { cities } from '@/content/cities'
 
 export const metadata = {
@@ -72,11 +73,11 @@ export default function LeawoodPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-              <Link href="/book/" className="btn-primary">
-                Book Same-Week Inspection
+              <Link href="/inspect/" className="btn-primary">
+                Book Free Inspection
               </Link>
-              <Link href="/estimate/" className="btn-secondary">
-                Start Teamwork Estimate
+              <Link href="/contact/" className="btn-secondary">
+                Contact Us
               </Link>
             </div>
 
@@ -185,33 +186,11 @@ export default function LeawoodPage() {
         </div>
       </section>
 
-      {/* Reviews */}
+      {/* Trust & Quality */}
       <section className="section-padding bg-white">
         <div className="container-custom">
-          <h2 className="heading-2 mb-12 text-center">What {cityData.cityName} Customers Say</h2>
-
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            {cityData.reviews.map((review, index) => (
-              <div key={index} className="card">
-                <div className="flex mb-3">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <FiStar key={i} className="w-5 h-5 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <p className="text-text-secondary mb-4">{review.text}</p>
-                <div className="border-t border-light-border pt-4">
-                  <p className="font-semibold">{review.name}</p>
-                  <p className="text-sm text-text-secondary">{review.city}, {cityData.state}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link href="/reviews/" className="btn-secondary">
-              Read All Reviews
-            </Link>
-          </div>
+          <h2 className="heading-2 mb-12 text-center">Why Choose Teamwork Roofing in {cityData.cityName}</h2>
+          <TrustBlock />
         </div>
       </section>
 
