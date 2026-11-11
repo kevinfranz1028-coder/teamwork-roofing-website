@@ -41,7 +41,7 @@ function InspectContent() {
             Book a Free Roof Inspection
           </h1>
           <p className="text-xl text-green-50 mb-8">
-            Free roof inspection with insurance claim help. Local Kansas City crew ready to serve.
+            Free roof inspection with photo documentation for insurance claims. Local Kansas City crew ready to serve.
           </p>
 
           {/* Primary CTA Buttons */}

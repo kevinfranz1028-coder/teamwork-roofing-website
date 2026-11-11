@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Gallery Approvals",
+  "description": "Homeowner approval tracking for gallery photos",
+  "type": "object",
+  "properties": {
+    "approvals": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]+-[0-9]+$": {
+          "type": "object",
+          "properties": {
+            "approved": {
+              "type": "boolean",
+              "description": "Whether homeowner has approved photo publication"
+            },
+            "approvedBy": {
+              "type": "string",
+              "description": "Who confirmed approval (e.g., 'Kevin', 'Megan')"
+            },
+            "approvedDate": {
+              "type": "string",
+              "format": "date",
+              "description": "Date approval was confirmed (YYYY-MM-DD)"
+            },
+            "blurChecked": {
+              "type": "boolean",
+              "description": "Whether house numbers/plates/faces have been manually checked and blurred"
+            }
+          },
+          "required": ["approved"]
+        }
+      }
+    }
+  },
+  "required": ["approvals"]
+}

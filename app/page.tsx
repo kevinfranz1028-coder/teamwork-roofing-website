@@ -5,6 +5,8 @@ import PromiseStrip from '@/components/PromiseStrip'
 import CTABand from '@/components/CTABand'
 import BrandsWeInstall from '@/components/BrandsWeInstall'
 import TrustBlock from '@/components/TrustBlock'
+import RecentWorkStrip from '@/components/RecentWorkStrip'
+import HomeHero from '@/components/HomeHero'
 
 export default function Home() {
   const services = [
@@ -28,8 +30,8 @@ export default function Home() {
       icon: FiCloudRain,
       title: 'Storm Damage',
       shortDesc: 'Full inspection',
-      frontDesc: 'Thorough inspection and insurance assistance',
-      backDesc: 'Complete storm damage assessment with detailed photo reports. We handle insurance claims and work directly with adjusters.',
+      frontDesc: 'Thorough inspection and documentation',
+      backDesc: 'Complete storm damage assessment with detailed photo reports. We document damage for your insurance claim and can be on-site during adjuster visits.',
       href: '/storm/'
     },
     {
@@ -103,83 +105,8 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Section - Clean Modern Design */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }}></div>
-        </div>
+      <HomeHero />
 
-        <div className="container-custom relative">
-          <div className="py-20 md:py-28 lg:py-32">
-            <div className="max-w-4xl">
-              {/* Trust Badge */}
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/20">
-                <FiShield className="w-4 h-4 text-teamwork-green" />
-                <span className="text-sm font-semibold">Kansas City's Trusted Roofing Partner Since 2009</span>
-              </div>
-
-              {/* Main Headline */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                Roofing & Exteriors —<br />
-                <span className="text-teamwork-green">The Teamwork Way</span>
-              </h1>
-
-              <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
-                Premium roofing, gutters, siding, and windows for Kansas City Metro. Same-week inspections, photo documentation, and a clean site guarantee.
-              </p>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Link
-                  href="/inspect/"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-teamwork-green text-white font-semibold rounded-lg hover:bg-teamwork-green-dark transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                >
-                  Book Free Inspection
-                  <FiArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <a
-                  href="tel:9132779925"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-all shadow-lg"
-                >
-                  <FiPhone className="mr-2 w-5 h-5 text-teamwork-green" />
-                  (913) 277-9925
-                </a>
-              </div>
-
-              {/* Trust Icons */}
-              <div className="flex flex-wrap gap-6 pt-8 border-t border-white/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teamwork-green/20 flex items-center justify-center">
-                    <FiCheckCircle className="w-5 h-5 text-teamwork-green" />
-                  </div>
-                  <span className="text-sm font-medium">Licensed & Insured</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teamwork-green/20 flex items-center justify-center">
-                    <FiClock className="w-5 h-5 text-teamwork-green" />
-                  </div>
-                  <span className="text-sm font-medium">Same-Week Service</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teamwork-green/20 flex items-center justify-center">
-                    <FiCamera className="w-5 h-5 text-teamwork-green" />
-                  </div>
-                  <span className="text-sm font-medium">Photo Documented</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teamwork-green/20 flex items-center justify-center">
-                    <FiShield className="w-5 h-5 text-teamwork-green" />
-                  </div>
-                  <span className="text-sm font-medium">Warranty Backed</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Services Grid with Flip Cards */}
       <section className="section-padding bg-white">
@@ -339,6 +266,8 @@ export default function Home() {
       </section>
 
       <BrandsWeInstall variant="full" />
+
+      <RecentWorkStrip />
 
       <CTABand title="Ready to Protect Your Home?" subtitle="Same-week inspections available. Book online or call now." />
     </>

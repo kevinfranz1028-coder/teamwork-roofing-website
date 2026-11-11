@@ -4,12 +4,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://teamworkroofingkc.com'
 
   return [
+    // Homepage
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
     },
+    // Main Services
     {
       url: `${baseUrl}/services/`,
       lastModified: new Date(),
@@ -52,6 +54,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.9,
     },
+    // Booking & Contact
     {
       url: `${baseUrl}/inspect/`,
       lastModified: new Date(),
@@ -59,19 +62,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/financing/`,
+      url: `${baseUrl}/contact/`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    // Company Pages
+    {
+      url: `${baseUrl}/about/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/warranty/`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/projects/`,
+      url: `${baseUrl}/gallery/`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
@@ -80,32 +84,54 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/reviews/`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/faq/`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
       priority: 0.7,
     },
+    // Resources
     {
-      url: `${baseUrl}/about/`,
+      url: `${baseUrl}/financing/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/contact/`,
+      url: `${baseUrl}/warranty/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/materials/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
+    {
+      url: `${baseUrl}/faq/`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    // Legal
+    {
+      url: `${baseUrl}/privacy/`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms/`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    // Service Areas
+    {
+      url: `${baseUrl}/service-areas/`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    // Overland Park Pages
     {
       url: `${baseUrl}/overland-park-ks/`,
       lastModified: new Date(),
@@ -116,32 +142,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/overland-park-ks/roof-repair/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/overland-park-ks/emergency-roof-repair/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/overland-park-ks/roofing-contractor/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/overland-park-ks/roofing-companies/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    // Service Areas Landing Page
-    {
-      url: `${baseUrl}/service-areas/`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.6,
     },
     // Leawood Pages
     {
@@ -154,31 +173,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/leawood-ks/roof-repair/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/leawood-ks/emergency-roof-repair/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/leawood-ks/roof-replacement/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/leawood-ks/roofing-contractor/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/leawood-ks/roofing-companies/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     // Lenexa Pages
     {
@@ -191,31 +210,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/lenexa-ks/roof-repair/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/lenexa-ks/emergency-roof-repair/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/lenexa-ks/roof-replacement/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/lenexa-ks/roofing-contractor/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/lenexa-ks/roofing-companies/`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
   ]
 }

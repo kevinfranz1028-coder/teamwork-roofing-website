@@ -1,0 +1,29 @@
+{
+  "$schema": "./gallery-approvals.schema.json",
+  "approvals": {
+    "kansas-city-ks-001": {
+      "approved": true,
+      "approvedBy": "Kevin",
+      "approvedDate": "2026-11-07",
+      "blurChecked": true
+    },
+    "kansas-city-ks-002": {
+      "approved": true,
+      "approvedBy": "Kevin",
+      "approvedDate": "2026-11-07",
+      "blurChecked": true
+    },
+    "olathe-002": {
+      "approved": true,
+      "approvedBy": "Kevin",
+      "approvedDate": "2026-11-07",
+      "blurChecked": true
+    },
+    "overland-park-001": {
+      "approved": true,
+      "approvedBy": "Kevin",
+      "approvedDate": "2026-11-07",
+      "blurChecked": true
+    }
+  }
+}
