@@ -76,8 +76,8 @@ export default function RoofingContractorPage() {
               More than a vendor — a partner from day one. Licensed, insured, and committed to trust, communication, and quality in every {cityData.cityName} project.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/book/" className="btn-primary">Book Same-Week Inspection</Link>
-              <Link href="/estimate/" className="btn-secondary">Start Teamwork Estimate</Link>
+              <Link href="/inspect/" className="btn-primary">Book Same-Week Inspection</Link>
+              <Link href="/inspect/" className="btn-secondary">Start Teamwork Estimate</Link>
             </div>
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function RoofingContractorPage() {
               Book a same-week inspection in {cityData.cityName} and experience the Teamwork difference.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/book/" className="btn-primary">Book Inspection</Link>
+              <Link href="/inspect/" className="btn-primary">Book Inspection</Link>
               <a href={`tel:${cityData.phone}`} className="btn-secondary">Call {cityData.phone}</a>
             </div>
           </div>

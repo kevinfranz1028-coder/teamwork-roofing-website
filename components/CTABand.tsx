@@ -18,10 +18,10 @@ export default function CTABand({
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link href="/book/" className="px-6 py-3 bg-white text-teamwork-green font-semibold rounded-lg hover:bg-gray-100 transition-all shadow-lg">
+          <Link href="/inspect/" className="px-6 py-3 bg-white text-teamwork-green font-semibold rounded-lg hover:bg-gray-100 transition-all shadow-lg">
             Book Same-Week Inspection
           </Link>
-          <Link href="/estimate/" className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-teamwork-green transition-all">
+          <Link href="/inspect/" className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-teamwork-green transition-all">
             Start Teamwork Estimate
           </Link>
           <a href="tel:9132779925" className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-teamwork-green transition-all">

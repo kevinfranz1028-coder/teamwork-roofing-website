@@ -64,10 +64,10 @@ export default function MaterialsPage() {
               We help you choose the right roofing system for your home, budget, and Kansas City weather conditions. Every installation follows manufacturer specifications and includes photo documentation, clean site practices, and our Teamwork Warranty.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/book/" className="btn-primary">
+              <Link href="/inspect/" className="btn-primary">
                 Book Same-Week Inspection
               </Link>
-              <Link href="/estimate/" className="btn-secondary">
+              <Link href="/inspect/" className="btn-secondary">
                 Start Teamwork Estimate
               </Link>
             </div>

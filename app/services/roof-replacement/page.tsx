@@ -90,10 +90,10 @@ export default function RoofReplacementPage() {
               Premium materials, expert installation, photo documentation, and financing options for Kansas City Metro homeowners
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/book/" className="btn-primary">
+              <Link href="/inspect/" className="btn-primary">
                 Book Same-Week Inspection
               </Link>
-              <Link href="/estimate/" className="btn-secondary">
+              <Link href="/inspect/" className="btn-secondary">
                 Start Teamwork Estimate
               </Link>
             </div>
@@ -160,7 +160,7 @@ export default function RoofReplacementPage() {
                         </ul>
                       </div>
                       <Link
-                        href="/book/"
+                        href="/inspect/"
                         className="block w-full text-center bg-white text-teamwork-green py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors mt-4"
                       >
                         Book Inspection →

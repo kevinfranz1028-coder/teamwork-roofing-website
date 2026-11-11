@@ -63,8 +63,8 @@ export default function RoofingContractorPage() {
               More than a vendor — a partner from day one. Licensed, insured, and committed to trust, communication, and quality in every Overland Park project.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/book/" className="btn-primary">Book Same-Week Inspection</Link>
-              <Link href="/estimate/" className="btn-secondary">Start Teamwork Estimate</Link>
+              <Link href="/inspect/" className="btn-primary">Book Same-Week Inspection</Link>
+              <Link href="/inspect/" className="btn-secondary">Start Teamwork Estimate</Link>
             </div>
           </div>
         </div>

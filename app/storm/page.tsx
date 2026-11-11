@@ -27,7 +27,7 @@ export default function StormPage() {
               </Link>
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/book/" className="btn-primary">Book Storm Inspection</Link>
+              <Link href="/inspect/" className="btn-primary">Book Storm Inspection</Link>
               <a href="tel:9132779925" className="btn-secondary">Call 913-277-9925</a>
             </div>
           </div>

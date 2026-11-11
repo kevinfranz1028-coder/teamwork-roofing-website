@@ -32,10 +32,10 @@ export default function NotFound() {
         </div>
 
         <div className="flex flex-wrap gap-4 justify-center">
-          <Link href="/book/" className="btn-primary">
+          <Link href="/inspect/" className="btn-primary">
             Book Same-Week Inspection
           </Link>
-          <Link href="/estimate/" className="btn-secondary">
+          <Link href="/inspect/" className="btn-secondary">
             Start Teamwork Estimate
           </Link>
           <a href="tel:9132779925" className="btn-secondary">

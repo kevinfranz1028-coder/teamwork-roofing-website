@@ -21,8 +21,8 @@ export default function WindowsPage() {
               Energy-efficient window replacement for comfort, lower energy bills, and improved curb appeal.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/book/" className="btn-primary">Book Inspection</Link>
-              <Link href="/estimate/" className="btn-secondary">Get Estimate</Link>
+              <Link href="/inspect/" className="btn-primary">Book Inspection</Link>
+              <Link href="/inspect/" className="btn-secondary">Get Estimate</Link>
             </div>
           </div>
         </div>

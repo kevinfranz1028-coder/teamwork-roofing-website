@@ -24,7 +24,7 @@ export default function MobileBottomBar() {
         </a>
 
         <Link
-          href="/estimate/"
+          href="/inspect/"
           className="flex flex-col items-center justify-center py-3 text-text-secondary hover:text-teamwork-green transition-colors"
         >
           <FiClipboard className="w-5 h-5 mb-1" />
@@ -32,7 +32,7 @@ export default function MobileBottomBar() {
         </Link>
 
         <Link
-          href="/book/"
+          href="/inspect/"
           className="flex flex-col items-center justify-center py-3 bg-teamwork-green text-white"
         >
           <FiCalendar className="w-5 h-5 mb-1" />
