@@ -38,8 +38,8 @@ export default function NotFound() {
           <Link href="/estimate/" className="btn-secondary">
             Start Teamwork Estimate
           </Link>
-          <a href="tel:9133963717" className="btn-secondary">
-            Call 913-396-3717
+          <a href="tel:9132779925" className="btn-secondary">
+            Call 913-277-9925
           </a>
         </div>
       </div>

@@ -53,7 +53,7 @@ export default function ServiceAreasPage() {
               Teamwork serves the Kansas City Metro with roofing and exterior services — roof repair, roof replacement, gutters, siding, windows, and storm inspections.
             </p>
             <p className="text-text-secondary">
-              If you don't see your city listed, call or text us at <a href="tel:9133963717" className="text-teamwork-green hover:underline">913-396-3717</a>
+              If you don't see your city listed, call or text us at <a href="tel:9132779925" className="text-teamwork-green hover:underline">913-277-9925</a>
             </p>
           </div>
         </div>

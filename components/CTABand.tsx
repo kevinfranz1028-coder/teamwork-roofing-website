@@ -24,8 +24,8 @@ export default function CTABand({
           <Link href="/estimate/" className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-teamwork-green transition-all">
             Start Teamwork Estimate
           </Link>
-          <a href="tel:9133963717" className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-teamwork-green transition-all">
-            Call 913-396-3717
+          <a href="tel:9132779925" className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-teamwork-green transition-all">
+            Call 913-277-9925
           </a>
         </div>
       </div>

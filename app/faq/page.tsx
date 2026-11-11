@@ -36,7 +36,7 @@ export default function FAQPage() {
       title: 'Roof Repair',
       faqs: [
         { q: 'How do I know if I need repair or replacement?', a: 'We\'ll assess your roof honestly and show you photos. If repair makes sense, we\'ll repair it. If replacement is smarter long-term, we\'ll explain why.' },
-        { q: 'Do you offer emergency roof repair?', a: 'Yes, call 913-396-3717 for active leaks or emergency situations. We prioritize urgent repairs.' },
+        { q: 'Do you offer emergency roof repair?', a: 'Yes, call 913-277-9925 for active leaks or emergency situations. We prioritize urgent repairs.' },
         { q: 'How long do roof repairs last?', a: 'Depends on the repair type and roof age. Quality repairs on newer roofs can last years; older roofs may need replacement soon.' },
         { q: 'Will my repair be covered by warranty?', a: 'Yes, our repair work is backed by our Teamwork Warranty.' }
       ]
@@ -96,7 +96,7 @@ export default function FAQPage() {
       faqs: [
         { q: 'What does the Teamwork Warranty cover?', a: 'Our installation workmanship, leak-free performance, and clean site practices. See our Warranty page for full details.' },
         { q: 'How long is the warranty?', a: 'Installation workmanship warranty terms vary by project type. Manufacturer material warranties range from 25 years to lifetime.' },
-        { q: 'How do I file a warranty claim?', a: 'Call us at 913-396-3717 or use our contact form. We\'ll schedule an inspection and address covered issues promptly.' }
+        { q: 'How do I file a warranty claim?', a: 'Call us at 913-277-9925 or use our contact form. We\'ll schedule an inspection and address covered issues promptly.' }
       ]
     }
   ]
@@ -173,7 +173,7 @@ export default function FAQPage() {
         </div>
       </section>
 
-      <CTABand title="Still Have Questions?" subtitle="Call us at 913-396-3717 or book your same-week inspection" />
+      <CTABand title="Still Have Questions?" subtitle="Call us at 913-277-9925 or book your same-week inspection" />
     </>
   )
 }
